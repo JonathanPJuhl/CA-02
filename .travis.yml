@@ -20,7 +20,7 @@ services:
 # safelist: add branches here or remove section if you want builds to happen on all branches
 branches:
   only:
-  - master
+  - main
 
 # blocklist: syntax
 # branches:
