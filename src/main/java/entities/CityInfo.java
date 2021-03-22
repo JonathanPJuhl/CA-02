@@ -24,6 +24,12 @@ public class CityInfo implements Serializable {
     public CityInfo() {
     }
    
+    public void addAddress(Address address){
+        if (address != null){
+            this.address.add(address);
+            address.setCityInfo(this);
+        }
+    }
     
     public int getZip() {
         return zip;

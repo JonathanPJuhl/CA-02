@@ -26,11 +26,40 @@ public class Hobby implements Serializable {
 
     public Hobby() {
     }
+       
+    public void addPerson(Person person){
+        if (person != null){
+            this.persons.add(person);
+            person.getHobbies().add(this);
+        }
+    }
     
-    
-
     public int getId() {
         return id;
+    }
+
+    public String getHobbyName() {
+        return hobbyName;
+    }
+
+    public void setHobbyName(String hobbyName) {
+        this.hobbyName = hobbyName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public List<Person> getPersons() {
+        return persons;
+    }
+
+    public void setPersons(List<Person> persons) {
+        this.persons = persons;
     }
 
     

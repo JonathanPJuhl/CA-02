@@ -23,7 +23,7 @@ public class Address implements Serializable {
     @ManyToOne
     private CityInfo cityInfo;
     
-    @OneToMany(cascade = CascadeType.PERSIST, mappedBy= "address")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy= "address")
     private Person person;
 
     public Address() {
@@ -33,6 +33,37 @@ public class Address implements Serializable {
         return id;
     }
 
-    
+    public String getStreet() {
+        return street;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    public String getAdditionalInfo() {
+        return additionalInfo;
+    }
+
+    public void setAdditionalInfo(String additionalInfo) {
+        this.additionalInfo = additionalInfo;
+    }
+
+    public CityInfo getCityInfo() {
+        return cityInfo;
+    }
+
+    public void setCityInfo(CityInfo cityInfo) {
+        this.cityInfo = cityInfo;
+    }
+
+    public Person getPerson() {
+        return person;
+    }
+
+    public void setPerson(Person person) {
+        this.person = person;
+    }
+
     
 }

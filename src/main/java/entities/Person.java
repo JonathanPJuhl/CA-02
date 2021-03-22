@@ -42,13 +42,89 @@ public class Person implements Serializable {
 
     public Person() {
     }
-    
-    
 
+    public Person(int id, String email, String firstName, String lastName, List<Phone> phones, Address address, List<Hobby> hobbies) {
+        this.id = id;
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phones = phones;
+        this.address = address;
+        this.hobbies = hobbies;
+    }
+    
+    public void addAddress(Address address){
+        if (address != null){
+            this.address = address;
+            address.setPerson(this);
+          }
+    }
+    
+    
+    public void addHobby(Hobby hobby){
+        if (hobby != null){
+            this.hobbies.add(hobby);
+            hobby.getPersons().add(this);
+        }
+    }
+    
+    public void addPhone(Phone phone){
+        if (phone != null){
+            this.phones.add(phone);
+            phone.setPerson(this);
+        }
+    }
+    
     public int getId() {
         return id;
     }
+    public String getEmail() {
+        return email;
+    }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public List<Phone> getPhones() {
+        return phones;
+    }
+
+    public void setPhones(List<Phone> phones) {
+        this.phones = phones;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
+    public List<Hobby> getHobbies() {
+        return hobbies;
+    }
+
+    public void setHobbies(List<Hobby> hobbies) {
+        this.hobbies = hobbies;
+    }
     
     
 }
