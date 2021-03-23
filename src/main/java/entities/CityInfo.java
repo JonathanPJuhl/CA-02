@@ -18,12 +18,18 @@ public class CityInfo implements Serializable {
     private int zip;
     private String cityName;
     
-    @OneToMany(cascade =CascadeType.PERSIST, mappedBy="cityInfo")
+    @OneToMany(cascade =CascadeType.ALL, mappedBy="cityInfo")
     private List<Address> address;
 
     public CityInfo() {
     }
-   
+
+    public CityInfo(int zip, String cityName) {
+        this.zip = zip;
+        this.cityName = cityName;
+
+    }
+
     public void addAddress(Address address){
         if (address != null){
             this.address.add(address);

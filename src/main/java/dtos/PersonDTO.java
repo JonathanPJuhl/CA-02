@@ -5,13 +5,9 @@ import entities.Address;
 import entities.Hobby;
 import entities.Person;
 import entities.Phone;
-import entities.RenameMe;
+
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.CascadeType;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 
 
 public class PersonDTO {
@@ -23,16 +19,22 @@ public class PersonDTO {
     private Address address;
     private List<Hobby> hobbies;
 
-    public PersonDTO(Person person) {
+
+    public PersonDTO(Person person, Address address, List<Phone> phones, List<Hobby> hobby) {
         this.email = person.getEmail();
         this.firstName = person.getFirstName();
         this.lastName = person.getLastName();
-        this.phones = person.getPhones();
-        this.address = person.getAddress();
-        this.hobbies = person.getHobbies();
+        this.phones = phones;
+        this.address = address;
+        this.hobbies = hobby;
     }
 
-    
+    public PersonDTO(Person pers) {
+        this.email = pers.getEmail();
+        this.firstName = pers.getFirstName();
+        this.lastName = pers.getLastName();
+    }
+
     public static List<PersonDTO> getDtos(List<Person> persons){
         List<PersonDTO> pdtos = new ArrayList();
         persons.forEach(pers->pdtos.add(new PersonDTO(pers)));

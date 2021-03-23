@@ -26,7 +26,12 @@ public class Hobby implements Serializable {
 
     public Hobby() {
     }
-       
+
+    public Hobby(String hobbyName, String description) {
+        this.hobbyName = hobbyName;
+        this.description = description;
+    }
+
     public void addPerson(Person person){
         if (person != null){
             this.persons.add(person);
