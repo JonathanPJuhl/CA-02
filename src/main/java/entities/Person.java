@@ -35,7 +35,7 @@ public class Person implements Serializable {
     @OneToMany(cascade = CascadeType.PERSIST, mappedBy= "person")
     private List<Phone> phones = new ArrayList<>();
     
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     private Address address;
     
     @ManyToMany(cascade = CascadeType.PERSIST, mappedBy= "persons")
@@ -77,7 +77,7 @@ public class Person implements Serializable {
     public void addPhone(Phone phone){
         if (phone != null){
             this.phones.add(phone);
-            //phone.setPerson(this);
+            phone.setPerson(this);
         }
     }
     

@@ -40,8 +40,18 @@ public class PersonFacade {
     }
     
     public PersonDTO create(PersonDTO pDTO){
+        Person pers = new Person(pDTO.getEmail(), pDTO.getFirstName(), pDTO.getLastName());
 
-        Person pers = new Person(pDTO.getEmail(), pDTO.getFirstName(), pDTO.getLastName(),  pDTO.getPhones(), pDTO.getAddress(), pDTO.getHobbies());
+        for (Phone p: pDTO.getPhones()) {
+            pers.addPhone(p);
+        }
+
+        for(Hobby h: pDTO.getHobbies()){
+            pers.addHobby(h);
+        }
+
+        pers.addAddress(pDTO.getAddress());
+
 
         EntityManager em = emf.createEntityManager();
         try {

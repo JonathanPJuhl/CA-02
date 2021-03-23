@@ -3,6 +3,7 @@ package entities;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -67,5 +68,16 @@ public class Hobby implements Serializable {
         this.persons = persons;
     }
 
-    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Hobby)) return false;
+        Hobby hobby = (Hobby) o;
+        return getId() == hobby.getId() && getHobbyName().equals(hobby.getHobbyName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getHobbyName());
+    }
 }
