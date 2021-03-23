@@ -15,18 +15,18 @@ public class PersonDTO {
     private String email;
     private String firstName;
     private String lastName;
-    private List<Phone> phones;
-    private Address address;
-    private List<Hobby> hobbies;
+    private List<PhoneDTO> phonesDTO;
+    private AddressDTO addressesDTO;
+    private List<HobbyDTO> hobbiesDTO;
 
 
-    public PersonDTO(Person person, Address address, List<Phone> phones, List<Hobby> hobby) {
+    public PersonDTO(Person person, AddressDTO addressesDTO, List<PhoneDTO> phonesDTO, List<HobbyDTO> hobbiesDTO) {
         this.email = person.getEmail();
         this.firstName = person.getFirstName();
         this.lastName = person.getLastName();
-        this.phones = phones;
-        this.address = address;
-        this.hobbies = hobby;
+        this.phonesDTO = phonesDTO;
+        this.addressesDTO = addressesDTO;
+        this.hobbiesDTO = hobbiesDTO;
     }
 
     public PersonDTO(Person pers) {
@@ -65,28 +65,28 @@ public class PersonDTO {
         this.lastName = lastName;
     }
 
-    public List<Phone> getPhones() {
-        return phones;
+    public List<PhoneDTO> getPhones() {
+        return phonesDTO;
     }
 
-    public void setPhones(List<Phone> phones) {
-        this.phones = phones;
+    public void setPhones(List<PhoneDTO> phonesDTO) {
+        this.phonesDTO = phonesDTO;
     }
 
-    public Address getAddress() {
-        return address;
+    public AddressDTO getAddress() {
+        return addressesDTO;
     }
 
-    public void setAddress(Address address) {
-        this.address = address;
+    public void setAddress(AddressDTO addressDTO) {
+        this.addressesDTO = addressDTO;
     }
 
-    public List<Hobby> getHobbies() {
-        return hobbies;
+    public List<HobbyDTO> getHobbies() {
+        return hobbiesDTO;
     }
 
-    public void setHobbies(List<Hobby> hobbies) {
-        this.hobbies = hobbies;
+    public void setHobbies(List<HobbyDTO> hobbiesDTO) {
+        this.hobbiesDTO = hobbiesDTO;
     }
     
     

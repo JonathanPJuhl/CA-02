@@ -22,7 +22,7 @@ public class Address implements Serializable {
     private String street;
     private String additionalInfo;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     private CityInfo cityInfo;
     
     @OneToMany(cascade = CascadeType.PERSIST, mappedBy= "address")
@@ -31,13 +31,19 @@ public class Address implements Serializable {
     public Address() {
     }
 
-    public Address(String street, String additionalInfo, CityInfo cityInfo) {
+    public Address(String street, String additionalInfo) {
         this.street = street;
         this.additionalInfo = additionalInfo;
-        this.cityInfo = cityInfo;
 
     }
-
+    
+        public void addCityInfo(CityInfo cityInfo){
+        if (cityInfo != null){
+           this.setCityInfo(cityInfo);
+           //address.addPerson(this);
+          }
+    }
+    
     public int getId() {
         return id;
     }
