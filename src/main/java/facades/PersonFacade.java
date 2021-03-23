@@ -45,14 +45,16 @@ public class PersonFacade {
             pers.addPhone(new Phone(p.getPhoneNumber(), p.getTypeOfNumber()));
         }
 
-        for (HobbyDTO h : pDTO.getHobbies()) {
+       /* for (HobbyDTO h : pDTO.getHobbies()) {
             pers.addHobby(new Hobby(h.getHobbyName(), h.getDescription()));
-        }
+        }*/
 
-        pers.addAddress(new Address(pDTO.getAddress().getStreet(),
-                pDTO.getAddress().getAdditionalInfo(),
-                new CityInfo(pDTO.getAddress().getCityInfoDto().getZip(),
-                        pDTO.getAddress().getCityInfoDto().getCityName())));
+        Address address = new Address(pDTO.getAddress().getStreet(),
+                pDTO.getAddress().getAdditionalInfo());
+        address.addCityInfo(new CityInfo(pDTO.getAddress().getCityInfoDto().getZip(), pDTO.getAddress().getCityInfoDto().getCityName()));
+        pers.addAddress(address);
+
+
 
         EntityManager em = emf.createEntityManager();
         try {

@@ -5,9 +5,7 @@
  */
 package facades;
 
-import dtos.AddressDTO;
-import dtos.CityInfoDTO;
-import dtos.PersonDTO;
+import dtos.*;
 import entities.*;
 
 import javax.persistence.EntityManagerFactory;
@@ -27,18 +25,18 @@ public class Populator {
         PersonFacade fe = PersonFacade.getPersonFacade(emf);
 
         CityInfoDTO ci = new CityInfoDTO(new CityInfo(2830, "Virum"));
-        AddressDTO ad = new AddressDTO( new Address("Street", "Additional"), );
-        ad
-        List<Phone> phones = new ArrayList<Phone>();
-        Phone phone = new Phone(2134566, "home");
+        AddressDTO ad = new AddressDTO( new Address("Street", "Additional"), ci);
+
+        List<PhoneDTO> phones = new ArrayList<PhoneDTO>();
+        PhoneDTO phone = new PhoneDTO(new Phone(2134566, "home"));
         phones.add(phone);
-        Hobby hobby = new Hobby("Fodbold", "spark til bolden og fake skader");
-        List<Hobby> hobbies = new ArrayList<>();
+        HobbyDTO hobby = new HobbyDTO(new Hobby("Fodbold", "spark til bolden og fake skader"));
+        List<HobbyDTO> hobbies = new ArrayList<>();
         hobbies.add(hobby);
 
-        fe.create(new PersonDTO(new Person("mail@mail.dk", "Jens", "Brønd"), ad, phones, hobbies));
+        fe.create(new PersonDTO(new Person("mail@mail.dk", "Jens", "Brønd"), ad, phones));
 
-        CityInfo ci2 = new CityInfo(2800, "Lyngby");
+        /*CityInfo ci2 = new CityInfo(2800, "Lyngby");
         Address ad2 = new Address("Street", "Additional", ci2);
         List<Phone> phones2 = new ArrayList<Phone>();
         Phone phone2 = new Phone(2134566232, "home");
@@ -58,7 +56,7 @@ public class Populator {
         List<Hobby> hobbies3 = new ArrayList<>();
         hobbies3.add(hobby3);
 
-        fe.create(new PersonDTO(new Person("mail@mail.dk", "Jens3", "Brønd3"), ad3, phones3, hobbies3));
+        fe.create(new PersonDTO(new Person("mail@mail.dk", "Jens3", "Brønd3"), ad3, phones3, hobbies3));*/
         /* fe.create(new RenameMeDTO(new RenameMe("First 1", "Last 1")));
         fe.create(new RenameMeDTO(new RenameMe("First 2", "Last 2")));
         fe.create(new RenameMeDTO(new RenameMe("First 3", "Last 3")));*/

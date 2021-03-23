@@ -1,9 +1,6 @@
 package dtos;
 
-import entities.CityInfo;
-import entities.Hobby;
-import entities.Person;
-import entities.Phone;
+import entities.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +11,9 @@ public class AddressDTO {
     private String additionalInfo;
     private CityInfoDTO cityInfoDto;
 
-    public AddressDTO(String street, String additionalInfo, CityInfoDTO cityInfoDto) {
-        this.street = street;
-        this.additionalInfo = additionalInfo;
+    public AddressDTO(Address address, CityInfoDTO cityInfoDto) {
+        this.street = address.getStreet();
+        this.additionalInfo = address.getAdditionalInfo();
         this.cityInfoDto = cityInfoDto;
     }
 

@@ -18,7 +18,7 @@ public class CityInfo implements Serializable {
     private int zip;
     private String cityName;
     
-    @OneToMany(cascade =CascadeType.ALL, mappedBy="cityInfo")
+    @OneToMany(cascade =CascadeType.PERSIST, mappedBy="cityInfo")
     private List<Address> address;
 
     public CityInfo() {
