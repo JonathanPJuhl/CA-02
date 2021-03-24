@@ -1,35 +1,37 @@
 package facades;
 
-import dtos.RenameMeDTO;
-import entities.RenameMe;
-import java.util.List;
+import dtos.HobbyDTO;
+import dtos.PersonDTO;
+import dtos.PhoneDTO;
+import entities.*;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.TypedQuery;
-import utils.EMF_Creator;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * Rename Class to a relevant name Add add relevant facade methods
  */
-public class FacadeExample {
+public class PersonFacade {
 
-    private static FacadeExample instance;
+    private static PersonFacade instance;
     private static EntityManagerFactory emf;
-    
+
     //Private Constructor to ensure Singleton
-    private FacadeExample() {}
-    
-    
+    private PersonFacade() {
+    }
+
     /**
-     * 
+     *
      * @param _emf
      * @return an instance of this facade class.
      */
-    public static FacadeExample getFacadeExample(EntityManagerFactory _emf) {
+    public static PersonFacade getPersonFacade(EntityManagerFactory _emf) {
         if (instance == null) {
             emf = _emf;
-            instance = new FacadeExample();
+            instance = new PersonFacade();
         }
         return instance;
     }
@@ -37,47 +39,70 @@ public class FacadeExample {
     private EntityManager getEntityManager() {
         return emf.createEntityManager();
     }
-    
-    public RenameMeDTO create(RenameMeDTO rm){
-        RenameMe rme = new RenameMe(rm.getDummyStr1(), rm.getDummyStr2());
+
+    public PersonDTO create(PersonDTO pDTO) {
+
+        Person pers = new Person(pDTO.getEmail(), pDTO.getFirstName(), pDTO.getLastName());
+
+        for (PhoneDTO p : pDTO.getPhones()) {
+            pers.addPhone(new Phone(p.getPhoneNumber(), p.getTypeOfNumber()));
+        }
+
+
+        for (HobbyDTO h : pDTO.getHobbies()) {
+
+           Hobby hobby = new Hobby(h.getHobbyName(), h.getDescription());
+
+           pers.addHobby(hobby);
+
+        }
+
+        Address address = new Address(pDTO.getAddress().getStreet(),
+                pDTO.getAddress().getAdditionalInfo());
+        address.addCityInfo(new CityInfo(pDTO.getAddress().getCityInfoDto().getZip(), pDTO.getAddress().getCityInfoDto().getCityName()));
+        pers.addAddress(address);
+
+
+
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
-            em.persist(rme);
+            em.persist(pers);
             em.getTransaction().commit();
         } finally {
             em.close();
         }
-        return new RenameMeDTO(rme);
+        return new PersonDTO(pers);
     }
-    public RenameMeDTO getById(long id){
+
+    /* public RenameMeDTO getById(long id){
         EntityManager em = emf.createEntityManager();
         return new RenameMeDTO(em.find(RenameMe.class, id));
-    }
-    
+    }*/
     //TODO Remove/Change this before use
-    public long getRenameMeCount(){
+    public long getRenameMeCount() {
         EntityManager em = emf.createEntityManager();
-        try{
-            long renameMeCount = (long)em.createQuery("SELECT COUNT(r) FROM RenameMe r").getSingleResult();
+        try {
+            long renameMeCount = (long) em.createQuery("SELECT COUNT(r) FROM RenameMe r").getSingleResult();
             return renameMeCount;
-        }finally{  
+        } finally {
             em.close();
         }
-        
+
     }
-    
+    /*
     public List<RenameMeDTO> getAll(){
         EntityManager em = emf.createEntityManager();
         TypedQuery<RenameMe> query = em.createQuery("SELECT r FROM RenameMe r", RenameMe.class);
         List<RenameMe> rms = query.getResultList();
         return RenameMeDTO.getDtos(rms);
-    }
-    
+    }*/
+
+ /*
     public static void main(String[] args) {
         emf = EMF_Creator.createEntityManagerFactory();
-        FacadeExample fe = getFacadeExample(emf);
+        PersonFacade fe = getPersonFacade(emf);
         fe.getAll().forEach(dto->System.out.println(dto));
     }
-
+     */
 }
