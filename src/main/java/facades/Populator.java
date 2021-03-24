@@ -44,9 +44,9 @@ public class Populator {
         HobbyDTO hobby = new HobbyDTO(new Hobby("Fodbold", "spark til bolden og fake skader"));
         List<HobbyDTO> hobbies = new ArrayList<>();
 
-        hF.createHobby(hobby);
-        HobbyDTO hobbyFromDB = hF.getHobbyFromDB(hobby);
-        hobbies.add(hobbyFromDB);
+        //hF.createHobby(hobby);
+        //HobbyDTO hobbyFromDB = hF.getHobbyFromDB(hobby);
+        hobbies.add(hobby);
         PersonDTO pDTO = new PersonDTO(new Person("mail@mail.dk", "Jens", "Brønd"), ad, phones, hobbies);
 
         pDTO.setAddress(ad);

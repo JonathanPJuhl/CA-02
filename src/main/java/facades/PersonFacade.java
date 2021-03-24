@@ -7,6 +7,8 @@ import entities.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -39,18 +41,20 @@ public class PersonFacade {
     }
 
     public PersonDTO create(PersonDTO pDTO) {
+
         Person pers = new Person(pDTO.getEmail(), pDTO.getFirstName(), pDTO.getLastName());
 
         for (PhoneDTO p : pDTO.getPhones()) {
             pers.addPhone(new Phone(p.getPhoneNumber(), p.getTypeOfNumber()));
         }
 
+
         for (HobbyDTO h : pDTO.getHobbies()) {
 
            Hobby hobby = new Hobby(h.getHobbyName(), h.getDescription());
 
-            pers.addHobby(h);
-            hobby.addPerson(pers);
+           pers.addHobby(hobby);
+
         }
 
         Address address = new Address(pDTO.getAddress().getStreet(),

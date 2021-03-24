@@ -59,6 +59,7 @@ public class Person implements Serializable {
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.hobbies = new ArrayList<>();
     }
 
     public void addAddress(Address address){
@@ -71,9 +72,8 @@ public class Person implements Serializable {
     
     public void addHobby(Hobby hobby){
         if (hobby != null){
-            Hobby hobby2 = new Hobby(hobby.getHobbyName(), hobby.getDescription());
-            this.hobbies.add(hobby2);
-            hobby2.getPersons().add(this);
+            this.hobbies.add(hobby);
+            hobby.getPersons().add(this);
         }
     }
     

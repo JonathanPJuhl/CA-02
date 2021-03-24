@@ -2,6 +2,7 @@
 package entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import javax.persistence.Entity;
@@ -31,14 +32,10 @@ public class Hobby implements Serializable {
     public Hobby(String hobbyName, String description) {
         this.hobbyName = hobbyName;
         this.description = description;
+        this.persons = new ArrayList<>();
     }
 
-    public void addPerson(Person person){
-        if (person != null){
-            this.persons.add(person);
-            //person.getHobbies().add(this);
-        }
-    }
+
     
     public int getId() {
         return id;
