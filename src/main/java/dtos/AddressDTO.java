@@ -17,10 +17,10 @@ public class AddressDTO {
         this.cityInfoDto = cityInfoDto;
     }
 
-    public AddressDTO(entities.Address address) {
+    public AddressDTO(Address address) {
         this.street = address.getStreet();
         this.additionalInfo = address.getAdditionalInfo();
-        this.cityInfoDto = new CityInfoDTO(address.getCityInfo());
+       // this.cityInfoDto = new CityInfoDTO(address.getCityInfo());
     }
 
     public String getStreet() {

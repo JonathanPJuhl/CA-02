@@ -9,6 +9,8 @@ import dtos.*;
 import entities.*;
 
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.TypedQuery;
+
 import utils.EMF_Creator;
 
 import java.util.ArrayList;
@@ -23,18 +25,34 @@ public class Populator {
     public static void populate() {
         EntityManagerFactory emf = EMF_Creator.createEntityManagerFactory();
         PersonFacade fe = PersonFacade.getPersonFacade(emf);
+        AddressAndCityInfoFacade acF = AddressAndCityInfoFacade.getPersonFacade(emf);
+        PhoneFacade pF = PhoneFacade.getPersonFacade(emf);
+        HobbyFacade hF = HobbyFacade.getPersonFacade(emf);
 
         CityInfoDTO ci = new CityInfoDTO(new CityInfo(2830, "Virum"));
-        AddressDTO ad = new AddressDTO( new Address("Street", "Additional"), ci);
+        AddressDTO ad = new AddressDTO( new Address("Street", "Additional"));
+        ad.setCityInfoDto(ci);
+        //acF.createCityInfo(ci);
+
+        //AddressDTO address = acF.getAddressFromDB(ad);
 
         List<PhoneDTO> phones = new ArrayList<PhoneDTO>();
         PhoneDTO phone = new PhoneDTO(new Phone(2134566, "home"));
+        //pF.createPhone(phone);
+        //PhoneDTO phoneFromDB = pF.getPhoneFromDB(phone);
         phones.add(phone);
         HobbyDTO hobby = new HobbyDTO(new Hobby("Fodbold", "spark til bolden og fake skader"));
         List<HobbyDTO> hobbies = new ArrayList<>();
-        hobbies.add(hobby);
 
-        fe.create(new PersonDTO(new Person("mail@mail.dk", "Jens", "Brønd"), ad, phones));
+        hF.createHobby(hobby);
+        HobbyDTO hobbyFromDB = hF.getHobbyFromDB(hobby);
+        hobbies.add(hobbyFromDB);
+        PersonDTO pDTO = new PersonDTO(new Person("mail@mail.dk", "Jens", "Brønd"), ad, phones, hobbies);
+
+        pDTO.setAddress(ad);
+        pDTO.setPhones(phones);
+        pDTO.setHobbies(hobbies);
+        fe.create(pDTO);
 
         /*CityInfo ci2 = new CityInfo(2800, "Lyngby");
         Address ad2 = new Address("Street", "Additional", ci2);

@@ -20,13 +20,13 @@ public class PersonDTO {
     private List<HobbyDTO> hobbiesDTO;
 
 
-    public PersonDTO(Person person, AddressDTO addressesDTO, List<PhoneDTO> phonesDTO) {
+    public PersonDTO(Person person, AddressDTO addressesDTO, List<PhoneDTO> phonesDTO, List<HobbyDTO> hobbiesDTO) {
         this.email = person.getEmail();
         this.firstName = person.getFirstName();
         this.lastName = person.getLastName();
         this.phonesDTO = phonesDTO;
         this.addressesDTO = addressesDTO;
-        //this.hobbiesDTO = hobbiesDTO;
+        this.hobbiesDTO = hobbiesDTO;
     }
 
     public PersonDTO(Person pers) {

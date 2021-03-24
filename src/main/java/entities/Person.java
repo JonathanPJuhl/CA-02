@@ -5,6 +5,8 @@
  */
 package entities;
 
+import dtos.HobbyDTO;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +37,7 @@ public class Person implements Serializable {
     @OneToMany(cascade = CascadeType.PERSIST, mappedBy= "person")
     private List<Phone> phones = new ArrayList<>();
     
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     private Address address;
     
     @ManyToMany(cascade = CascadeType.PERSIST, mappedBy= "persons")
@@ -69,8 +71,9 @@ public class Person implements Serializable {
     
     public void addHobby(Hobby hobby){
         if (hobby != null){
-            this.hobbies.add(hobby);
-            hobby.getPersons().add(this);
+            Hobby hobby2 = new Hobby(hobby.getHobbyName(), hobby.getDescription());
+            this.hobbies.add(hobby2);
+            hobby2.getPersons().add(this);
         }
     }
     

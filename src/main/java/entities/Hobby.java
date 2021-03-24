@@ -36,7 +36,7 @@ public class Hobby implements Serializable {
     public void addPerson(Person person){
         if (person != null){
             this.persons.add(person);
-            person.getHobbies().add(this);
+            //person.getHobbies().add(this);
         }
     }
     
