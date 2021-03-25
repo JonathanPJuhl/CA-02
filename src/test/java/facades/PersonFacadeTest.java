@@ -70,7 +70,7 @@ public class PersonFacadeTest {
             phones.add(phone);
 
 
-            Hobby hobby = new Hobby("Fodbold", "spark til bolden og fake skader");
+            Hobby hobby = new Hobby("Fodbold", "spark til bolden og fake skader","boldspill", "teamsport");
             List<Hobby> hobbies = new ArrayList<>();
             hobbies.add(hobby);
 
@@ -103,7 +103,7 @@ public class PersonFacadeTest {
         List<PhoneDTO> phones = new ArrayList<PhoneDTO>();
         PhoneDTO phone = new PhoneDTO(new Phone(73829374, "also home"));
         phones.add(phone);
-        HobbyDTO hobby = new HobbyDTO(new Hobby("Tennis", "smash bold"));
+        HobbyDTO hobby = new HobbyDTO(new Hobby("Tennis", "smash bold","boldspill", "teamsport and single player"));
         List<HobbyDTO> hobbies = new ArrayList<>();
         hobbies.add(hobby);
         PersonDTO pDTO = new PersonDTO(new Person("cool@mail.dk", "Peter", "Jensen"), ad, phones, hobbies);
@@ -128,7 +128,7 @@ public class PersonFacadeTest {
         List<PhoneDTO> phones = new ArrayList<PhoneDTO>();
         PhoneDTO phone = new PhoneDTO(new Phone(73829374, "also so home"));
         phones.add(phone);
-        HobbyDTO hobby = new HobbyDTO(new Hobby("Hockey", "smash more bold"));
+        HobbyDTO hobby = new HobbyDTO(new Hobby("Hockey", "smash more bold","vintersport", "teamsport"));
         List<HobbyDTO> hobbies = new ArrayList<>();
         hobbies.add(hobby);
         PersonDTO pDTO = new PersonDTO(new Person("icecool@mail.dk", "Hugo", "Jarvier"), ad, phones, hobbies);
