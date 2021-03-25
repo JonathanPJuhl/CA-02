@@ -10,7 +10,9 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -70,6 +72,10 @@ public class PersonResource {
         return FACADE.getNumberOfPersonsByHobby(hobbyGiven);
     }
     
+//    @Path("editPerson/{newPersonData}")
+//    @PUT
+//    @Consumes({MediaType.APPLICATION_JSON})
+//    @Produces({MediaType.APPLICATION_JSON})
     
     
 }

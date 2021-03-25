@@ -2,6 +2,7 @@ package facades;
 
 import dtos.HobbyDTO;
 import dtos.PersonDTO;
+import dtos.Person_UltraDTO;
 import dtos.PhoneDTO;
 import entities.*;
 
@@ -80,6 +81,56 @@ public class PersonFacade {
         return new RenameMeDTO(em.find(RenameMe.class, id));
     }*/
     //TODO Remove/Change this before use
+    public void updatePerson(PersonDTO newData) {
+        EntityManager em = emf.createEntityManager();
+
+        if (newData.getFirstName() != null) {
+            Query query = em.createQuery("UPDATE Person SET PERSON.firstName =:newFirstName WHERE person.id =:id");
+            query.setParameter("newFirstName", newData.getFirstName());
+            query.setParameter("id", newData.getId());
+            query.executeUpdate();
+        }
+        if (newData.getLastName() != null) {
+            Query query2 = em.createQuery("UPDATE Person SET PERSON.lastName =:newLastName WHERE person.id =:id");
+            query2.setParameter("newLastName", newData.getLastName());
+            query2.setParameter("id", newData.getId());
+            query2.executeUpdate();
+        }
+        if (newData.getAddress() != null) {
+            Query query3 = em.createQuery("UPDATE Person SET PERSON.address =:newAddress WHERE person.id =:id");
+            query3.setParameter("newAddress", newData.getAddress());
+            query3.setParameter("id", newData.getId());
+            query3.executeUpdate();
+        }
+        if (newData.getEmail() != null) {
+            Query query4 = em.createQuery("UPDATE Person SET PERSON.email =:newEmail WHERE person.id =:id");
+            query4.setParameter("newEmail", newData.getEmail());
+            query4.setParameter("id", newData.getId());
+            query4.executeUpdate();
+        }
+
+        if (newData.getHobbies() != null) {
+            TypedQuery<Person_UltraDTO> query7777 = em.createQuery("UPDATE new dtos.Person_UltraDTO (p.hobbyName, p.description) FROM Person p JOIN p.hobbies", Person_UltraDTO.class);
+            TypedQuery<Person_UltraDTO> query5 = em.createQuery("UPDATE Hobby h SET (h.description =:description, h.hobbyName =:hobbyName) WHERE t.id in (select t1.id from Team t1  LEFT JOIN t1.members m WHERE t1.current = :current_true AND m.account = :account)", Person_UltraDTO.class);
+            query5.setParameter("id", newData.getId());
+       
+            
+            
+            TypedQuery<PersonStyleDTO> q4 = em.createQuery("SELECT new dto.PersonStyleDTO(p.name, p.year, s.styleName) FROM Person p JOIN p.styles s", dto.PersonStyleDTO.class);
+
+            
+            
+//            Query query5 = em.createQuery("UPDATE Person SET Person =:newEmail WHERE person.id =:id");
+
+
+//            
+//            query5.setParameter("newEmail", newData.getEmail());
+//            query5.setParameter("id", newData.getId());
+//            query5.executeUpdate();
+        }
+
+    }
+
     public long getCount() {
         EntityManager em = emf.createEntityManager();
         try {
@@ -120,12 +171,11 @@ public class PersonFacade {
     //Ugly but works
     public long getNumberOfPersonsByHobby(String hobbyGiven) {
         EntityManager em = emf.createEntityManager();
-        Query count = em.createQuery("SELECT COUNT(p) FROM Person p JOIN p.hobbies sw WHERE sw.hobbyName ='" + hobbyGiven + "'");
+        Query count = em.createQuery("SELECT COUNT(p) FROM Person p JOIN p.hobbies sw WHERE sw.hobbyName =:hobby");
+        count.setParameter("hobby", hobbyGiven);
         long howMany = (long) count.getSingleResult();
         return howMany;
     }
-
-    
 
 //    public long getNumberOfPersonsByHobby(String hobbyGiven) {
 //        EntityManager em = emf.createEntityManager();
@@ -135,11 +185,6 @@ public class PersonFacade {
 //        
 //        return howManyInHobby;
 //    }
-    
-    
-    
-    
-    
     /*
     public static void main(String[] args) {
         emf = EMF_Creator.createEntityManagerFactory();
