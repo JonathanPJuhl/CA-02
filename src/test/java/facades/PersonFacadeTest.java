@@ -151,13 +151,22 @@ public class PersonFacadeTest {
     
     @Test
     public void testEditPerson() throws Exception {
-        PersonDTO pDToBeforeChanges = new PersonDTO(person);
+        int personToChangeID = person.getId();
         PersonDTO pDToExpected = new PersonDTO(person);
         pDToExpected.setEmail("wannabemail@hacker.dk");
-        PersonDTO pdtoResult = facade.updatePerson(pDToExpected, pDToBeforeChanges);
-        assertEquals(pDToExpected,pdtoResult);
+        PersonDTO pdtoResult = facade.updatePerson(pDToExpected, personToChangeID);
+        assertEquals(pDToExpected.getEmail(),pdtoResult.getEmail());
     }
-        
+     
+
+    @Test(expected = Exception.class)
+    public void testEditPersonWithNullAttribute() throws Exception {
+        int personToChangeID = person.getId();
+        PersonDTO pDToExpected = new PersonDTO(person);
+        pDToExpected.setEmail(null);
+        PersonDTO pdtoResult = facade.updatePerson(pDToExpected, personToChangeID);
+    }
+    
     @Test
     public void testGetAllByCity() {
 

@@ -90,37 +90,30 @@ public class PersonFacade {
         return pdto;
     }
     
-    public PersonDTO findPersonByPersonDTO(PersonDTO personDTO, EntityManager em) throws Exception{
-        Person personFound;
-        if(personDTO == null){
-        throw new Exception("PersonDTO er null"); /// ??? Behøver vi denne in case - TODO bedre exception
-        }else {
-            personFound = em.find(Person.class, personDTO);
-        //Query query = em.createQuery("SELECT Person p WHERE p.id =:id", Person.class); //AND WHERE p.firstname =:firstname AND WHERE p.lastname =:lastname", Person.class);
-          // query.setParameter("id", personDTO.getId());
-           // query.setParameter("email", personDTO.getEmail());
-           // query.setParameter("firstname", personDTO.getFirstName());
-           // query.setParameter("lastname", personDTO.getLastName());
-            //personFound = (Person)query.getSingleResult();
+    public Person findPersonByID(int personDTOID, EntityManager em){
+        Query query = em.createQuery("SELECT p FROM Person p WHERE p.id =:id", Person.class); //AND WHERE p.firstname =:firstname AND WHERE p.lastname =:lastname", Person.class);
+        query.setParameter("id", personDTOID);
         
-        }
-        PersonDTO personFoundDTO = new PersonDTO(personFound);
-        return personFoundDTO;
+        return (Person) query.getSingleResult();
     }
     
-    public PersonDTO updatePerson(PersonDTO newData, PersonDTO oldPersonDTO) throws Exception { // ??? TODO Tilpas til bedre exception
+    public PersonDTO updatePerson(PersonDTO newPersonDTO, int oldPersonID) throws Exception { // ??? TODO Tilpas til bedre exception SAMT (!) - overveje måske et objekt istedet for int ?
         EntityManager em = emf.createEntityManager();
-        Person personNewData = new Person(newData.getEmail(),newData.getFirstName(),newData.getLastName());
        PersonDTO updatedPersonDTO;
+       Person personFromDB;
+       Person personUpdated;
         try {
             em.getTransaction().begin();
             
-            validatePersonDTO(newData);
+            validatePersonDTO(newPersonDTO);//? ?? SKal vi lave fejlhåndtering?
+            //personNewData = new Person(newData.getEmail(),newData.getFirstName(),newData.getLastName());
+            personFromDB = findPersonByID(oldPersonID, em); 
+            personFromDB.setEmail(newPersonDTO.getEmail());
+            personFromDB.setFirstName(newPersonDTO.getFirstName());
+            personFromDB.setLastName(newPersonDTO.getLastName());
+            em.merge(personFromDB);
+            personUpdated = findPersonByID(personFromDB.getId(), em);
             
-            PersonDTO oldPersonDTOFromDB = findPersonByPersonDTO(oldPersonDTO, em);
-            newData.setId(oldPersonDTOFromDB.getId());
-            em.merge(newData);
-            updatedPersonDTO = findPersonByPersonDTO(newData, em);
 
         /*if (newData.getFirstName() != null) {
             Query query = em.createQuery("UPDATE Person p SET p.firstName =:newFirstName WHERE p.id =:id");
@@ -176,7 +169,7 @@ public class PersonFacade {
         } finally {
             em.close();
         }
-        return updatedPersonDTO;
+        return new PersonDTO(personUpdated);
     }
 
     public long getCount() {
