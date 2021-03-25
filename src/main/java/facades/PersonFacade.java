@@ -9,6 +9,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+import javax.ws.rs.PathParam;
 
 /**
  *
@@ -48,12 +51,11 @@ public class PersonFacade {
             pers.addPhone(new Phone(p.getPhoneNumber(), p.getTypeOfNumber()));
         }
 
-
         for (HobbyDTO h : pDTO.getHobbies()) {
 
-           Hobby hobby = new Hobby(h.getHobbyName(), h.getDescription());
+            Hobby hobby = new Hobby(h.getHobbyName(), h.getDescription());
 
-           pers.addHobby(hobby);
+            pers.addHobby(hobby);
 
         }
 
@@ -61,8 +63,6 @@ public class PersonFacade {
                 pDTO.getAddress().getAdditionalInfo());
         address.addCityInfo(new CityInfo(pDTO.getAddress().getCityInfoDto().getZip(), pDTO.getAddress().getCityInfoDto().getCityName()));
         pers.addAddress(address);
-
-
 
         EntityManager em = emf.createEntityManager();
         try {
@@ -80,25 +80,65 @@ public class PersonFacade {
         return new RenameMeDTO(em.find(RenameMe.class, id));
     }*/
     //TODO Remove/Change this before use
-    public long getRenameMeCount() {
+    public long getCount() {
         EntityManager em = emf.createEntityManager();
         try {
-            long renameMeCount = (long) em.createQuery("SELECT COUNT(r) FROM RenameMe r").getSingleResult();
-            return renameMeCount;
+            long personCount = (long) em.createQuery("SELECT COUNT(r) FROM Person r").getSingleResult();
+            return personCount;
         } finally {
             em.close();
         }
 
     }
-    /*
-    public List<RenameMeDTO> getAll(){
-        EntityManager em = emf.createEntityManager();
-        TypedQuery<RenameMe> query = em.createQuery("SELECT r FROM RenameMe r", RenameMe.class);
-        List<RenameMe> rms = query.getResultList();
-        return RenameMeDTO.getDtos(rms);
-    }*/
 
- /*
+    public List<PersonDTO> getAll() {
+        EntityManager em = emf.createEntityManager();
+        TypedQuery<Person> query = em.createQuery("SELECT p FROM Person p", Person.class);
+        List<Person> pdto = query.getResultList();
+        List<PersonDTO> pdtos = PersonDTO.getDtos(pdto);
+        return pdtos;
+    }
+
+    public List<PersonDTO> getAllPersonsByGivenHobby(String hobbyGiven) {
+        EntityManager em = emf.createEntityManager();
+        TypedQuery<Person> query = em.createQuery("SELECT p FROM Person p JOIN p.hobbies hob WHERE hob.hobbyName =:var1", Person.class);
+        query.setParameter("var1", hobbyGiven);
+        List<Person> pdto = query.getResultList();
+        List<PersonDTO> pdtos = PersonDTO.getDtos(pdto);
+        return pdtos;
+    }
+
+    public List<PersonDTO> getPeopleByCity(int cityZip) {
+        EntityManager em = emf.createEntityManager();
+        TypedQuery<Person> query = em.createQuery("SELECT p FROM Person p JOIN p.address.cityInfo cit WHERE cit.zip =:var1", Person.class);
+        query.setParameter("var1", cityZip);
+        List<Person> pdto = query.getResultList();
+        List<PersonDTO> pdtos = PersonDTO.getDtos(pdto);
+        return pdtos;
+    }
+
+    //Ugly but works
+    public long getNumberOfPersonsByHobby(String hobbyGiven) {
+        EntityManager em = emf.createEntityManager();
+        Query count = em.createQuery("SELECT COUNT(p) FROM Person p JOIN p.hobbies sw WHERE sw.hobbyName ='" + hobbyGiven + "'");
+        long howMany = (long) count.getSingleResult();
+        return howMany;
+    }
+
+//    public long getNumberOfPersonsByHobby(String hobbyGiven) {
+//        EntityManager em = emf.createEntityManager();
+//        TypedQuery<long> count = em.createQuery("SELECT COUNT(p) FROM Person p JOIN p.hobbies sw WHERE sw.hobbyName =:var1", long.class);
+//        count.setParameter("var1", hobbyGiven);
+//        List<PersonDTO> howManyInHobby = count.getResultList();
+//        
+//        return howManyInHobby;
+//    }
+    
+    
+    
+    
+    
+    /*
     public static void main(String[] args) {
         emf = EMF_Creator.createEntityManagerFactory();
         PersonFacade fe = getPersonFacade(emf);

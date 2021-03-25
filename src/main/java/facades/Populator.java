@@ -30,29 +30,57 @@ public class Populator {
         HobbyFacade hF = HobbyFacade.getPersonFacade(emf);
 
         CityInfoDTO ci = new CityInfoDTO(new CityInfo(2830, "Virum"));
+        CityInfoDTO ci2 = new CityInfoDTO(new CityInfo(2800, "Lyngby"));
+        CityInfoDTO ci3 = new CityInfoDTO(new CityInfo(6666, "Helvete"));
         AddressDTO ad = new AddressDTO( new Address("Street", "Additional"));
+        AddressDTO ad2 = new AddressDTO( new Address("Street2", "In addition"));
+        AddressDTO ad3 = new AddressDTO( new Address("Street3", "Also this"));
         ad.setCityInfoDto(ci);
+        ad2.setCityInfoDto(ci2);
+        ad3.setCityInfoDto(ci3);
         //acF.createCityInfo(ci);
 
         //AddressDTO address = acF.getAddressFromDB(ad);
 
-        List<PhoneDTO> phones = new ArrayList<PhoneDTO>();
+        List<PhoneDTO> phones = new ArrayList<>();
+        List<PhoneDTO> phones2 = new ArrayList<>();
+        List<PhoneDTO> phones3 = new ArrayList<>();
         PhoneDTO phone = new PhoneDTO(new Phone(2134566, "home"));
+        PhoneDTO phone2 = new PhoneDTO(new Phone(483927398, "home"));
+        PhoneDTO phone3 = new PhoneDTO(new Phone(12928382, "home"));
         //pF.createPhone(phone);
         //PhoneDTO phoneFromDB = pF.getPhoneFromDB(phone);
         phones.add(phone);
+        phones2.add(phone2);
+        phones3.add(phone3);
         HobbyDTO hobby = new HobbyDTO(new Hobby("Fodbold", "spark til bolden og fake skader"));
+        HobbyDTO hobby2 = new HobbyDTO(new Hobby("Håndbold", "kast bolden og rigtige skader"));
+        HobbyDTO hobby3 = new HobbyDTO(new Hobby("Tennis", "sving til bolden og ingen skader"));
         List<HobbyDTO> hobbies = new ArrayList<>();
+        List<HobbyDTO> hobbies2 = new ArrayList<>();
+        List<HobbyDTO> hobbies3 = new ArrayList<>();
 
         //hF.createHobby(hobby);
         //HobbyDTO hobbyFromDB = hF.getHobbyFromDB(hobby);
         hobbies.add(hobby);
+        hobbies2.add(hobby2);
+        hobbies3.add(hobby3);
         PersonDTO pDTO = new PersonDTO(new Person("mail@mail.dk", "Jens", "Brønd"), ad, phones, hobbies);
+        PersonDTO pDTO2 = new PersonDTO(new Person("nice@mailsnice.org", "Peter", "Ballerupsen"), ad, phones2, hobbies2);
+        PersonDTO pDTO3 = new PersonDTO(new Person("icecool@nice.com", "Juno", "Børslev"), ad, phones3, hobbies3);
 
         pDTO.setAddress(ad);
+        pDTO2.setAddress(ad2);
+        pDTO3.setAddress(ad3);
         pDTO.setPhones(phones);
+        pDTO2.setPhones(phones2);
+        pDTO3.setPhones(phones3);
         pDTO.setHobbies(hobbies);
+        pDTO2.setHobbies(hobbies2);
+        pDTO3.setHobbies(hobbies3);
         fe.create(pDTO);
+        fe.create(pDTO2);
+        fe.create(pDTO3);
 
         /*CityInfo ci2 = new CityInfo(2800, "Lyngby");
         Address ad2 = new Address("Street", "Additional", ci2);

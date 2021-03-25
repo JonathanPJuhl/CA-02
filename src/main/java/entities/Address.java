@@ -9,10 +9,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 
 
 @Entity
+//@NamedQuery(name = "Address.deleteAllRows", query = "DELETE FROM Address")
 public class Address implements Serializable {
 
     private static final long serialVersionUID = 1L;

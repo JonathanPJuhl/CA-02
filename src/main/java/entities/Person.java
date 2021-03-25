@@ -17,6 +17,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 
 /**
@@ -24,6 +25,7 @@ import javax.persistence.OneToMany;
  * @author MariHaugen
  */
 @Entity
+@NamedQuery(name = "Person.deleteAllRows", query = "DELETE FROM Person")
 public class Person implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -34,13 +36,13 @@ public class Person implements Serializable {
     private String firstName;
     private String lastName;
     
-    @OneToMany(cascade = CascadeType.PERSIST, mappedBy= "person")
+    @OneToMany(orphanRemoval = true, cascade = CascadeType.PERSIST, mappedBy= "person")
     private List<Phone> phones = new ArrayList<>();
     
     @ManyToOne(cascade = CascadeType.PERSIST)
     private Address address;
     
-    @ManyToMany(cascade = CascadeType.PERSIST, mappedBy= "persons")
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy= "persons")
     private List<Hobby> hobbies;
 
     public Person() {
@@ -133,6 +135,20 @@ public class Person implements Serializable {
 
     public void setHobbies(List<Hobby> hobbies) {
         this.hobbies = hobbies;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Person{id=").append(id);
+        sb.append(", email=").append(email);
+        sb.append(", firstName=").append(firstName);
+        sb.append(", lastName=").append(lastName);
+        sb.append(", phones=").append(phones);
+        sb.append(", address=").append(address);
+        sb.append(", hobbies=").append(hobbies);
+        sb.append('}');
+        return sb.toString();
     }
     
     

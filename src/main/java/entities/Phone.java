@@ -9,6 +9,7 @@ import javax.persistence.*;
  * @author MariHaugen
  */
 @Entity
+//@NamedQuery(name = "Phone.deleteAllRows", query = "DELETE FROM Phone")
 public class Phone implements Serializable {
 
     private static final long serialVersionUID = 1L;
