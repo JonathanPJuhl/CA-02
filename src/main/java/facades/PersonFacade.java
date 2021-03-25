@@ -51,7 +51,7 @@ public class PersonFacade {
 
         for (HobbyDTO h : pDTO.getHobbies()) {
 
-            Hobby hobby = new Hobby(h.getHobbyName(), h.getDescription());
+            Hobby hobby = new Hobby(h.getName(), h.getWikiLink(), h.getCategory(), h.getType());
 
             pers.addHobby(hobby);
 

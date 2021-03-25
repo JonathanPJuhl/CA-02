@@ -27,7 +27,7 @@ public class Populator {
         PersonFacade fe = PersonFacade.getPersonFacade(emf);
         AddressAndCityInfoFacade acF = AddressAndCityInfoFacade.getPersonFacade(emf);
         PhoneFacade pF = PhoneFacade.getPersonFacade(emf);
-        HobbyFacade hF = HobbyFacade.getPersonFacade(emf);
+        HobbyFacade hF = HobbyFacade.getHobbyFacade(emf);
 
         CityInfoDTO ci = new CityInfoDTO(new CityInfo(7777777, "Virum"));
         CityInfoDTO ci2 = new CityInfoDTO(new CityInfo(8888888, "Lyngby"));
@@ -53,9 +53,9 @@ public class Populator {
         phones.add(phone);
         phones2.add(phone2);
         phones3.add(phone3);
-        HobbyDTO hobby = new HobbyDTO(new Hobby("Fodbold", "spark til bolden og fake skader"));
-        HobbyDTO hobby2 = new HobbyDTO(new Hobby("Håndbold", "kast bolden og rigtige skader"));
-        HobbyDTO hobby3 = new HobbyDTO(new Hobby("Tennis", "sving til bolden og ingen skader"));
+        HobbyDTO hobby = new HobbyDTO(new Hobby("Fodbold", "spark til bolden og fake skader","boldspill", "teamsport"));
+        HobbyDTO hobby2 = new HobbyDTO(new Hobby("Håndbold", "kast bolden og rigtige skader","boldspill", "teamsport"));
+        HobbyDTO hobby3 = new HobbyDTO(new Hobby("Tennis", "sving til bolden og ingen skader","boldspill", "teamsport"));
         List<HobbyDTO> hobbies = new ArrayList<>();
         List<HobbyDTO> hobbies2 = new ArrayList<>();
         List<HobbyDTO> hobbies3 = new ArrayList<>();
