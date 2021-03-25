@@ -121,7 +121,7 @@ public class PersonFacadeTest {
     public void testGetAllPersons() {
         EntityManagerFactory emf = EMF_Creator.createEntityManagerFactory();
         PersonFacade fe = PersonFacade.getPersonFacade(emf);
-        
+
 
         CityInfoDTO ci = new CityInfoDTO(new CityInfo(2030, "Holte"));
         AddressDTO ad = new AddressDTO(new Address("Street3", "Additional and more"));
@@ -150,6 +150,26 @@ public class PersonFacadeTest {
         List<PersonDTO> lisDto = fe.getAllPersonsByGivenHobby("Fodbold");
 
         assertEquals(lisDto.get(0).getFirstName(), "Jens");
+
+    }
+    @Test
+    public void testGetAllByCity() {
+
+        EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();
+        PersonFacade fe = PersonFacade.getPersonFacade(EMF);
+        List<PersonDTO> lisDto = fe.getPeopleByCity(2830);
+
+        assertEquals(lisDto.size(),1);
+
+    }
+    @Test
+    public void testNumberOfPersonsByHobby() {
+
+        EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();
+        PersonFacade fe = PersonFacade.getPersonFacade(EMF);
+        Long nrOfPeople = fe.getNumberOfPersonsByHobby("Fodbold");
+
+        assertEquals(nrOfPeople, 1);
 
     }
 

@@ -24,7 +24,7 @@ public class CityInfoResource {
     @GET
     @Produces({MediaType.APPLICATION_JSON})
     public String getAllZipcodes() {
-
+        //FACADE.
         return "{\"msg\":\"Hello World\"}";
     }
 

@@ -29,9 +29,9 @@ public class Populator {
         PhoneFacade pF = PhoneFacade.getPersonFacade(emf);
         HobbyFacade hF = HobbyFacade.getPersonFacade(emf);
 
-        CityInfoDTO ci = new CityInfoDTO(new CityInfo(2830, "Virum"));
-        CityInfoDTO ci2 = new CityInfoDTO(new CityInfo(2800, "Lyngby"));
-        CityInfoDTO ci3 = new CityInfoDTO(new CityInfo(6666, "Helvete"));
+        CityInfoDTO ci = new CityInfoDTO(new CityInfo(7777777, "Virum"));
+        CityInfoDTO ci2 = new CityInfoDTO(new CityInfo(8888888, "Lyngby"));
+        CityInfoDTO ci3 = new CityInfoDTO(new CityInfo(9999999, "Helvete"));
         AddressDTO ad = new AddressDTO( new Address("Street", "Additional"));
         AddressDTO ad2 = new AddressDTO( new Address("Street2", "In addition"));
         AddressDTO ad3 = new AddressDTO( new Address("Street3", "Also this"));
