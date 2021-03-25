@@ -148,14 +148,17 @@ public class PersonFacadeTest {
         assertEquals(lisDto.get(0).getFirstName(), "Jens");
 
     }
+    
     @Test
-
-    public void testEditPerson() {
-        PersonDTO pDTO = new PersonDTO(person);
-        int a = facade.updatePerson(pDTO);
-        assertEquals(a, 1);
+    public void testEditPerson() throws Exception {
+        PersonDTO pDToBeforeChanges = new PersonDTO(person);
+        PersonDTO pDToExpected = new PersonDTO(person);
+        pDToExpected.setEmail("wannabemail@hacker.dk");
+        PersonDTO pdtoResult = facade.updatePerson(pDToExpected, pDToBeforeChanges);
+        assertEquals(pDToExpected,pdtoResult);
     }
-        @Test
+        
+    @Test
     public void testGetAllByCity() {
 
 

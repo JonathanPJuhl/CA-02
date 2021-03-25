@@ -104,6 +104,11 @@ public class PersonDTO {
         return id;
     }
     
+  
+
+    public void setId(int id) {// Må vi dette ??? 
+        this.id = id;
+    }
     
     
 }

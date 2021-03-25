@@ -80,14 +80,49 @@ public class PersonFacade {
         EntityManager em = emf.createEntityManager();
         return new RenameMeDTO(em.find(RenameMe.class, id));
     }*/
-    //TODO Remove/Change this before use
-    public int updatePerson(PersonDTO newData) {
+    
+    public PersonDTO validatePersonDTO(PersonDTO pdto) throws Exception{ //???
+        if(pdto.getEmail()== null 
+                || pdto.getFirstName() == null
+                || pdto.getEmail() == null){
+            throw new Exception("En personegenskab er null"); //?????? - TODO Tilpas til bedre exception
+        } 
+        return pdto;
+    }
+    
+    public PersonDTO findPersonByPersonDTO(PersonDTO personDTO, EntityManager em) throws Exception{
+        Person personFound;
+        if(personDTO == null){
+        throw new Exception("PersonDTO er null"); /// ??? Behøver vi denne in case - TODO bedre exception
+        }else {
+            personFound = em.find(Person.class, personDTO);
+        //Query query = em.createQuery("SELECT Person p WHERE p.id =:id", Person.class); //AND WHERE p.firstname =:firstname AND WHERE p.lastname =:lastname", Person.class);
+          // query.setParameter("id", personDTO.getId());
+           // query.setParameter("email", personDTO.getEmail());
+           // query.setParameter("firstname", personDTO.getFirstName());
+           // query.setParameter("lastname", personDTO.getLastName());
+            //personFound = (Person)query.getSingleResult();
+        
+        }
+        PersonDTO personFoundDTO = new PersonDTO(personFound);
+        return personFoundDTO;
+    }
+    
+    public PersonDTO updatePerson(PersonDTO newData, PersonDTO oldPersonDTO) throws Exception { // ??? TODO Tilpas til bedre exception
         EntityManager em = emf.createEntityManager();
-
+        Person personNewData = new Person(newData.getEmail(),newData.getFirstName(),newData.getLastName());
+       PersonDTO updatedPersonDTO;
         try {
             em.getTransaction().begin();
+            
+            validatePersonDTO(newData);
+            
+            PersonDTO oldPersonDTOFromDB = findPersonByPersonDTO(oldPersonDTO, em);
+            newData.setId(oldPersonDTOFromDB.getId());
+            em.merge(newData);
+            updatedPersonDTO = findPersonByPersonDTO(newData, em);
 
-        if (newData.getFirstName() != null) {
+        /*if (newData.getFirstName() != null) {
             Query query = em.createQuery("UPDATE Person p SET p.firstName =:newFirstName WHERE p.id =:id");
             query.setParameter("newFirstName", newData.getFirstName());
             query.setParameter("id", newData.getId());
@@ -136,12 +171,12 @@ public class PersonFacade {
 //            query5.setParameter("newEmail", newData.getEmail());
 //            query5.setParameter("id", newData.getId());
 //            query5.executeUpdate();
-        }
+        }*/
             em.getTransaction().commit();
         } finally {
             em.close();
         }
-        return 1;
+        return updatedPersonDTO;
     }
 
     public long getCount() {
