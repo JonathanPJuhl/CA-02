@@ -76,7 +76,7 @@ public class RenameMeResourceTest {
         phones.add(phone);
 
 
-        Hobby hobby = new Hobby("Fodbold", "spark til bolden og fake skader");
+        Hobby hobby = new Hobby("Fodbold", "spark til bolden og fake skader", "boldsport", "teamsport");
         List<Hobby> hobbies = new ArrayList<>();
         hobbies.add(hobby);
 
