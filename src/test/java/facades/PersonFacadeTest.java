@@ -139,7 +139,6 @@ public class PersonFacadeTest {
     }
 
     @Test
-    @Disabled
     public void testGetAllByHobby() {
 
 
@@ -151,7 +150,8 @@ public class PersonFacadeTest {
     @Test
 
     public void testEditPerson() {
-        PersonDTO pDTO = new PersonDTO(person);
+        person.setFirstName("null");
+        Person pDTO = person;
         int a = facade.updatePerson(pDTO);
         assertEquals(a, 1);
     }
@@ -160,7 +160,7 @@ public class PersonFacadeTest {
 
 
         PersonFacade fe = PersonFacade.getPersonFacade(emf);
-        List<PersonDTO> lisDto = fe.getPeopleByCity(2830);
+        List<PersonDTO> lisDto = fe.getPeopleByCity("Virum");
 
         assertEquals(lisDto.size(),1);
 

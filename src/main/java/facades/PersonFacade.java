@@ -6,12 +6,9 @@ import dtos.Person_UltraDTO;
 import dtos.PhoneDTO;
 import entities.*;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
 import javax.ws.rs.PathParam;
 
 /**
@@ -75,19 +72,23 @@ public class PersonFacade {
         }
         return new PersonDTO(pers);
     }
+    public PersonDTO getbyID(int id){
+    EntityManager em = emf.createEntityManager();
+    PersonDTO pDTO = new PersonDTO(em.find(Person.class, id));
+        return pDTO;
+}
 
-    /* public RenameMeDTO getById(long id){
-        EntityManager em = emf.createEntityManager();
-        return new RenameMeDTO(em.find(RenameMe.class, id));
-    }*/
     //TODO Remove/Change this before use
-    public int updatePerson(PersonDTO newData) {
+    public int updatePerson(Person newData) {
         EntityManager em = emf.createEntityManager();
 
         try {
             em.getTransaction().begin();
+            Person pers = em.merge(newData);
+            em.remove(getbyID(pers.getId()));
+            em.persist(newData);
 
-        if (newData.getFirstName() != null) {
+        /*if (newData.getFirstName() != null) {
             Query query = em.createQuery("UPDATE Person p SET p.firstName =:newFirstName WHERE p.id =:id");
             query.setParameter("newFirstName", newData.getFirstName());
             query.setParameter("id", newData.getId());
@@ -136,13 +137,26 @@ public class PersonFacade {
 //            query5.setParameter("newEmail", newData.getEmail());
 //            query5.setParameter("id", newData.getId());
 //            query5.executeUpdate();
-        }
+        }*/
             em.getTransaction().commit();
         } finally {
             em.close();
         }
         return 1;
     }
+
+    public int getPersonIDByNameAndNumber(PersonDTO personDTO){
+        EntityManager em = emf.createEntityManager();
+        TypedQuery<Person> pers = em.createQuery("SELECT p FROM Person p WHERE p.email = :email", Person.class);
+        pers.setParameter("email", personDTO.getEmail());
+
+        Person p = pers.getSingleResult();
+        int id = p.getId();
+        /*Person persFromDB = pers.getSingleResult();
+        int id = persFromDB.getId();*/
+        return id;
+    }
+
 
     public long getCount() {
         EntityManager em = emf.createEntityManager();
@@ -172,10 +186,10 @@ public class PersonFacade {
         return pdtos;
     }
 
-    public List<PersonDTO> getPeopleByCity(int cityZip) {
+    public List<PersonDTO> getPeopleByCity(String city) {
         EntityManager em = emf.createEntityManager();
-        TypedQuery<Person> query = em.createQuery("SELECT p FROM Person p JOIN p.address.cityInfo cit WHERE cit.zip =:var1", Person.class);
-        query.setParameter("var1", cityZip);
+        TypedQuery<Person> query = em.createQuery("SELECT p FROM Person p JOIN p.address.cityInfo cit WHERE cit.cityName =:cityname", Person.class);
+        query.setParameter("cityname", city);
         List<Person> pdto = query.getResultList();
         List<PersonDTO> pdtos = PersonDTO.getDtos(pdto);
         return pdtos;
@@ -184,9 +198,10 @@ public class PersonFacade {
     //Ugly but works
     public long getNumberOfPersonsByHobby(String hobbyGiven) {
         EntityManager em = emf.createEntityManager();
-        Query count = em.createQuery("SELECT COUNT(p) FROM Person p JOIN p.hobbies sw WHERE sw.hobbyName =:hobby");
+        TypedQuery<Person> count = em.createQuery("SELECT COUNT(p) FROM Person p JOIN p.hobbies sw WHERE sw.hobbyName =:hobby", Person.class);
         count.setParameter("hobby", hobbyGiven);
-        long howMany = (long) count.getSingleResult();
+        List<Person> people = count.getResultList();
+        long howMany = people.size();
         return howMany;
     }
 
