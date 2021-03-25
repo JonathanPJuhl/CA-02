@@ -27,9 +27,9 @@ public class HobbyResource {
             
     @GET
     @Produces({MediaType.APPLICATION_JSON})
-    public List<HobbyDTO> getAllPHobbies() {
+    public String getAllHobbies() {
         List<HobbyDTO> ListOfHobbies = FACADE.getAll();
-        return ListOfHobbies;
+        return GSON.toJson(ListOfHobbies);
 
     }
 }
