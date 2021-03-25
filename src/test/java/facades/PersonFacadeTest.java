@@ -1,7 +1,10 @@
-/*
 package facades;
 
+import dtos.AddressDTO;
+import dtos.CityInfoDTO;
+import dtos.HobbyDTO;
 import dtos.PersonDTO;
+import dtos.PhoneDTO;
 import entities.CityInfo;
 import entities.Hobby;
 import entities.Person;
@@ -22,12 +25,12 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 //Uncomment the line below, to temporarily disable this test
-@Disabled
+//@Disabled
 public class PersonFacadeTest {
 
-    
     private static EntityManagerFactory emf;
     private static PersonFacade facade;
+    private static Person person;
 
     public PersonFacadeTest() {
     }
@@ -50,42 +53,33 @@ public class PersonFacadeTest {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
+
+            em.createNamedQuery("Phone.deleteAllRows").executeUpdate();
+            em.createNamedQuery("Hobby.deleteAllRows").executeUpdate();
             em.createNamedQuery("Person.deleteAllRows").executeUpdate();
+            em.createNamedQuery("Address.deleteAllRows").executeUpdate();
+            em.createNamedQuery("CityInfo.deleteAllRows").executeUpdate();
+
             EntityManagerFactory emf = EMF_Creator.createEntityManagerFactory();
-            PersonFacade fe = PersonFacade.getPersonFacade(emf);
 
             CityInfo ci = new CityInfo(2830, "Virum");
-            Address ad = new Address("Street", "Additional", ci);
-            List<Phone> phones = new ArrayList<Phone>();
+            Address ad = new Address("Street", "Additional");
+            ad.addCityInfo(ci);
+
+            List<Phone> phones = new ArrayList<>();
             Phone phone = new Phone(2134566, "home");
             phones.add(phone);
+
+
             Hobby hobby = new Hobby("Fodbold", "spark til bolden og fake skader");
             List<Hobby> hobbies = new ArrayList<>();
             hobbies.add(hobby);
 
-            em.persist(new PersonDTO(new Person("mail@mail.dk", "Jens", "Brønd"), ad, phones, hobbies));
-
-            CityInfo ci2 = new CityInfo(2800, "Lyngby");
-            Address ad2 = new Address("Street", "Additional", ci2);
-            List<Phone> phones2 = new ArrayList<Phone>();
-            Phone phone2 = new Phone(2134566232, "home");
-            phones2.add(phone2);
-            Hobby hobby2 = new Hobby("Håndbold", "spark til bolden og få rødt kort");
-            List<Hobby> hobbies2 = new ArrayList<>();
-            hobbies2.add(hobby2);
-
-            em.persist(new PersonDTO(new Person("mail@mail.dk", "Jens2", "Brønd2"), ad2, phones2, hobbies2));
-
-            CityInfo ci3 = new CityInfo(2970, "Hørsholm");
-            Address ad3 = new Address("Street", "Additional", ci3);
-            List<Phone> phones3 = new ArrayList<Phone>();
-            Phone phone3 = new Phone(2134566232, "home");
-            phones3.add(phone3);
-            Hobby hobby3 = new Hobby("Amerikansk fodbold", "spark til bolden og få rigtige skader");
-            List<Hobby> hobbies3 = new ArrayList<>();
-            hobbies3.add(hobby3);
-
-            em.persist(new PersonDTO(new Person("mail@mail.dk", "Jens3", "Brønd3"), ad3, phones3, hobbies3));
+            person = new Person("mail@mail.dk", "Jens", "Brønd", phones, ad, hobbies);
+            person.addHobby(hobby);
+            person.addAddress(ad);
+            person.addPhone(phone);
+            em.persist(person);
 
             em.getTransaction().commit();
         } finally {
@@ -98,12 +92,85 @@ public class PersonFacadeTest {
 //        Remove any data after each test was run
     }
 
-//    @Test
-//    public v
-  
-    
-    // TODO: Delete or change this method 
+    @Test
+    public void testCreatePerson() {
 
+        EntityManagerFactory emf = EMF_Creator.createEntityManagerFactory();
+        PersonFacade fe = PersonFacade.getPersonFacade(emf);
+
+        CityInfoDTO ci = new CityInfoDTO(new CityInfo(2800, "Lyngby"));
+        AddressDTO ad = new AddressDTO(new Address("Street2", "Additional more"));
+        ad.setCityInfoDto(ci);
+        List<PhoneDTO> phones = new ArrayList<PhoneDTO>();
+        PhoneDTO phone = new PhoneDTO(new Phone(73829374, "also home"));
+        phones.add(phone);
+        HobbyDTO hobby = new HobbyDTO(new Hobby("Tennis", "smash bold"));
+        List<HobbyDTO> hobbies = new ArrayList<>();
+        hobbies.add(hobby);
+        PersonDTO pDTO = new PersonDTO(new Person("cool@mail.dk", "Peter", "Jensen"), ad, phones, hobbies);
+
+        pDTO.setAddress(ad);
+        pDTO.setPhones(phones);
+        pDTO.setHobbies(hobbies);
+        fe.create(pDTO);
+
+        assertEquals(facade.getCount(), 2);
+    }
+
+    @Test
+    public void testGetAllPersons() {
+        EntityManagerFactory emf = EMF_Creator.createEntityManagerFactory();
+        PersonFacade fe = PersonFacade.getPersonFacade(emf);
+
+
+        CityInfoDTO ci = new CityInfoDTO(new CityInfo(2030, "Holte"));
+        AddressDTO ad = new AddressDTO(new Address("Street3", "Additional and more"));
+        ad.setCityInfoDto(ci);
+        List<PhoneDTO> phones = new ArrayList<PhoneDTO>();
+        PhoneDTO phone = new PhoneDTO(new Phone(73829374, "also so home"));
+        phones.add(phone);
+        HobbyDTO hobby = new HobbyDTO(new Hobby("Hockey", "smash more bold"));
+        List<HobbyDTO> hobbies = new ArrayList<>();
+        hobbies.add(hobby);
+        PersonDTO pDTO = new PersonDTO(new Person("icecool@mail.dk", "Hugo", "Jarvier"), ad, phones, hobbies);
+
+        pDTO.setAddress(ad);
+        pDTO.setPhones(phones);
+        pDTO.setHobbies(hobbies);
+        fe.create(pDTO);
+
+        assertEquals(facade.getAll().size(), 2);
+    }
+
+    @Test
+    public void testGetAllByHobby() {
+
+        EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();
+        PersonFacade fe = PersonFacade.getPersonFacade(EMF);
+        List<PersonDTO> lisDto = fe.getAllPersonsByGivenHobby("Fodbold");
+
+        assertEquals(lisDto.get(0).getFirstName(), "Jens");
+
+    }
+    @Test
+    public void testGetAllByCity() {
+
+        EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();
+        PersonFacade fe = PersonFacade.getPersonFacade(EMF);
+        List<PersonDTO> lisDto = fe.getPeopleByCity(2830);
+
+        assertEquals(lisDto.size(),1);
+
+    }
+    @Test
+    public void testNumberOfPersonsByHobby() {
+
+        EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();
+        PersonFacade fe = PersonFacade.getPersonFacade(EMF);
+        Long nrOfPeople = fe.getNumberOfPersonsByHobby("Fodbold");
+
+        assertEquals(nrOfPeople, 1);
+
+    }
 
 }
-*/
