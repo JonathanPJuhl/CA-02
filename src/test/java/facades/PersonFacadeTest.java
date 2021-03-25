@@ -60,7 +60,6 @@ public class PersonFacadeTest {
             em.createNamedQuery("Address.deleteAllRows").executeUpdate();
             em.createNamedQuery("CityInfo.deleteAllRows").executeUpdate();
 
-            EntityManagerFactory emf = EMF_Creator.createEntityManagerFactory();
 
             CityInfo ci = new CityInfo(2830, "Virum");
             Address ad = new Address("Street", "Additional");
@@ -95,7 +94,7 @@ public class PersonFacadeTest {
     @Test
     public void testCreatePerson() {
 
-        EntityManagerFactory emf = EMF_Creator.createEntityManagerFactory();
+
         PersonFacade fe = PersonFacade.getPersonFacade(emf);
 
         CityInfoDTO ci = new CityInfoDTO(new CityInfo(2800, "Lyngby"));
@@ -119,7 +118,7 @@ public class PersonFacadeTest {
 
     @Test
     public void testGetAllPersons() {
-        EntityManagerFactory emf = EMF_Creator.createEntityManagerFactory();
+
         PersonFacade fe = PersonFacade.getPersonFacade(emf);
 
 
@@ -145,8 +144,8 @@ public class PersonFacadeTest {
     @Test
     public void testGetAllByHobby() {
 
-        EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();
-        PersonFacade fe = PersonFacade.getPersonFacade(EMF);
+
+        PersonFacade fe = PersonFacade.getPersonFacade(emf);
         List<PersonDTO> lisDto = fe.getAllPersonsByGivenHobby("Fodbold");
 
         assertEquals(lisDto.get(0).getFirstName(), "Jens");
@@ -155,8 +154,8 @@ public class PersonFacadeTest {
     @Test
     public void testGetAllByCity() {
 
-        EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();
-        PersonFacade fe = PersonFacade.getPersonFacade(EMF);
+
+        PersonFacade fe = PersonFacade.getPersonFacade(emf);
         List<PersonDTO> lisDto = fe.getPeopleByCity(2830);
 
         assertEquals(lisDto.size(),1);
@@ -165,8 +164,8 @@ public class PersonFacadeTest {
     @Test
     public void testNumberOfPersonsByHobby() {
 
-        EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();
-        PersonFacade fe = PersonFacade.getPersonFacade(EMF);
+
+        PersonFacade fe = PersonFacade.getPersonFacade(emf);
         Long nrOfPeople = fe.getNumberOfPersonsByHobby("Fodbold");
 
         assertEquals(nrOfPeople, 1);
