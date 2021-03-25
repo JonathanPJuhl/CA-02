@@ -81,42 +81,51 @@ public class PersonFacade {
         return new RenameMeDTO(em.find(RenameMe.class, id));
     }*/
     //TODO Remove/Change this before use
-    public void updatePerson(PersonDTO newData) {
+    public int updatePerson(PersonDTO newData) {
         EntityManager em = emf.createEntityManager();
 
+        try {
+            em.getTransaction().begin();
+
         if (newData.getFirstName() != null) {
-            Query query = em.createQuery("UPDATE Person SET PERSON.firstName =:newFirstName WHERE person.id =:id");
+            Query query = em.createQuery("UPDATE Person p SET p.firstName =:newFirstName WHERE p.id =:id");
             query.setParameter("newFirstName", newData.getFirstName());
             query.setParameter("id", newData.getId());
             query.executeUpdate();
         }
         if (newData.getLastName() != null) {
-            Query query2 = em.createQuery("UPDATE Person SET PERSON.lastName =:newLastName WHERE person.id =:id");
+            Query query2 = em.createQuery("UPDATE Person p SET p.lastName =:newLastName WHERE p.id =:id");
             query2.setParameter("newLastName", newData.getLastName());
             query2.setParameter("id", newData.getId());
             query2.executeUpdate();
         }
         if (newData.getAddress() != null) {
-            Query query3 = em.createQuery("UPDATE Person SET PERSON.address =:newAddress WHERE person.id =:id");
+            Query query3 = em.createQuery("UPDATE Person p SET p.address =:newAddress WHERE p.id =:id");
             query3.setParameter("newAddress", newData.getAddress());
             query3.setParameter("id", newData.getId());
             query3.executeUpdate();
         }
         if (newData.getEmail() != null) {
-            Query query4 = em.createQuery("UPDATE Person SET PERSON.email =:newEmail WHERE person.id =:id");
+            Query query4 = em.createQuery("UPDATE Person p SET p.email =:newEmail WHERE p.id =:id");
             query4.setParameter("newEmail", newData.getEmail());
             query4.setParameter("id", newData.getId());
             query4.executeUpdate();
         }
 
         if (newData.getHobbies() != null) {
-            TypedQuery<Person_UltraDTO> query7777 = em.createQuery("UPDATE new dtos.Person_UltraDTO (p.hobbyName, p.description) FROM Person p JOIN p.hobbies", Person_UltraDTO.class);
-            TypedQuery<Person_UltraDTO> query5 = em.createQuery("UPDATE Hobby h SET (h.description =:description, h.hobbyName =:hobbyName) WHERE t.id in (select t1.id from Team t1  LEFT JOIN t1.members m WHERE t1.current = :current_true AND m.account = :account)", Person_UltraDTO.class);
-            query5.setParameter("id", newData.getId());
-       
+           // TypedQuery<Person_UltraDTO> query7777 = em.createQuery("UPDATE new dtos.Person_UltraDTO (p.hobbyName, p.description) FROM Person p JOIN p.hobbies", Person_UltraDTO.class);
+           // TypedQuery<Person_UltraDTO> query5 = em.createQuery("UPDATE Hobby h SET (h.description =:description, h.hobbyName =:hobbyName) WHERE t.id in (select t1.id from Team t1  LEFT JOIN t1.members m WHERE t1.current = :current_true AND m.account = :account)", Person_UltraDTO.class);
+            TypedQuery<Person_UltraDTO> query6 = em.createQuery("UPDATE Hobby h SET h.description =:description, h.hobbyName =:hobbyName WHERE h.id in (select h1.id from Hobby h1  LEFT JOIN h1.persons p WHERE h1.id = :hobbyID AND p.id = :personID)", Person_UltraDTO.class);
+            TypedQuery<Person_UltraDTO> query7 = em.createQuery("UPDATE Person p SET p.hobbies =: hobby WHERE p.id in (select p1.id from Person p1  LEFT JOIN p1.hobbies h WHERE h.hobbyName = :hobbyName AND p.id = :personID)", Person_UltraDTO.class);
+            query7.setParameter("hobby", newData.getHobbies());
+            query7.setParameter("hobbyName", newData.getHobbies().get(0).getHobbyName());
+            query7.setParameter("personID", newData.getId());
+
+
+
             
             
-            TypedQuery<PersonStyleDTO> q4 = em.createQuery("SELECT new dto.PersonStyleDTO(p.name, p.year, s.styleName) FROM Person p JOIN p.styles s", dto.PersonStyleDTO.class);
+            //TypedQuery<PersonStyleDTO> q4 = em.createQuery("SELECT new dto.PersonStyleDTO(p.name, p.year, s.styleName) FROM Person p JOIN p.styles s", dto.PersonStyleDTO.class);
 
             
             
@@ -128,7 +137,11 @@ public class PersonFacade {
 //            query5.setParameter("id", newData.getId());
 //            query5.executeUpdate();
         }
-
+            em.getTransaction().commit();
+        } finally {
+            em.close();
+        }
+        return 1;
     }
 
     public long getCount() {
