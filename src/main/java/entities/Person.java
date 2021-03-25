@@ -42,7 +42,7 @@ public class Person implements Serializable {
     @ManyToOne(cascade = CascadeType.PERSIST)
     private Address address;
     
-    @ManyToMany(cascade = CascadeType.ALL, mappedBy= "persons")
+    @ManyToMany(cascade = CascadeType.PERSIST, mappedBy= "persons")
     private List<Hobby> hobbies;
 
     public Person() {

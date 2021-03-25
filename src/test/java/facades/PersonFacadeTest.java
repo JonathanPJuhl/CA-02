@@ -53,30 +53,32 @@ public class PersonFacadeTest {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
+
+            em.createNamedQuery("Phone.deleteAllRows").executeUpdate();
             em.createNamedQuery("Hobby.deleteAllRows").executeUpdate();
             em.createNamedQuery("Person.deleteAllRows").executeUpdate();
+            em.createNamedQuery("Address.deleteAllRows").executeUpdate();
+            em.createNamedQuery("CityInfo.deleteAllRows").executeUpdate();
 
             EntityManagerFactory emf = EMF_Creator.createEntityManagerFactory();
 
             CityInfo ci = new CityInfo(2830, "Virum");
             Address ad = new Address("Street", "Additional");
             ad.addCityInfo(ci);
-            //acF.createCityInfo(ci);
 
-            //AddressDTO address = acF.getAddressFromDB(ad);
             List<Phone> phones = new ArrayList<>();
             Phone phone = new Phone(2134566, "home");
             phones.add(phone);
-            //pF.createPhone(phone);
-            //PhoneDTO phoneFromDB = pF.getPhoneFromDB(phone);
+
 
             Hobby hobby = new Hobby("Fodbold", "spark til bolden og fake skader");
             List<Hobby> hobbies = new ArrayList<>();
             hobbies.add(hobby);
 
-            //hF.createHobby(hobby);
-            //HobbyDTO hobbyFromDB = hF.getHobbyFromDB(hobby);
             person = new Person("mail@mail.dk", "Jens", "Brønd", phones, ad, hobbies);
+            person.addHobby(hobby);
+            person.addAddress(ad);
+            person.addPhone(phone);
             em.persist(person);
 
             em.getTransaction().commit();
@@ -91,15 +93,10 @@ public class PersonFacadeTest {
     }
 
     @Test
-    @Disabled
     public void testCreatePerson() {
 
         EntityManagerFactory emf = EMF_Creator.createEntityManagerFactory();
         PersonFacade fe = PersonFacade.getPersonFacade(emf);
-
-        AddressAndCityInfoFacade acF = AddressAndCityInfoFacade.getPersonFacade(emf);
-        PhoneFacade pF = PhoneFacade.getPersonFacade(emf);
-        HobbyFacade hF = HobbyFacade.getPersonFacade(emf);
 
         CityInfoDTO ci = new CityInfoDTO(new CityInfo(2800, "Lyngby"));
         AddressDTO ad = new AddressDTO(new Address("Street2", "Additional more"));
@@ -124,10 +121,7 @@ public class PersonFacadeTest {
     public void testGetAllPersons() {
         EntityManagerFactory emf = EMF_Creator.createEntityManagerFactory();
         PersonFacade fe = PersonFacade.getPersonFacade(emf);
-
-        AddressAndCityInfoFacade acF = AddressAndCityInfoFacade.getPersonFacade(emf);
-        PhoneFacade pF = PhoneFacade.getPersonFacade(emf);
-        HobbyFacade hF = HobbyFacade.getPersonFacade(emf);
+        
 
         CityInfoDTO ci = new CityInfoDTO(new CityInfo(2030, "Holte"));
         AddressDTO ad = new AddressDTO(new Address("Street3", "Additional and more"));
@@ -154,7 +148,8 @@ public class PersonFacadeTest {
 
         EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();
         PersonFacade fe = PersonFacade.getPersonFacade(EMF);
-        List<PersonDTO> lisDto = fe.getAllPersonsByGivenHobby("Tennis");
+        List<PersonDTO> lisDto = fe.getAllPersonsByGivenHobby("Fodbold");
+
         assertEquals(lisDto.get(0).getFirstName(), "Jens");
 
     }
