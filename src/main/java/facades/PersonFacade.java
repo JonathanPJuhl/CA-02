@@ -179,7 +179,7 @@ public class PersonFacade {
 
     public List<PersonDTO> getAllPersonsByGivenHobby(String hobbyGiven) {
         EntityManager em = emf.createEntityManager();
-        TypedQuery<Person> query = em.createQuery("SELECT p FROM Person p JOIN p.hobbies hob WHERE hob.hobbyName =:var1", Person.class);
+        TypedQuery<Person> query = em.createQuery("SELECT p FROM Person p JOIN p.hobbies hob WHERE hob.name =:var1", Person.class);
         query.setParameter("var1", hobbyGiven);
         List<Person> pdto = query.getResultList();
         List<PersonDTO> pdtos = PersonDTO.getDtos(pdto);
@@ -198,7 +198,7 @@ public class PersonFacade {
     //Ugly but works
     public long getNumberOfPersonsByHobby(String hobbyGiven) {
         EntityManager em = emf.createEntityManager();
-        TypedQuery<Person> count = em.createQuery("SELECT COUNT(p) FROM Person p JOIN p.hobbies sw WHERE sw.hobbyName =:hobby", Person.class);
+        TypedQuery<Person> count = em.createQuery("SELECT COUNT(p) FROM Person p JOIN p.hobbies ph WHERE ph.name =:hobby", Person.class);
         count.setParameter("hobby", hobbyGiven);
         List<Person> people = count.getResultList();
         long howMany = people.size();
