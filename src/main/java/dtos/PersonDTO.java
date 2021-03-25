@@ -12,6 +12,7 @@ import java.util.List;
 
 public class PersonDTO {
     
+    private int id;
     private String email;
     private String firstName;
     private String lastName;
@@ -21,6 +22,16 @@ public class PersonDTO {
 
 
     public PersonDTO(Person person, AddressDTO addressesDTO, List<PhoneDTO> phonesDTO, List<HobbyDTO> hobbiesDTO) {
+        this.email = person.getEmail();
+        this.firstName = person.getFirstName();
+        this.lastName = person.getLastName();
+        this.phonesDTO = phonesDTO;
+        this.addressesDTO = addressesDTO;
+        this.hobbiesDTO = hobbiesDTO;
+    }
+    
+        public PersonDTO(int id, Person person, AddressDTO addressesDTO, List<PhoneDTO> phonesDTO, List<HobbyDTO> hobbiesDTO) {
+        this.id = id;
         this.email = person.getEmail();
         this.firstName = person.getFirstName();
         this.lastName = person.getLastName();
@@ -87,6 +98,10 @@ public class PersonDTO {
 
     public void setHobbies(List<HobbyDTO> hobbiesDTO) {
         this.hobbiesDTO = hobbiesDTO;
+    }
+
+    public int getId() {
+        return id;
     }
     
     
