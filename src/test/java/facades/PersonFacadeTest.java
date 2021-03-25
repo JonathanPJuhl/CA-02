@@ -10,6 +10,7 @@ import entities.Hobby;
 import entities.Person;
 import entities.Address;
 import entities.Phone;
+import errorhandling.ArgumentNullException;
 import java.util.ArrayList;
 import java.util.List;
 import utils.EMF_Creator;
@@ -23,6 +24,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+//import org.junit.Test;
 
 //Uncomment the line below, to temporarily disable this test
 //@Disabled
@@ -70,7 +72,7 @@ public class PersonFacadeTest {
             phones.add(phone);
 
 
-            Hobby hobby = new Hobby("Fodbold", "spark til bolden og fake skader");
+            Hobby hobby = new Hobby("Fodbold", "spark til bolden og fake skader","boldspill", "teamsport");
             List<Hobby> hobbies = new ArrayList<>();
             hobbies.add(hobby);
 
@@ -102,7 +104,7 @@ public class PersonFacadeTest {
         List<PhoneDTO> phones = new ArrayList<PhoneDTO>();
         PhoneDTO phone = new PhoneDTO(new Phone(73829374, "also home"));
         phones.add(phone);
-        HobbyDTO hobby = new HobbyDTO(new Hobby("Tennis", "smash bold"));
+        HobbyDTO hobby = new HobbyDTO(new Hobby("Tennis", "smash bold","boldspill", "teamsport and single player"));
         List<HobbyDTO> hobbies = new ArrayList<>();
         hobbies.add(hobby);
         PersonDTO pDTO = new PersonDTO(new Person("cool@mail.dk", "Peter", "Jensen"), ad, phones, hobbies);
@@ -125,7 +127,7 @@ public class PersonFacadeTest {
         List<PhoneDTO> phones = new ArrayList<PhoneDTO>();
         PhoneDTO phone = new PhoneDTO(new Phone(73829374, "also so home"));
         phones.add(phone);
-        HobbyDTO hobby = new HobbyDTO(new Hobby("Hockey", "smash more bold"));
+        HobbyDTO hobby = new HobbyDTO(new Hobby("Hockey", "smash more bold","vintersport", "teamsport"));
         List<HobbyDTO> hobbies = new ArrayList<>();
         hobbies.add(hobby);
         PersonDTO pDTO = new PersonDTO(new Person("icecool@mail.dk", "Hugo", "Jarvier"), ad, phones, hobbies);
@@ -139,7 +141,6 @@ public class PersonFacadeTest {
     }
 
     @Test
-    @Disabled
     public void testGetAllByHobby() {
 
 
@@ -150,7 +151,7 @@ public class PersonFacadeTest {
     }
     
     @Test
-    public void testEditPerson() throws Exception {
+    public void testEditPerson() throws ArgumentNullException {
         int personToChangeID = person.getId();
         PersonDTO pDToExpected = new PersonDTO(person);
         pDToExpected.setEmail("wannabemail@hacker.dk");
@@ -159,20 +160,20 @@ public class PersonFacadeTest {
     }
      
 
-    @Test(expected = Exception.class)
+    //TODO lav negativ tests !!!!!!!!!!!!!!!!!!!!!!
+    /*@Test(expected = Exception.class)
     public void testEditPersonWithNullAttribute() throws Exception {
         int personToChangeID = person.getId();
         PersonDTO pDToExpected = new PersonDTO(person);
         pDToExpected.setEmail(null);
         PersonDTO pdtoResult = facade.updatePerson(pDToExpected, personToChangeID);
-    }
+    }*/
     
-    @Test
     public void testGetAllByCity() {
 
 
         PersonFacade fe = PersonFacade.getPersonFacade(emf);
-        List<PersonDTO> lisDto = fe.getPeopleByCity(2830);
+        List<PersonDTO> lisDto = fe.getPeopleByCity("Virum");
 
         assertEquals(lisDto.size(),1);
 

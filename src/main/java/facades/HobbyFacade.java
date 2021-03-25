@@ -1,7 +1,10 @@
 package facades;
 
 import dtos.HobbyDTO;
+
 import entities.Hobby;
+
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -25,7 +28,7 @@ public class HobbyFacade {
      * @param _emf
      * @return an instance of this facade class.
      */
-    public static HobbyFacade getPersonFacade(EntityManagerFactory _emf) {
+    public static HobbyFacade getHobbyFacade(EntityManagerFactory _emf) {
         if (instance == null) {
             emf = _emf;
             instance = new HobbyFacade();
@@ -36,11 +39,20 @@ public class HobbyFacade {
     private EntityManager getEntityManager() {
         return emf.createEntityManager();
     }
+    
+    public List<HobbyDTO> getAll() {
+        EntityManager em = emf.createEntityManager();
+        TypedQuery<Hobby> query = em.createQuery("SELECT h FROM Hobby h", Hobby.class);
+        List<Hobby> hobbyDTO = query.getResultList();
+        List<HobbyDTO> hobbyDTOs = HobbyDTO.getHobbyDtos(hobbyDTO);
+        return hobbyDTOs;
+    }
+    
 
 
     public HobbyDTO createHobby(HobbyDTO hobby) {
 
-        Hobby hobby1 = new Hobby(hobby.getHobbyName(), hobby.getDescription());
+        Hobby hobby1 = new Hobby(hobby.getName(), hobby.getWikiLink(), hobby.getCategory(), hobby.getType());
 
         EntityManager em = emf.createEntityManager();
         try {
@@ -56,7 +68,7 @@ public class HobbyFacade {
     public HobbyDTO getHobbyFromDB(HobbyDTO hobby){
         EntityManager em = emf.createEntityManager();
         TypedQuery<Hobby> hobbyFromDB = em.createQuery("SELECT h FROM Hobby h WHERE h.hobbyName = :a1", Hobby.class);
-        hobbyFromDB.setParameter("a1", hobby.getHobbyName());
+        hobbyFromDB.setParameter("a1", hobby.getName());
         return new HobbyDTO(hobbyFromDB.getSingleResult());
     }
 

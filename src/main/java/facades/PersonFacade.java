@@ -5,13 +5,12 @@ import dtos.PersonDTO;
 import dtos.Person_UltraDTO;
 import dtos.PhoneDTO;
 import entities.*;
+import errorhandling.ArgumentNullException;
+import errorhandling.ExceptionDTO;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
 import javax.ws.rs.PathParam;
 
 /**
@@ -54,7 +53,7 @@ public class PersonFacade {
 
         for (HobbyDTO h : pDTO.getHobbies()) {
 
-            Hobby hobby = new Hobby(h.getHobbyName(), h.getDescription());
+            Hobby hobby = new Hobby(h.getName(), h.getWikiLink(), h.getCategory(), h.getType());
 
             pers.addHobby(hobby);
 
@@ -75,38 +74,38 @@ public class PersonFacade {
         }
         return new PersonDTO(pers);
     }
-
-    /* public RenameMeDTO getById(long id){
-        EntityManager em = emf.createEntityManager();
-        return new RenameMeDTO(em.find(RenameMe.class, id));
-    }*/
+    public PersonDTO getbyID(int id){
+    EntityManager em = emf.createEntityManager();
+    PersonDTO pDTO = new PersonDTO(em.find(Person.class, id));
+        return pDTO;
+}
     
-    public PersonDTO validatePersonDTO(PersonDTO pdto) throws Exception{ //???
+    public PersonDTO validatePersonDTO(PersonDTO pdto) throws ArgumentNullException{ //???
         if(pdto.getEmail()== null 
                 || pdto.getFirstName() == null
                 || pdto.getEmail() == null){
-            throw new Exception("En personegenskab er null"); //?????? - TODO Tilpas til bedre exception
+            throw new ArgumentNullException( "En personegenskab er null", 400); //?????? - TODO Tilpas til bedre exception
         } 
         return pdto;
     }
     
     public Person findPersonByID(int personDTOID, EntityManager em){
-        Query query = em.createQuery("SELECT p FROM Person p WHERE p.id =:id", Person.class); //AND WHERE p.firstname =:firstname AND WHERE p.lastname =:lastname", Person.class);
+        Query query = em.createQuery("SELECT p FROM Person p WHERE p.id =:id", Person.class); 
         query.setParameter("id", personDTOID);
         
         return (Person) query.getSingleResult();
     }
     
-    public PersonDTO updatePerson(PersonDTO newPersonDTO, int oldPersonID) throws Exception { // ??? TODO Tilpas til bedre exception SAMT (!) - overveje måske et objekt istedet for int ?
+    public PersonDTO updatePerson(PersonDTO newPersonDTO, int oldPersonID) throws ArgumentNullException { //TODO overveje måske et objekt istedet for int ?
+
         EntityManager em = emf.createEntityManager();
        PersonDTO updatedPersonDTO;
        Person personFromDB;
        Person personUpdated;
         try {
             em.getTransaction().begin();
-            
-            validatePersonDTO(newPersonDTO);//? ?? SKal vi lave fejlhåndtering?
-            //personNewData = new Person(newData.getEmail(),newData.getFirstName(),newData.getLastName());
+
+            validatePersonDTO(newPersonDTO);
             personFromDB = findPersonByID(oldPersonID, em); 
             personFromDB.setEmail(newPersonDTO.getEmail());
             personFromDB.setFirstName(newPersonDTO.getFirstName());
@@ -114,7 +113,6 @@ public class PersonFacade {
             em.merge(personFromDB);
             personUpdated = findPersonByID(personFromDB.getId(), em);
             
-
         /*if (newData.getFirstName() != null) {
             Query query = em.createQuery("UPDATE Person p SET p.firstName =:newFirstName WHERE p.id =:id");
             query.setParameter("newFirstName", newData.getFirstName());
@@ -172,6 +170,19 @@ public class PersonFacade {
         return new PersonDTO(personUpdated);
     }
 
+    public int getPersonIDByNameAndNumber(PersonDTO personDTO){
+        EntityManager em = emf.createEntityManager();
+        TypedQuery<Person> pers = em.createQuery("SELECT p FROM Person p WHERE p.email = :email", Person.class);
+        pers.setParameter("email", personDTO.getEmail());
+
+        Person p = pers.getSingleResult();
+        int id = p.getId();
+        /*Person persFromDB = pers.getSingleResult();
+        int id = persFromDB.getId();*/
+        return id;
+    }
+
+
     public long getCount() {
         EntityManager em = emf.createEntityManager();
         try {
@@ -193,17 +204,17 @@ public class PersonFacade {
 
     public List<PersonDTO> getAllPersonsByGivenHobby(String hobbyGiven) {
         EntityManager em = emf.createEntityManager();
-        TypedQuery<Person> query = em.createQuery("SELECT p FROM Person p JOIN p.hobbies hob WHERE hob.hobbyName =:var1", Person.class);
+        TypedQuery<Person> query = em.createQuery("SELECT p FROM Person p JOIN p.hobbies hob WHERE hob.name =:var1", Person.class);
         query.setParameter("var1", hobbyGiven);
         List<Person> pdto = query.getResultList();
         List<PersonDTO> pdtos = PersonDTO.getDtos(pdto);
         return pdtos;
     }
 
-    public List<PersonDTO> getPeopleByCity(int cityZip) {
+    public List<PersonDTO> getPeopleByCity(String city) {
         EntityManager em = emf.createEntityManager();
-        TypedQuery<Person> query = em.createQuery("SELECT p FROM Person p JOIN p.address.cityInfo cit WHERE cit.zip =:var1", Person.class);
-        query.setParameter("var1", cityZip);
+        TypedQuery<Person> query = em.createQuery("SELECT p FROM Person p JOIN p.address.cityInfo cit WHERE cit.cityName =:cityname", Person.class);
+        query.setParameter("cityname", city);
         List<Person> pdto = query.getResultList();
         List<PersonDTO> pdtos = PersonDTO.getDtos(pdto);
         return pdtos;
@@ -212,9 +223,10 @@ public class PersonFacade {
     //Ugly but works
     public long getNumberOfPersonsByHobby(String hobbyGiven) {
         EntityManager em = emf.createEntityManager();
-        Query count = em.createQuery("SELECT COUNT(p) FROM Person p JOIN p.hobbies sw WHERE sw.hobbyName =:hobby");
+        TypedQuery<Person> count = em.createQuery("SELECT COUNT(p) FROM Person p JOIN p.hobbies ph WHERE ph.name =:hobby", Person.class);
         count.setParameter("hobby", hobbyGiven);
-        long howMany = (long) count.getSingleResult();
+        List<Person> people = count.getResultList();
+        long howMany = people.size();
         return howMany;
     }
 

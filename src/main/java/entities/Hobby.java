@@ -21,8 +21,11 @@ public class Hobby implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String hobbyName;
-    private String description;
+    private String name;
+    private String wikiLink;
+    private String category;
+    private String type;
+    
     
     @ManyToMany
     @JoinColumn(name = "hobbies")
@@ -31,33 +34,51 @@ public class Hobby implements Serializable {
     public Hobby() {
     }
 
-    public Hobby(String hobbyName, String description) {
-        this.hobbyName = hobbyName;
-        this.description = description;
+    public Hobby(String name, String wikiLink, String category, String type) {
+        this.name = name;
+        this.wikiLink = wikiLink;
+        this.category = category;
+        this.type = type;
         this.persons = new ArrayList<>();
     }
-
-
-    
+ 
     public int getId() {
         return id;
     }
 
-    public String getHobbyName() {
-        return hobbyName;
+    public String getName() {
+        return name;
     }
 
-    public void setHobbyName(String hobbyName) {
-        this.hobbyName = hobbyName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getDescription() {
-        return description;
+    public String getWikiLink() {
+        return wikiLink;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setWikiLink(String wikiLink) {
+        this.wikiLink = wikiLink;
     }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    
 
     public List<Person> getPersons() {
         return persons;
@@ -72,11 +93,11 @@ public class Hobby implements Serializable {
         if (this == o) return true;
         if (!(o instanceof Hobby)) return false;
         Hobby hobby = (Hobby) o;
-        return getId() == hobby.getId() && getHobbyName().equals(hobby.getHobbyName());
+        return getId() == hobby.getId() && getName().equals(hobby.getName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getHobbyName());
+        return Objects.hash(getId(), getName());
     }
 }

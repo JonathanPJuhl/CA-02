@@ -4,9 +4,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dtos.PersonDTO;
 import entities.Person;
+import errorhandling.ArgumentNullException;
 import utils.EMF_Creator;
 import facades.PersonFacade;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
@@ -27,10 +30,13 @@ public class PersonResource {
     private static final PersonFacade FACADE = PersonFacade.getPersonFacade(EMF);
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
+
     @GET
     @Produces({MediaType.APPLICATION_JSON})
-    public String demo() {
-        return "{\"msg\":\"Hello World\"}";
+    public String getAllPersons() {
+        List<PersonDTO> ListOfPeople = FACADE.getAll();
+        return GSON.toJson(ListOfPeople);
+
     }
 
     @Path("count")
@@ -42,40 +48,51 @@ public class PersonResource {
         return "{\"count\":" + count + "}";  //Done manually so no need for a DTO
     }
 
-    @Path("all")
-    @GET
-    @Produces({MediaType.APPLICATION_JSON})
-    public List<PersonDTO> getAllPersons() {
-        List<PersonDTO> ListOfPeople = FACADE.getAll();
-        return ListOfPeople;
 
-    }
 
-    @Path("peopByHobby/{hobby}")
+    @Path("hobby/{hobby}")
     @GET
     @Produces({MediaType.APPLICATION_JSON})
     public List<PersonDTO> getAllPersonsByGivenHobby(@PathParam("hobby") String hobbyGiven) {
         return FACADE.getAllPersonsByGivenHobby(hobbyGiven);
     }
 
-    @Path("peopleByZip/{zip}")
+    @Path("city/{cityname}")
     @GET
     @Produces({MediaType.APPLICATION_JSON})
-    public List<PersonDTO> getAllPersonsByGivenCity(@PathParam("zip") int zipper) {
-        return FACADE.getPeopleByCity(zipper);
+    public String getAllPersonsByGivenCity(@PathParam("cityname") String cityname) {
+        return GSON.toJson(FACADE.getPeopleByCity(cityname));
     }
     
-    @Path("peopleNumberByHobby/{hobby}")
+    @Path("count/{hobby}")
     @GET
     @Produces({MediaType.APPLICATION_JSON})
-    public long getNumberOfPersonsByHobby(@PathParam("hobby") String hobbyGiven){
-        return FACADE.getNumberOfPersonsByHobby(hobbyGiven);
+    public String getNumberOfPersonsByHobby(@PathParam("hobby") String hobbyGiven){
+        long count = FACADE.getNumberOfPersonsByHobby(hobbyGiven);
+        return "{\"count\":" + count + "}";
     }
-    
-//    @Path("editPerson/{newPersonData}")
-//    @PUT
-//    @Consumes({MediaType.APPLICATION_JSON})
-//    @Produces({MediaType.APPLICATION_JSON})
-    
+    @Path("id/{id}")
+    @GET
+    @Produces({MediaType.APPLICATION_JSON})
+    public String getPersonByID(@PathParam("id") int id){
+        return  GSON.toJson(FACADE.getbyID(id));
+    }
+
+
+
+    @Path("{id}&&{newPersonData}")
+    @PUT
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    public String editPersonByIDAndPersonInfo(@PathParam("id") int iDToEdit, @PathParam("newPersonData") String persInfoForUpdating){
+        String jsonPersonDTO="It's error time!";
+        try {String[] newPersonData = persInfoForUpdating.split("+");
+            PersonDTO personDTOToBe = new PersonDTO(new Person(newPersonData[0], newPersonData[1], newPersonData[2]));
+            jsonPersonDTO = GSON.toJson(FACADE.updatePerson(personDTOToBe,iDToEdit));
+        } catch (ArgumentNullException ex) {
+            Logger.getLogger(PersonResource.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return jsonPersonDTO;
+    }
     
 }
