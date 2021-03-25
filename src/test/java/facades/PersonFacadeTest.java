@@ -23,7 +23,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import sun.font.TrueTypeFont;
 
 //Uncomment the line below, to temporarily disable this test
 //@Disabled
@@ -150,6 +149,7 @@ public class PersonFacadeTest {
     }
 
     @Test
+    @Disabled
     public void testGetAllByHobby() {
 
         EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();

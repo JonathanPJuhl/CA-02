@@ -125,6 +125,8 @@ public class PersonFacade {
         return howMany;
     }
 
+    
+
 //    public long getNumberOfPersonsByHobby(String hobbyGiven) {
 //        EntityManager em = emf.createEntityManager();
 //        TypedQuery<long> count = em.createQuery("SELECT COUNT(p) FROM Person p JOIN p.hobbies sw WHERE sw.hobbyName =:var1", long.class);
