@@ -60,7 +60,6 @@ public class PersonFacadeTest {
             em.createNamedQuery("Address.deleteAllRows").executeUpdate();
             em.createNamedQuery("CityInfo.deleteAllRows").executeUpdate();
 
-            EntityManagerFactory emf = EMF_Creator.createEntityManagerFactory();
 
             CityInfo ci = new CityInfo(2830, "Virum");
             Address ad = new Address("Street", "Additional");
@@ -95,8 +94,7 @@ public class PersonFacadeTest {
     @Test
     public void testCreatePerson() {
 
-        EntityManagerFactory emf = EMF_Creator.createEntityManagerFactory();
-        PersonFacade fe = PersonFacade.getPersonFacade(emf);
+
 
         CityInfoDTO ci = new CityInfoDTO(new CityInfo(2800, "Lyngby"));
         AddressDTO ad = new AddressDTO(new Address("Street2", "Additional more"));
@@ -112,16 +110,14 @@ public class PersonFacadeTest {
         pDTO.setAddress(ad);
         pDTO.setPhones(phones);
         pDTO.setHobbies(hobbies);
-        fe.create(pDTO);
+        facade.create(pDTO);
 
         assertEquals(facade.getCount(), 2);
     }
 
     @Test
     public void testGetAllPersons() {
-        EntityManagerFactory emf = EMF_Creator.createEntityManagerFactory();
-        PersonFacade fe = PersonFacade.getPersonFacade(emf);
-        
+
 
         CityInfoDTO ci = new CityInfoDTO(new CityInfo(2030, "Holte"));
         AddressDTO ad = new AddressDTO(new Address("Street3", "Additional and more"));
@@ -137,7 +133,7 @@ public class PersonFacadeTest {
         pDTO.setAddress(ad);
         pDTO.setPhones(phones);
         pDTO.setHobbies(hobbies);
-        fe.create(pDTO);
+        facade.create(pDTO);
 
         assertEquals(facade.getAll().size(), 2);
     }
@@ -146,18 +142,39 @@ public class PersonFacadeTest {
     @Disabled
     public void testGetAllByHobby() {
 
-        EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();
-        PersonFacade fe = PersonFacade.getPersonFacade(EMF);
-        List<PersonDTO> lisDto = fe.getAllPersonsByGivenHobby("Fodbold");
+
+        List<PersonDTO> lisDto = facade.getAllPersonsByGivenHobby("Fodbold");
 
         assertEquals(lisDto.get(0).getFirstName(), "Jens");
 
     }
     @Test
-    public void testEditPerson(){
+
+    public void testEditPerson() {
         PersonDTO pDTO = new PersonDTO(person);
         int a = facade.updatePerson(pDTO);
         assertEquals(a, 1);
+    }
+        @Test
+    public void testGetAllByCity() {
+
+
+        PersonFacade fe = PersonFacade.getPersonFacade(emf);
+        List<PersonDTO> lisDto = fe.getPeopleByCity(2830);
+
+        assertEquals(lisDto.size(),1);
+
+    }
+    @Test
+    public void testNumberOfPersonsByHobby() {
+
+
+        PersonFacade fe = PersonFacade.getPersonFacade(emf);
+        Long nrOfPeople = fe.getNumberOfPersonsByHobby("Fodbold");
+
+        assertEquals(nrOfPeople, 1);
+
+
     }
 
 }
