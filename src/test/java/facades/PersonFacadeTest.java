@@ -147,14 +147,14 @@ public class PersonFacadeTest {
         assertEquals(lisDto.get(0).getFirstName(), "Jens");
 
     }
-    @Test
+  /*  @Test
 
     public void testEditPerson() {
         person.setFirstName("null");
         Person pDTO = person;
         int a = facade.updatePerson(pDTO);
         assertEquals(a, 1);
-    }
+    }*/
         @Test
     public void testGetAllByCity() {
 
