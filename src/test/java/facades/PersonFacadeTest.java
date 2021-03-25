@@ -95,7 +95,6 @@ public class PersonFacadeTest {
     public void testCreatePerson() {
 
 
-        PersonFacade fe = PersonFacade.getPersonFacade(emf);
 
         CityInfoDTO ci = new CityInfoDTO(new CityInfo(2800, "Lyngby"));
         AddressDTO ad = new AddressDTO(new Address("Street2", "Additional more"));
@@ -111,15 +110,13 @@ public class PersonFacadeTest {
         pDTO.setAddress(ad);
         pDTO.setPhones(phones);
         pDTO.setHobbies(hobbies);
-        fe.create(pDTO);
+        facade.create(pDTO);
 
         assertEquals(facade.getCount(), 2);
     }
 
     @Test
     public void testGetAllPersons() {
-
-        PersonFacade fe = PersonFacade.getPersonFacade(emf);
 
 
         CityInfoDTO ci = new CityInfoDTO(new CityInfo(2030, "Holte"));
@@ -136,7 +133,7 @@ public class PersonFacadeTest {
         pDTO.setAddress(ad);
         pDTO.setPhones(phones);
         pDTO.setHobbies(hobbies);
-        fe.create(pDTO);
+        facade.create(pDTO);
 
         assertEquals(facade.getAll().size(), 2);
     }
@@ -145,18 +142,25 @@ public class PersonFacadeTest {
     public void testGetAllByHobby() {
 
 
-        PersonFacade fe = PersonFacade.getPersonFacade(emf);
-        List<PersonDTO> lisDto = fe.getAllPersonsByGivenHobby("Fodbold");
+        List<PersonDTO> lisDto = facade.getAllPersonsByGivenHobby("Fodbold");
 
         assertEquals(lisDto.get(0).getFirstName(), "Jens");
 
     }
     @Test
+
+    public void testEditPerson() {
+        person.setFirstName("null");
+        Person pDTO = person;
+        int a = facade.updatePerson(pDTO);
+        assertEquals(a, 1);
+    }
+        @Test
     public void testGetAllByCity() {
 
 
         PersonFacade fe = PersonFacade.getPersonFacade(emf);
-        List<PersonDTO> lisDto = fe.getPeopleByCity(2830);
+        List<PersonDTO> lisDto = fe.getPeopleByCity("Virum");
 
         assertEquals(lisDto.size(),1);
 
@@ -169,6 +173,7 @@ public class PersonFacadeTest {
         Long nrOfPeople = fe.getNumberOfPersonsByHobby("Fodbold");
 
         assertEquals(nrOfPeople, 1);
+
 
     }
 
