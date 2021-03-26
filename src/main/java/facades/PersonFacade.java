@@ -104,7 +104,7 @@ public class PersonFacade {
         EntityManager em = emf.createEntityManager();
        PersonDTO updatedPersonDTO;
        Person personFromDB;
-       Person personUpdated;
+       Person personUpdated = null;
         try {
             em.getTransaction().begin();
 
