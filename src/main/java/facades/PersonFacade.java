@@ -108,12 +108,12 @@ public class PersonFacade {
         EntityManager em = emf.createEntityManager();
        PersonDTO updatedPersonDTO;
        Person personFromDB;
-       Person personUpdated;
+       Person personUpdated = null;
         try {
             em.getTransaction().begin();
 
 
-            /*if (newData.getFirstName() != null) {
+            /*if (newData.getFirstName() != null) { */
 
             validatePersonDTO(newPersonDTO);
             personFromDB = findPersonByID(oldPersonID, em); 
