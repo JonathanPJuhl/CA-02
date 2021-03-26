@@ -96,7 +96,7 @@ public class PersonFacade {
         return (Person) query.getSingleResult();
     }
     
-    public PersonDTO updatePerson(PersonDTO newPersonDTO, int oldPersonID) throws ArgumentNullException { //TODO overveje måske et objekt istedet for int ?
+    public PersonDTO updatePerson(PersonDTO newPersonDTO, int oldPersonID) throws ArgumentNullException, NullPointerException { //TODO overveje måske et objekt istedet for int ?
 
         EntityManager em = emf.createEntityManager();
        PersonDTO updatedPersonDTO;
@@ -107,6 +107,9 @@ public class PersonFacade {
 
             validatePersonDTO(newPersonDTO);
             personFromDB = findPersonByID(oldPersonID, em); 
+            if(personFromDB == null){
+                throw new NullPointerException("Person to update doesn't exist"); 
+            }
             personFromDB.setEmail(newPersonDTO.getEmail());
             personFromDB.setFirstName(newPersonDTO.getFirstName());
             personFromDB.setLastName(newPersonDTO.getLastName());

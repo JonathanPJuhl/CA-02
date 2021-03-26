@@ -151,7 +151,7 @@ public class PersonFacadeTest {
     }
     
     @Test
-    public void testEditPerson() throws ArgumentNullException {
+    public void testEditPerson() throws ArgumentNullException, Exception {
         int personToChangeID = person.getId();
         PersonDTO pDToExpected = new PersonDTO(person);
         pDToExpected.setEmail("wannabemail@hacker.dk");
@@ -161,7 +161,7 @@ public class PersonFacadeTest {
      
 
     //TODO lav negativ tests !!!!!!!!!!!!!!!!!!!!!!
-    /*@Test(expected = Exception.class)
+    /*@Test(expected = ArgumentNullException.class)
     public void testEditPersonWithNullAttribute() throws Exception {
         int personToChangeID = person.getId();
         PersonDTO pDToExpected = new PersonDTO(person);

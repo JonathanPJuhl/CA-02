@@ -51,6 +51,8 @@ public class Populator {
         //pF.createPhone(phone);
         //PhoneDTO phoneFromDB = pF.getPhoneFromDB(phone);
         phones.add(phone);
+        phones.add(phone2);
+        phones.add(phone3);
         phones2.add(phone2);
         phones3.add(phone3);
         HobbyDTO hobby = new HobbyDTO(new Hobby("Fodbold", "spark til bolden og fake skader","boldspill", "teamsport"));
