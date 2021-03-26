@@ -84,17 +84,18 @@ public class PersonResource {
     @PUT
     @Consumes({MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_JSON})
-    public String editPersonByIDAndPersonInfo(@PathParam("id") int iDToEdit, String persInfoForUpdating){ // TODO Ændre
-        String jsonPersonDTO="It's error time!";
-        try {String[] newPersonData = persInfoForUpdating.split("+");
-            PersonDTO personDTOToBe = new PersonDTO(new Person(newPersonData[0], newPersonData[1], newPersonData[2]));
-            jsonPersonDTO = GSON.toJson(FACADE.updatePerson(personDTOToBe,iDToEdit));
+    public String editPersonByIDAndPersonInfo(@PathParam("id") int iDToEdit, String persInfoForUpdating){ 
+        String jsonPersonDTO;
+        try{
+            PersonDTO persDTOEditTo = GSON.fromJson(persInfoForUpdating, PersonDTO.class);
+            jsonPersonDTO = GSON.toJson(FACADE.updatePerson(persDTOEditTo,iDToEdit));
         } catch (ArgumentNullException ex) {
             Logger.getLogger(PersonResource.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("\n"+ex.getErrorCode());
+            jsonPersonDTO = ex.getMessage();
         }
         catch(NullPointerException e){
             Logger.getLogger(PersonResource.class.getName()).log(Level.SEVERE, null, e);
+            jsonPersonDTO = e.getMessage();
         }
         return jsonPersonDTO;
     }

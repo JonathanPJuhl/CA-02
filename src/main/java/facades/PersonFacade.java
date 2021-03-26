@@ -11,7 +11,10 @@ import errorhandling.ExceptionDTO;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.PathParam;
+import rest.PersonResource;
 
 /**
  *
@@ -167,7 +170,12 @@ public class PersonFacade {
 //            query5.executeUpdate();
         }*/
             em.getTransaction().commit();
-        } finally {
+        }catch(ArgumentNullException ex){
+            Logger.getLogger(PersonResource.class.getName()).log(Level.SEVERE, null, ex);
+            ex.getErrorCode();
+            throw ex;
+        }
+        finally {
             em.close();
         }
         return new PersonDTO(personUpdated);

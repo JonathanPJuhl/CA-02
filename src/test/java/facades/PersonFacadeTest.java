@@ -19,12 +19,14 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-//import org.junit.Test;
+
 
 //Uncomment the line below, to temporarily disable this test
 //@Disabled
@@ -160,14 +162,21 @@ public class PersonFacadeTest {
     }
      
 
-    //TODO lav negativ tests !!!!!!!!!!!!!!!!!!!!!!
-    /*@Test(expected = ArgumentNullException.class)
-    public void testEditPersonWithNullAttribute() throws Exception {
+    //Negativ test
+    @Test
+    public void testEditPersonWithNullEmail() throws Exception {
+       
         int personToChangeID = person.getId();
         PersonDTO pDToExpected = new PersonDTO(person);
         pDToExpected.setEmail(null);
-        PersonDTO pdtoResult = facade.updatePerson(pDToExpected, personToChangeID);
-    }*/
+        ArgumentNullException exception =  Assertions.assertThrows(ArgumentNullException.class, () -> {
+           facade.updatePerson(pDToExpected, personToChangeID);
+        });
+        String expectedMessage = "En personegenskab er null";
+        String actualMessage = exception.getMessage();
+        
+        assertTrue(actualMessage.equals(expectedMessage));       
+    }
     
     public void testGetAllByCity() {
 
