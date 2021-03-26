@@ -14,6 +14,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -53,8 +54,8 @@ public class PersonResource {
     @Path("hobby/{hobby}")
     @GET
     @Produces({MediaType.APPLICATION_JSON})
-    public List<PersonDTO> getAllPersonsByGivenHobby(@PathParam("hobby") String hobbyGiven) {
-        return FACADE.getAllPersonsByGivenHobby(hobbyGiven);
+    public String getAllPersonsByGivenHobby(@PathParam("hobby") String hobbyGiven) {
+        return GSON.toJson(FACADE.getAllPersonsByGivenHobby(hobbyGiven));
     }
 
     @Path("city/{cityname}")
@@ -78,6 +79,22 @@ public class PersonResource {
         return  GSON.toJson(FACADE.getbyID(id));
     }
 
+    
+    @Path("{id}")
+    @DELETE
+    public void deletePersonById(@PathParam("id") int id){
+        FACADE.deletePersonById(id);
+    }
+//    @Produces({MediaType.APPLICATION_JSON})
+//    @Consumes({MediaType.APPLICATION_JSON})
+    
+//    @Path("editPerson/{newPersonData}")
+//    @PUT
+//    @Consumes({MediaType.APPLICATION_JSON})
+//    @Produces({MediaType.APPLICATION_JSON})
+    
+
+
 
 
     @Path("{id}")
@@ -99,5 +116,6 @@ public class PersonResource {
         }
         return jsonPersonDTO;
     }
+
     
 }

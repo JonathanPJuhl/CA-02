@@ -77,10 +77,13 @@ public class PersonFacade {
         }
         return new PersonDTO(pers);
     }
-    public PersonDTO getbyID(int id){
-    EntityManager em = emf.createEntityManager();
-    PersonDTO pDTO = new PersonDTO(em.find(Person.class, id));
+
+    public PersonDTO getbyID(int id) {
+        EntityManager em = emf.createEntityManager();
+        PersonDTO pDTO = new PersonDTO(em.find(Person.class, id));
         return pDTO;
+
+
 }
     
     public PersonDTO validatePersonDTO(PersonDTO pdto) throws ArgumentNullException{ //???
@@ -101,12 +104,16 @@ public class PersonFacade {
     
     public PersonDTO updatePerson(PersonDTO newPersonDTO, int oldPersonID) throws ArgumentNullException, NullPointerException { //TODO overveje måske et objekt istedet for int ?
 
+
         EntityManager em = emf.createEntityManager();
        PersonDTO updatedPersonDTO;
        Person personFromDB;
        Person personUpdated = null;
         try {
             em.getTransaction().begin();
+
+
+            /*if (newData.getFirstName() != null) { */
 
             validatePersonDTO(newPersonDTO);
             personFromDB = findPersonByID(oldPersonID, em); 
@@ -120,6 +127,7 @@ public class PersonFacade {
             personUpdated = findPersonByID(personFromDB.getId(), em);
             
         /*if (newData.getFirstName() != null) {
+
             Query query = em.createQuery("UPDATE Person p SET p.firstName =:newFirstName WHERE p.id =:id");
             query.setParameter("newFirstName", newData.getFirstName());
             query.setParameter("id", newData.getId());
@@ -181,7 +189,7 @@ public class PersonFacade {
         return new PersonDTO(personUpdated);
     }
 
-    public int getPersonIDByNameAndNumber(PersonDTO personDTO){
+    public int getPersonIDByNameAndNumber(PersonDTO personDTO) {
         EntityManager em = emf.createEntityManager();
         TypedQuery<Person> pers = em.createQuery("SELECT p FROM Person p WHERE p.email = :email", Person.class);
         pers.setParameter("email", personDTO.getEmail());
@@ -192,7 +200,6 @@ public class PersonFacade {
         int id = persFromDB.getId();*/
         return id;
     }
-
 
     public long getCount() {
         EntityManager em = emf.createEntityManager();
@@ -239,6 +246,23 @@ public class PersonFacade {
         List<Person> people = count.getResultList();
         long howMany = people.size();
         return howMany;
+    }
+
+    public void deletePersonById(int id) {
+        EntityManager em = emf.createEntityManager();
+        
+        try {
+            em.getTransaction().begin();
+            
+            
+            TypedQuery<Person> aPerson = em.createQuery("SELECT p FROM Person p WHERE p.id=:id", Person.class);
+            aPerson.setParameter("id", id);
+            Person pToBeDeleted = aPerson.getSingleResult();
+            em.remove(pToBeDeleted);
+            em.getTransaction().commit();
+        } finally {
+            em.close();
+        }
     }
 
 //    public long getNumberOfPersonsByHobby(String hobbyGiven) {
