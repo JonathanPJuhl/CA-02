@@ -176,5 +176,17 @@ public class PersonFacadeTest {
 
 
     }
+    
+    @Test
+    public void testDeletePerson(){
+        
+        
+        facade.deletePersonById(person.getId());
+        
+        assertEquals(facade.getAll().size(), 0);
+        
+    }
+    
+    
 
 }
