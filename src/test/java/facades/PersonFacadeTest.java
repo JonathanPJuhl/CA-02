@@ -10,6 +10,7 @@ import entities.Hobby;
 import entities.Person;
 import entities.Address;
 import entities.Phone;
+import errorhandling.ArgumentNullException;
 import java.util.ArrayList;
 import java.util.List;
 import utils.EMF_Creator;
@@ -18,11 +19,14 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+
 
 //Uncomment the line below, to temporarily disable this test
 //@Disabled
@@ -147,15 +151,33 @@ public class PersonFacadeTest {
         assertEquals(lisDto.get(0).getFirstName(), "Jens");
 
     }
-  /*  @Test
+    
+    @Test
+    public void testEditPerson() throws ArgumentNullException, Exception {
+        int personToChangeID = person.getId();
+        PersonDTO pDToExpected = new PersonDTO(person);
+        pDToExpected.setEmail("wannabemail@hacker.dk");
+        PersonDTO pdtoResult = facade.updatePerson(pDToExpected, personToChangeID);
+        assertEquals(pDToExpected.getEmail(),pdtoResult.getEmail());
+    }
+     
 
-    public void testEditPerson() {
-        person.setFirstName("null");
-        Person pDTO = person;
-        int a = facade.updatePerson(pDTO);
-        assertEquals(a, 1);
-    }*/
-        @Test
+    //Negativ test
+    @Test
+    public void testEditPersonWithNullEmail() throws Exception {
+       
+        int personToChangeID = person.getId();
+        PersonDTO pDToExpected = new PersonDTO(person);
+        pDToExpected.setEmail(null);
+        ArgumentNullException exception =  Assertions.assertThrows(ArgumentNullException.class, () -> {
+           facade.updatePerson(pDToExpected, personToChangeID);
+        });
+        String expectedMessage = "En personegenskab er null";
+        String actualMessage = exception.getMessage();
+        
+        assertTrue(actualMessage.equals(expectedMessage));       
+    }
+    
     public void testGetAllByCity() {
 
 
