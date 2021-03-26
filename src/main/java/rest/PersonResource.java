@@ -4,9 +4,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dtos.PersonDTO;
 import entities.Person;
+import errorhandling.ArgumentNullException;
 import utils.EMF_Creator;
 import facades.PersonFacade;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
@@ -75,6 +78,7 @@ public class PersonResource {
     public String getPersonByID(@PathParam("id") int id){
         return  GSON.toJson(FACADE.getbyID(id));
     }
+
     
     @Path("{id}")
     @DELETE
@@ -89,5 +93,29 @@ public class PersonResource {
 //    @Consumes({MediaType.APPLICATION_JSON})
 //    @Produces({MediaType.APPLICATION_JSON})
     
+
+
+
+
+    @Path("{id}")
+    @PUT
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    public String editPersonByIDAndPersonInfo(@PathParam("id") int iDToEdit, String persInfoForUpdating){ 
+        String jsonPersonDTO;
+        try{
+            PersonDTO persDTOEditTo = GSON.fromJson(persInfoForUpdating, PersonDTO.class);
+            jsonPersonDTO = GSON.toJson(FACADE.updatePerson(persDTOEditTo,iDToEdit));
+        } catch (ArgumentNullException ex) {
+            Logger.getLogger(PersonResource.class.getName()).log(Level.SEVERE, null, ex);
+            jsonPersonDTO = ex.getMessage();
+        }
+        catch(NullPointerException e){
+            Logger.getLogger(PersonResource.class.getName()).log(Level.SEVERE, null, e);
+            jsonPersonDTO = e.getMessage();
+        }
+        return jsonPersonDTO;
+    }
+
     
 }

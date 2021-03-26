@@ -5,11 +5,16 @@ import dtos.PersonDTO;
 import dtos.Person_UltraDTO;
 import dtos.PhoneDTO;
 import entities.*;
+import errorhandling.ArgumentNullException;
+import errorhandling.ExceptionDTO;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.PathParam;
+import rest.PersonResource;
 
 /**
  *
@@ -77,19 +82,52 @@ public class PersonFacade {
         EntityManager em = emf.createEntityManager();
         PersonDTO pDTO = new PersonDTO(em.find(Person.class, id));
         return pDTO;
+
+
+}
+    
+    public PersonDTO validatePersonDTO(PersonDTO pdto) throws ArgumentNullException{ //???
+        if(pdto.getEmail()== null 
+                || pdto.getFirstName() == null
+                || pdto.getEmail() == null){
+            throw new ArgumentNullException( "En personegenskab er null", 400); //?????? - TODO Tilpas til bedre exception
+        } 
+        return pdto;
     }
+    
+    public Person findPersonByID(int personDTOID, EntityManager em){
+        Query query = em.createQuery("SELECT p FROM Person p WHERE p.id =:id", Person.class); 
+        query.setParameter("id", personDTOID);
+        
+        return (Person) query.getSingleResult();
+    }
+    
+    public PersonDTO updatePerson(PersonDTO newPersonDTO, int oldPersonID) throws ArgumentNullException, NullPointerException { //TODO overveje måske et objekt istedet for int ?
 
-    //TODO Remove/Change this before use
-    public int updatePerson(Person newData) {
+
         EntityManager em = emf.createEntityManager();
-
+       PersonDTO updatedPersonDTO;
+       Person personFromDB;
+       Person personUpdated;
         try {
             em.getTransaction().begin();
-            Person pers = em.merge(newData);
-            em.remove(getbyID(pers.getId()));
-            em.persist(newData);
+
 
             /*if (newData.getFirstName() != null) {
+
+            validatePersonDTO(newPersonDTO);
+            personFromDB = findPersonByID(oldPersonID, em); 
+            if(personFromDB == null){
+                throw new NullPointerException("Person to update doesn't exist"); 
+            }
+            personFromDB.setEmail(newPersonDTO.getEmail());
+            personFromDB.setFirstName(newPersonDTO.getFirstName());
+            personFromDB.setLastName(newPersonDTO.getLastName());
+            em.merge(personFromDB);
+            personUpdated = findPersonByID(personFromDB.getId(), em);
+            
+        /*if (newData.getFirstName() != null) {
+
             Query query = em.createQuery("UPDATE Person p SET p.firstName =:newFirstName WHERE p.id =:id");
             query.setParameter("newFirstName", newData.getFirstName());
             query.setParameter("id", newData.getId());
@@ -140,10 +178,15 @@ public class PersonFacade {
 //            query5.executeUpdate();
         }*/
             em.getTransaction().commit();
-        } finally {
+        }catch(ArgumentNullException ex){
+            Logger.getLogger(PersonResource.class.getName()).log(Level.SEVERE, null, ex);
+            ex.getErrorCode();
+            throw ex;
+        }
+        finally {
             em.close();
         }
-        return 1;
+        return new PersonDTO(personUpdated);
     }
 
     public int getPersonIDByNameAndNumber(PersonDTO personDTO) {
