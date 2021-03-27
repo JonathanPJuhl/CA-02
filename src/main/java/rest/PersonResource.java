@@ -38,6 +38,14 @@ public class PersonResource {
         return GSON.toJson(ListOfPeople);
 
     }
+    
+     @Path("phone/{phone number}")
+    @GET
+    @Produces({MediaType.APPLICATION_JSON})
+    public String getPersonByPhoneNumber(@PathParam ("phone number") int phoneNumber) {
+        return GSON.toJson(FACADE.getPersonByPhoneNumber(phoneNumber));
+
+    }
 
     @Path("count")
     @GET

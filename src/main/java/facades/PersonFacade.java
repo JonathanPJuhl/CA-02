@@ -390,6 +390,25 @@ public class PersonFacade {
         }
     }
 
+    public PersonDTO getPersonByPhoneNumber(int phoneNumber) {
+        EntityManager em = emf.createEntityManager();
+        Phone phoneFromDB = null;
+        try {
+            em.getTransaction().begin();
+            TypedQuery<Phone> query = em.createQuery("SELECT ph FROM Phone ph WHERE ph.phoneNumber=:phoneNumber", Phone.class);
+            query.setParameter("phoneNumber", phoneNumber);
+             phoneFromDB = query.getSingleResult();
+
+            //TODO fejlhåndtering ^^ hvad hvis phoneNumber ikke findes i db eller er f.eks. null?
+            
+            //em.getTransaction().commit();
+
+        } finally {
+            em.close();
+        }
+        return new PersonDTO(phoneFromDB.getPerson());
+    }
+
 //    public long getNumberOfPersonsByHobby(String hobbyGiven) {
 //        EntityManager em = emf.createEntityManager();
 //        TypedQuery<long> count = em.createQuery("SELECT COUNT(p) FROM Person p JOIN p.hobbies sw WHERE sw.hobbyName =:var1", long.class);
