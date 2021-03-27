@@ -273,9 +273,72 @@ public class PersonFacade {
         }
     }
 
+    public void removeHobby(int id, String hobbyRemove) throws Exception {
+        EntityManager em = emf.createEntityManager();
+        Hobby hobbyToBeRemoved;
+
+        try {
+
+            Query aPerson = em.createQuery("SELECT p FROM Person p WHERE p.id=:id");
+            aPerson.setParameter("id", id);
+            Person personToBeEdited = (Person) aPerson.getSingleResult();
+
+            if (personToBeEdited == null) {
+                throw new Exception("Person does not exist in DataBase");
+            }
+
+            Query aHobby = em.createQuery("SELECT h FROM Hobby h WHERE h.name=:name");
+            aHobby.setParameter("name", hobbyRemove);
+            hobbyToBeRemoved = (Hobby) aHobby.getSingleResult();
+
+            if (hobbyToBeRemoved == null) {
+                throw new Exception("The hobby refered by the given hobby name does not currently exist within our databases");
+            }
+
+            personToBeEdited.removeHobbie(hobbyToBeRemoved);
+
+            em.getTransaction().begin();
+            em.merge(personToBeEdited);
+            em.getTransaction().commit();
+
+        } finally {
+            em.close();
+        }
+    }
     
-    
-    
+    public void removePhone(int id, int phoneRemove) throws Exception {
+        EntityManager em = emf.createEntityManager();
+        Phone phoneToBeRemoved;
+
+        try {
+
+            Query aPerson = em.createQuery("SELECT p FROM Person p WHERE p.id=:id");
+            aPerson.setParameter("id", id);
+            Person personToBeEdited = (Person) aPerson.getSingleResult();
+
+            if (personToBeEdited == null) {
+                throw new Exception("Person does not exist in DataBase");
+            }
+
+            Query aPhone = em.createQuery("SELECT p FROM Phone p WHERE p.phoneNumber=:numbr");
+            aPhone.setParameter("numbr", phoneRemove);
+            phoneToBeRemoved = (Phone) aPhone.getSingleResult();
+
+            if (phoneToBeRemoved == null) {
+                throw new Exception("The hobby refered by the given hobby name does not currently exist within our databases");
+            }
+
+            personToBeEdited.removePhone(phoneToBeRemoved);
+
+            em.getTransaction().begin();
+            em.merge(personToBeEdited);
+            em.getTransaction().commit();
+
+        } finally {
+            em.close();
+        }
+    }
+
     public List<PersonDTO> getAll() {
         EntityManager em = emf.createEntityManager();
         TypedQuery<Person> query = em.createQuery("SELECT p FROM Person p", Person.class);
