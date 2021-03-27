@@ -31,7 +31,6 @@ public class PersonResource {
     private static final PersonFacade FACADE = PersonFacade.getPersonFacade(EMF);
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-
     @GET
     @Produces({MediaType.APPLICATION_JSON})
     public String getAllPersons() {
@@ -49,8 +48,6 @@ public class PersonResource {
         return "{\"count\":" + count + "}";  //Done manually so no need for a DTO
     }
 
-
-
     @Path("hobby/{hobby}")
     @GET
     @Produces({MediaType.APPLICATION_JSON})
@@ -64,58 +61,75 @@ public class PersonResource {
     public String getAllPersonsByGivenCity(@PathParam("cityname") String cityname) {
         return GSON.toJson(FACADE.getPeopleByCity(cityname));
     }
-    
+
     @Path("count/{hobby}")
     @GET
     @Produces({MediaType.APPLICATION_JSON})
-    public String getNumberOfPersonsByHobby(@PathParam("hobby") String hobbyGiven){
+    public String getNumberOfPersonsByHobby(@PathParam("hobby") String hobbyGiven) {
         long count = FACADE.getNumberOfPersonsByHobby(hobbyGiven);
         return "{\"count\":" + count + "}";
     }
+
     @Path("id/{id}")
     @GET
     @Produces({MediaType.APPLICATION_JSON})
-    public String getPersonByID(@PathParam("id") int id){
-        return  GSON.toJson(FACADE.getbyID(id));
+    public String getPersonByID(@PathParam("id") int id) {
+        return GSON.toJson(FACADE.getbyID(id));
     }
 
-    
     @Path("{id}")
     @DELETE
-    public void deletePersonById(@PathParam("id") int id){
+    public void deletePersonById(@PathParam("id") int id) {
         FACADE.deletePersonById(id);
     }
 //    @Produces({MediaType.APPLICATION_JSON})
 //    @Consumes({MediaType.APPLICATION_JSON})
-    
+
 //    @Path("editPerson/{newPersonData}")
 //    @PUT
 //    @Consumes({MediaType.APPLICATION_JSON})
 //    @Produces({MediaType.APPLICATION_JSON})
-    
-
-
-
-
     @Path("{id}")
     @PUT
     @Consumes({MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_JSON})
-    public String editPersonByIDAndPersonInfo(@PathParam("id") int iDToEdit, String persInfoForUpdating){ 
+    public String editPersonByIDAndPersonInfo(@PathParam("id") int iDToEdit, String persInfoForUpdating) {
         String jsonPersonDTO;
-        try{
+        try {
             PersonDTO persDTOEditTo = GSON.fromJson(persInfoForUpdating, PersonDTO.class);
-            jsonPersonDTO = GSON.toJson(FACADE.updatePerson(persDTOEditTo,iDToEdit));
+            jsonPersonDTO = GSON.toJson(FACADE.updatePerson(persDTOEditTo, iDToEdit));
         } catch (ArgumentNullException ex) {
             Logger.getLogger(PersonResource.class.getName()).log(Level.SEVERE, null, ex);
             jsonPersonDTO = ex.getMessage();
-        }
-        catch(NullPointerException e){
+        } catch (NullPointerException e) {
             Logger.getLogger(PersonResource.class.getName()).log(Level.SEVERE, null, e);
             jsonPersonDTO = e.getMessage();
         }
         return jsonPersonDTO;
     }
 
-    
+    @Path("addHobbyToPerson/{id}")
+    @PUT
+    public void addHobby(@PathParam("id") int idOfPerson, String hobbyToBeAdded) throws Exception {
+        FACADE.addHobbyToPerson(idOfPerson, hobbyToBeAdded);
+    }
+
+    @Path("removeHobbyFromPerson/{id}")
+    @DELETE
+    public void removeHobby(@PathParam("id") int idOfPerson, String hobbyToBeRemoved) throws Exception {
+        FACADE.removeHobby(idOfPerson, hobbyToBeRemoved);
+    }
+
+    @Path("addPhoneToPerson/{id}")
+    @PUT
+    public void addPhone(@PathParam("id") int idOfPerson, String numbr) throws Exception {
+        FACADE.addPhoneToPerson(idOfPerson, Integer.parseInt(numbr));
+    }
+
+    @Path("removePhoneFromPerson/{id}")
+    @DELETE
+    public void removePhone(@PathParam("id") int idOfPerson, String numbr) throws Exception {
+        FACADE.removePhone(idOfPerson, Integer.parseInt(numbr));
+    }
+
 }
