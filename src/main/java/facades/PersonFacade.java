@@ -214,6 +214,7 @@ public class PersonFacade {
 
         try {
 
+            em.getTransaction().begin();
             Query aPerson = em.createQuery("SELECT p FROM Person p WHERE p.id=:id");
             aPerson.setParameter("id", id);
             Person personToBeEdited = (Person) aPerson.getSingleResult();
@@ -232,7 +233,6 @@ public class PersonFacade {
 
             personToBeEdited.addHobby(hobbyToBeAdded);
 
-            em.getTransaction().begin();
             em.merge(personToBeEdited);
             em.getTransaction().commit();
 
@@ -246,7 +246,7 @@ public class PersonFacade {
         Phone phoneToBeAdded;
 
         try {
-
+            em.getTransaction().begin();
             Query aPerson = em.createQuery("SELECT p FROM Person p WHERE p.id=:id");
             aPerson.setParameter("id", id);
             Person personToBeEdited = (Person) aPerson.getSingleResult();
@@ -264,7 +264,6 @@ public class PersonFacade {
             }
             personToBeEdited.addPhone(phoneToBeAdded);
 
-            em.getTransaction().begin();
             em.merge(personToBeEdited);
             em.getTransaction().commit();
 
@@ -305,7 +304,7 @@ public class PersonFacade {
             em.close();
         }
     }
-    
+
     public void removePhone(int id, int phoneRemove) throws Exception {
         EntityManager em = emf.createEntityManager();
         Phone phoneToBeRemoved;

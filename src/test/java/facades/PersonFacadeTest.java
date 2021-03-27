@@ -216,7 +216,7 @@ public class PersonFacadeTest {
     }
 
     @Test
-    void testPhoneHobby() throws Exception {
+    void testAddhone() throws Exception {
         EntityManager em = emf.createEntityManager();
 
         Phone phone2 = new Phone(23112314, "Club");
