@@ -27,7 +27,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-
 //Uncomment the line below, to temporarily disable this test
 //@Disabled
 public class PersonFacadeTest {
@@ -35,6 +34,8 @@ public class PersonFacadeTest {
     private static EntityManagerFactory emf;
     private static PersonFacade facade;
     private static Person person;
+    private static List<Hobby> hobbies;
+    private static List<Phone> phones;
 
     public PersonFacadeTest() {
     }
@@ -47,7 +48,7 @@ public class PersonFacadeTest {
 
     @AfterAll
     public static void tearDownClass() {
-//        Clean up database after test is done or use a persistence unit with drop-and-create to start up clean on every test
+
     }
 
     // Setup the DataBase in a known state BEFORE EACH TEST
@@ -64,19 +65,17 @@ public class PersonFacadeTest {
             em.createNamedQuery("Address.deleteAllRows").executeUpdate();
             em.createNamedQuery("CityInfo.deleteAllRows").executeUpdate();
 
-
             CityInfo ci = new CityInfo(2830, "Virum");
             Address ad = new Address("Street", "Additional");
             ad.addCityInfo(ci);
 
-            List<Phone> phones = new ArrayList<>();
+            phones = new ArrayList<>();
             Phone phone = new Phone(2134566, "home");
-            phones.add(phone);
+        
 
-
-            Hobby hobby = new Hobby("Fodbold", "spark til bolden og fake skader","boldspill", "teamsport");
-            List<Hobby> hobbies = new ArrayList<>();
-            hobbies.add(hobby);
+            Hobby hobby = new Hobby("Fodbold", "spark til bolden og fake skader", "boldspill", "teamsport");
+            hobbies = new ArrayList<>();
+  
 
             person = new Person("mail@mail.dk", "Jens", "Brønd", phones, ad, hobbies);
             person.addHobby(hobby);
@@ -98,15 +97,13 @@ public class PersonFacadeTest {
     @Test
     public void testCreatePerson() {
 
-
-
         CityInfoDTO ci = new CityInfoDTO(new CityInfo(2800, "Lyngby"));
         AddressDTO ad = new AddressDTO(new Address("Street2", "Additional more"));
         ad.setCityInfoDto(ci);
         List<PhoneDTO> phones = new ArrayList<PhoneDTO>();
         PhoneDTO phone = new PhoneDTO(new Phone(73829374, "also home"));
         phones.add(phone);
-        HobbyDTO hobby = new HobbyDTO(new Hobby("Tennis", "smash bold","boldspill", "teamsport and single player"));
+        HobbyDTO hobby = new HobbyDTO(new Hobby("Tennis", "smash bold", "boldspill", "teamsport and single player"));
         List<HobbyDTO> hobbies = new ArrayList<>();
         hobbies.add(hobby);
         PersonDTO pDTO = new PersonDTO(new Person("cool@mail.dk", "Peter", "Jensen"), ad, phones, hobbies);
@@ -122,14 +119,13 @@ public class PersonFacadeTest {
     @Test
     public void testGetAllPersons() {
 
-
         CityInfoDTO ci = new CityInfoDTO(new CityInfo(2030, "Holte"));
         AddressDTO ad = new AddressDTO(new Address("Street3", "Additional and more"));
         ad.setCityInfoDto(ci);
         List<PhoneDTO> phones = new ArrayList<PhoneDTO>();
         PhoneDTO phone = new PhoneDTO(new Phone(73829374, "also so home"));
         phones.add(phone);
-        HobbyDTO hobby = new HobbyDTO(new Hobby("Hockey", "smash more bold","vintersport", "teamsport"));
+        HobbyDTO hobby = new HobbyDTO(new Hobby("Hockey", "smash more bold", "vintersport", "teamsport"));
         List<HobbyDTO> hobbies = new ArrayList<>();
         hobbies.add(hobby);
         PersonDTO pDTO = new PersonDTO(new Person("icecool@mail.dk", "Hugo", "Jarvier"), ad, phones, hobbies);
@@ -145,70 +141,103 @@ public class PersonFacadeTest {
     @Test
     public void testGetAllByHobby() {
 
-
         List<PersonDTO> lisDto = facade.getAllPersonsByGivenHobby("Fodbold");
 
         assertEquals(lisDto.get(0).getFirstName(), "Jens");
 
     }
-    
+
     @Test
     public void testEditPerson() throws ArgumentNullException, Exception {
         int personToChangeID = person.getId();
         PersonDTO pDToExpected = new PersonDTO(person);
         pDToExpected.setEmail("wannabemail@hacker.dk");
         PersonDTO pdtoResult = facade.updatePerson(pDToExpected, personToChangeID);
-        assertEquals(pDToExpected.getEmail(),pdtoResult.getEmail());
+        assertEquals(pDToExpected.getEmail(), pdtoResult.getEmail());
     }
-     
 
     //Negativ test
     @Test
     public void testEditPersonWithNullEmail() throws Exception {
-       
+
         int personToChangeID = person.getId();
         PersonDTO pDToExpected = new PersonDTO(person);
         pDToExpected.setEmail(null);
-        ArgumentNullException exception =  Assertions.assertThrows(ArgumentNullException.class, () -> {
-           facade.updatePerson(pDToExpected, personToChangeID);
+        ArgumentNullException exception = Assertions.assertThrows(ArgumentNullException.class, () -> {
+            facade.updatePerson(pDToExpected, personToChangeID);
         });
         String expectedMessage = "En personegenskab er null";
         String actualMessage = exception.getMessage();
-        
-        assertTrue(actualMessage.equals(expectedMessage));       
-    }
-    
-    public void testGetAllByCity() {
 
+        assertTrue(actualMessage.equals(expectedMessage));
+    }
+
+    public void testGetAllByCity() {
 
         PersonFacade fe = PersonFacade.getPersonFacade(emf);
         List<PersonDTO> lisDto = fe.getPeopleByCity("Virum");
 
-        assertEquals(lisDto.size(),1);
+        assertEquals(lisDto.size(), 1);
 
     }
+
     @Test
     public void testNumberOfPersonsByHobby() {
-
 
         PersonFacade fe = PersonFacade.getPersonFacade(emf);
         Long nrOfPeople = fe.getNumberOfPersonsByHobby("Fodbold");
 
         assertEquals(nrOfPeople, 1);
 
-
     }
-    
+
     @Test
-    public void testDeletePerson(){
-        
-        
-        facade.deletePersonById(person.getId());
-        
-        assertEquals(facade.getAll().size(), 0);
-        
-    }
-    
-    
+    public void testDeletePerson() {
 
+        facade.deletePersonById(person.getId());
+
+        assertEquals(facade.getAll().size(), 0);
+
+    }
+
+    @Test
+    void testAddHobby() throws Exception {
+        EntityManager em = emf.createEntityManager();
+
+        Hobby hobby2 = new Hobby("Ping Pong", "smash med battet", "boldspill", "freeforall altid bro");
+        hobbies.add(hobby2);
+        em.getTransaction().begin();
+        em.persist(hobby2);
+        em.getTransaction().commit();
+        em.close();
+
+        
+//        person.getHobbies().forEach(h -> {
+//            System.out.println(h.getName());
+//        });
+
+        facade.addHobbyToPerson(person.getId(), "Ping Pong");
+        assertEquals(person.getHobbies().size(), 2);
+    }
+
+    
+        @Test
+    void testPhoneHobby() throws Exception {
+        EntityManager em = emf.createEntityManager();
+
+        Phone phone2 = new Phone(23112314, "Club");
+        phones.add(phone2);
+        em.getTransaction().begin();
+        em.persist(phone2);
+        em.getTransaction().commit();
+        em.close();
+
+        
+//        person.getHobbies().forEach(h -> {
+//            System.out.println(h.getName());
+//        });
+
+        facade.addPhoneToPerson(person.getId(), 23112314);
+        assertEquals(person.getPhones().size(), 2);
+    }
 }
