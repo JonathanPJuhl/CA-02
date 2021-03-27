@@ -79,12 +79,18 @@ public class Person implements Serializable {
             }
         }
     }
-    
-    public void removePhones(){
-        if (phones != null){
-            for(Phone p : phones){
-               phones.remove(p);
-               p.getPerson().removePhones();
+
+    public void removePhone(Phone phone) {
+        if (phone != null) {
+            phones.remove(phone);
+        }
+    }
+
+    public void removePhones() {
+        if (phones != null) {
+            for (Phone p : phones) {
+                phones.remove(p);
+                p.getPerson().removePhones();
             }
         }
     }
@@ -157,7 +163,6 @@ public class Person implements Serializable {
     public List<Hobby> getHobbies() {
         return hobbies;
     }
-    
 
     public void setHobbies(List<Hobby> hobbies) {
         this.hobbies = hobbies;

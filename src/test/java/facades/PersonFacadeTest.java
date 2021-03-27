@@ -71,11 +71,9 @@ public class PersonFacadeTest {
 
             phones = new ArrayList<>();
             Phone phone = new Phone(2134566, "home");
-        
 
             Hobby hobby = new Hobby("Fodbold", "spark til bolden og fake skader", "boldspill", "teamsport");
             hobbies = new ArrayList<>();
-  
 
             person = new Person("mail@mail.dk", "Jens", "Brønd", phones, ad, hobbies);
             person.addHobby(hobby);
@@ -210,18 +208,14 @@ public class PersonFacadeTest {
         em.persist(hobby2);
         em.getTransaction().commit();
         em.close();
-
-        
 //        person.getHobbies().forEach(h -> {
 //            System.out.println(h.getName());
 //        });
-
         facade.addHobbyToPerson(person.getId(), "Ping Pong");
         assertEquals(person.getHobbies().size(), 2);
     }
 
-    
-        @Test
+    @Test
     void testPhoneHobby() throws Exception {
         EntityManager em = emf.createEntityManager();
 
@@ -231,13 +225,46 @@ public class PersonFacadeTest {
         em.persist(phone2);
         em.getTransaction().commit();
         em.close();
-
-        
 //        person.getHobbies().forEach(h -> {
 //            System.out.println(h.getName());
 //        });
-
         facade.addPhoneToPerson(person.getId(), 23112314);
         assertEquals(person.getPhones().size(), 2);
     }
+
+    @Test
+    void testHobbyRemoval() throws Exception {
+        EntityManager em = emf.createEntityManager();
+
+        Hobby hobby2 = new Hobby("Ping Pong", "smash med battet", "boldspill", "freeforall altid bro");
+        em.getTransaction().begin();
+        em.persist(hobby2);
+        em.getTransaction().commit();
+        em.close();
+//        person.getHobbies().forEach(h -> {
+//            System.out.println(h.getName());
+//        });
+        facade.addHobbyToPerson(person.getId(), "Ping Pong");
+        facade.removeHobby(person.getId(), "Ping Pong");
+                assertEquals(1, person.getHobbies().size());
+    }
+    
+    
+    @Test
+    void testPhoneRemoval() throws Exception {
+        EntityManager em = emf.createEntityManager();
+
+        Phone phone2 = new Phone( 33224512, "Work");
+        em.getTransaction().begin();
+        em.persist(phone2);
+        em.getTransaction().commit();
+        em.close();
+//        person.getHobbies().forEach(h -> {
+//            System.out.println(h.getName());
+//        });
+        facade.addPhoneToPerson(person.getId(), 33224512);
+        facade.removePhone(person.getId(), 33224512);
+                assertEquals(1, person.getPhones().size());
+    }
+
 }
