@@ -157,6 +157,7 @@ public class Person implements Serializable {
     public List<Hobby> getHobbies() {
         return hobbies;
     }
+    
 
     public void setHobbies(List<Hobby> hobbies) {
         this.hobbies = hobbies;

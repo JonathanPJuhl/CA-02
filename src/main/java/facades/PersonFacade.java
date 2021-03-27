@@ -83,50 +83,47 @@ public class PersonFacade {
         PersonDTO pDTO = new PersonDTO(em.find(Person.class, id));
         return pDTO;
 
+    }
 
-}
-    
-    public PersonDTO validatePersonDTO(PersonDTO pdto) throws ArgumentNullException{ //???
-        if(pdto.getEmail()== null 
+    public PersonDTO validatePersonDTO(PersonDTO pdto) throws ArgumentNullException { //???
+        if (pdto.getEmail() == null
                 || pdto.getFirstName() == null
-                || pdto.getEmail() == null){
-            throw new ArgumentNullException( "En personegenskab er null", 400); //?????? - TODO Tilpas til bedre exception
-        } 
+                || pdto.getEmail() == null) {
+            throw new ArgumentNullException("En personegenskab er null", 400); //?????? - TODO Tilpas til bedre exception
+        }
         return pdto;
     }
-    
-    public Person findPersonByID(int personDTOID, EntityManager em){
-        Query query = em.createQuery("SELECT p FROM Person p WHERE p.id =:id", Person.class); 
+
+    public Person findPersonByID(int personDTOID, EntityManager em) {
+        Query query = em.createQuery("SELECT p FROM Person p WHERE p.id =:id", Person.class);
         query.setParameter("id", personDTOID);
-        
+
         return (Person) query.getSingleResult();
     }
-    
+
     public PersonDTO updatePerson(PersonDTO newPersonDTO, int oldPersonID) throws ArgumentNullException, NullPointerException { //TODO overveje måske et objekt istedet for int ?
 
-
         EntityManager em = emf.createEntityManager();
-       PersonDTO updatedPersonDTO;
-       Person personFromDB;
-       Person personUpdated = null;
+        PersonDTO updatedPersonDTO;
+        Person personFromDB;
+        Person personUpdated = null;
         try {
             em.getTransaction().begin();
 
 
             /*if (newData.getFirstName() != null) { */
-
             validatePersonDTO(newPersonDTO);
-            personFromDB = findPersonByID(oldPersonID, em); 
-            if(personFromDB == null){
-                throw new NullPointerException("Person to update doesn't exist"); 
+            personFromDB = findPersonByID(oldPersonID, em);
+            if (personFromDB == null) {
+                throw new NullPointerException("Person to update doesn't exist");
             }
             personFromDB.setEmail(newPersonDTO.getEmail());
             personFromDB.setFirstName(newPersonDTO.getFirstName());
             personFromDB.setLastName(newPersonDTO.getLastName());
             em.merge(personFromDB);
             personUpdated = findPersonByID(personFromDB.getId(), em);
-            
-        /*if (newData.getFirstName() != null) {
+
+            /*if (newData.getFirstName() != null) {
 
             Query query = em.createQuery("UPDATE Person p SET p.firstName =:newFirstName WHERE p.id =:id");
             query.setParameter("newFirstName", newData.getFirstName());
@@ -178,12 +175,11 @@ public class PersonFacade {
 //            query5.executeUpdate();
         }*/
             em.getTransaction().commit();
-        }catch(ArgumentNullException ex){
+        } catch (ArgumentNullException ex) {
             Logger.getLogger(PersonResource.class.getName()).log(Level.SEVERE, null, ex);
             ex.getErrorCode();
             throw ex;
-        }
-        finally {
+        } finally {
             em.close();
         }
         return new PersonDTO(personUpdated);
@@ -212,6 +208,74 @@ public class PersonFacade {
 
     }
 
+    public void addHobbyToPerson(int id, String hobbyAdded) throws Exception {
+        EntityManager em = emf.createEntityManager();
+        Hobby hobbyToBeAdded;
+
+        try {
+
+            Query aPerson = em.createQuery("SELECT p FROM Person p WHERE p.id=:id");
+            aPerson.setParameter("id", id);
+            Person personToBeEdited = (Person) aPerson.getSingleResult();
+
+            if (personToBeEdited == null) {
+                throw new Exception("Person does not exist in DataBase");
+            }
+
+            Query aHobby = em.createQuery("SELECT h FROM Hobby h WHERE h.name=:name");
+            aHobby.setParameter("name", hobbyAdded);
+            hobbyToBeAdded = (Hobby) aHobby.getSingleResult();
+
+            if (hobbyToBeAdded == null) {
+                throw new Exception("The hobby refered by the given hobby name does not currently exist within our databases");
+            }
+
+            personToBeEdited.addHobby(hobbyToBeAdded);
+
+            em.getTransaction().begin();
+            em.merge(personToBeEdited);
+            em.getTransaction().commit();
+
+        } finally {
+            em.close();
+        }
+    }
+
+    public void addPhoneToPerson(int id, int number) throws Exception {
+        EntityManager em = emf.createEntityManager();
+        Phone phoneToBeAdded;
+
+        try {
+
+            Query aPerson = em.createQuery("SELECT p FROM Person p WHERE p.id=:id");
+            aPerson.setParameter("id", id);
+            Person personToBeEdited = (Person) aPerson.getSingleResult();
+
+            if (personToBeEdited == null) {
+                throw new Exception("Person does not exist in DataBase");
+            }
+
+            Query aPhone = em.createQuery("SELECT p FROM Phone p WHERE p.phoneNumber=:numbr");
+            aPhone.setParameter("numbr", number);
+            phoneToBeAdded = (Phone) aPhone.getSingleResult();
+
+            if (phoneToBeAdded == null) {
+                throw new Exception("The given number, does not correlate to an existing phone in the current DataBase");
+            }
+            personToBeEdited.addPhone(phoneToBeAdded);
+
+            em.getTransaction().begin();
+            em.merge(personToBeEdited);
+            em.getTransaction().commit();
+
+        } finally {
+            em.close();
+        }
+    }
+
+    
+    
+    
     public List<PersonDTO> getAll() {
         EntityManager em = emf.createEntityManager();
         TypedQuery<Person> query = em.createQuery("SELECT p FROM Person p", Person.class);
@@ -250,11 +314,10 @@ public class PersonFacade {
 
     public void deletePersonById(int id) {
         EntityManager em = emf.createEntityManager();
-        
+
         try {
             em.getTransaction().begin();
-            
-            
+
             TypedQuery<Person> aPerson = em.createQuery("SELECT p FROM Person p WHERE p.id=:id", Person.class);
             aPerson.setParameter("id", id);
             Person pToBeDeleted = aPerson.getSingleResult();
