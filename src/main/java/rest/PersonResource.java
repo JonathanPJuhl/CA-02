@@ -21,6 +21,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 //Todo Remove or change relevant parts before ACTUAL use
 @Path("persons")
@@ -31,12 +32,21 @@ public class PersonResource {
     private static final PersonFacade FACADE = PersonFacade.getPersonFacade(EMF);
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
+    public Response resp(String gson){
+        return Response.ok()
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Credentials", "true")
+                .header("Access-Control-Allow-Headers","origin, content-type, accept, authorization")
+                .header("Access-Control-Allow-Methods","GET, POST, PUT, DELETE, OPTIONS, HEAD")
+                .entity(gson).build();
+    }
+
     @GET
     @Produces({MediaType.APPLICATION_JSON})
-    public String getAllPersons() {
+    public Response getAllPersons() {
         List<PersonDTO> ListOfPeople = FACADE.getAll();
-        return GSON.toJson(ListOfPeople);
-
+        CorsFilter cors = new CorsFilter();
+        return resp(GSON.toJson(ListOfPeople));
     }
 
     @Path("count")
