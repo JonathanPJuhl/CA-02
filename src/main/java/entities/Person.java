@@ -35,14 +35,14 @@ public class Person implements Serializable {
     private String email;
     private String firstName;
     private String lastName;
-    
-    @OneToMany(orphanRemoval = true, cascade = CascadeType.PERSIST, mappedBy= "person")
+
+    @OneToMany(orphanRemoval = true, cascade = CascadeType.PERSIST, mappedBy = "person")
     private List<Phone> phones = new ArrayList<>();
-    
+
     @ManyToOne(cascade = CascadeType.PERSIST)
     private Address address;
-    
-    @ManyToMany(cascade = CascadeType.PERSIST, mappedBy= "persons")
+
+    @ManyToMany(cascade = CascadeType.PERSIST, mappedBy = "persons")
     private List<Hobby> hobbies;
 
     public Person() {
@@ -64,31 +64,62 @@ public class Person implements Serializable {
         this.hobbies = new ArrayList<>();
     }
 
-    public void addAddress(Address address){
-        if (address != null){
-           this.setAddress(address);
-           //address.addPerson(this);
-          }
+    public void removeHobbie(Hobby hobby) {
+        if (hobby != null) {
+            hobbies.remove(hobby);
+            hobby.getPersons().remove(this);
+        }
     }
-    
-    
-    public void addHobby(Hobby hobby){
-        if (hobby != null){
+
+    public void removeHobbies() {
+        if (hobbies != null) {
+            for (Hobby h : hobbies) {
+                hobbies.remove(h);
+                h.getPersons().remove(this);
+            }
+        }
+    }
+
+    public void removePhone(Phone phone) {
+        if (phone != null) {
+            phones.remove(phone);
+        }
+    }
+
+    public void removePhones() {
+        if (phones != null) {
+            for (Phone p : phones) {
+                phones.remove(p);
+                p.getPerson().removePhones();
+            }
+        }
+    }
+
+    public void addAddress(Address address) {
+        if (address != null) {
+            this.setAddress(address);
+            //address.addPerson(this);
+        }
+    }
+
+    public void addHobby(Hobby hobby) {
+        if (hobby != null) {
             this.hobbies.add(hobby);
             hobby.getPersons().add(this);
         }
     }
-    
-    public void addPhone(Phone phone){
-        if (phone != null){
+
+    public void addPhone(Phone phone) {
+        if (phone != null) {
             this.phones.add(phone);
             phone.setPerson(this);
         }
     }
-    
+
     public int getId() {
         return id;
     }
+
     public String getEmail() {
         return email;
     }
@@ -150,6 +181,5 @@ public class Person implements Serializable {
         sb.append('}');
         return sb.toString();
     }
-    
-    
+
 }

@@ -29,7 +29,7 @@ public class Phone implements Serializable {
         this.phoneNumber = phoneNumber;
         this.typeOfNumber = typeOfNumber;
     }
-
+    
     public int getId() {
         return id;
     }
