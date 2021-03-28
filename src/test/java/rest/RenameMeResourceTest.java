@@ -22,7 +22,7 @@ import org.glassfish.grizzly.http.util.HttpStatus;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 //Uncomment the line below, to temporarily disable this test
-//@Disabled
+//@Disabled 
 
 public class RenameMeResourceTest {
 

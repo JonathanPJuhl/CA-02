@@ -39,10 +39,11 @@ public class PersonResource {
 
     }
     
+    //TODO - Needs testing !!!!
      @Path("phone/{phone number}")
     @GET
     @Produces({MediaType.APPLICATION_JSON})
-    public String getPersonByPhoneNumber(@PathParam ("phone number") int phoneNumber) {
+    public String getPersonByPhoneNumber(@PathParam ("phone number") int phoneNumber) throws ArgumentNullException {
         return GSON.toJson(FACADE.getPersonByPhoneNumber(phoneNumber));
 
     }

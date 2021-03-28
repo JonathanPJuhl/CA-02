@@ -390,9 +390,15 @@ public class PersonFacade {
         }
     }
 
-    public PersonDTO getPersonByPhoneNumber(int phoneNumber) {
+    
+    //TODO - Needs Testing !!!!
+    public PersonDTO getPersonByPhoneNumber(int phoneNumber) throws ArgumentNullException {
         EntityManager em = emf.createEntityManager();
         Phone phoneFromDB = null;
+        Integer phoneNumberAsObject = phoneNumber;
+        if ( phoneNumberAsObject == null /*|| String.valueOf(phoneNumber).length() != 8*/) {
+            throw new ArgumentNullException("The phonenumber contains no numbers", 400);
+        }
         try {
             em.getTransaction().begin();
             TypedQuery<Phone> query = em.createQuery("SELECT ph FROM Phone ph WHERE ph.phoneNumber=:phoneNumber", Phone.class);
@@ -401,7 +407,7 @@ public class PersonFacade {
 
             //TODO fejlhåndtering ^^ hvad hvis phoneNumber ikke findes i db eller er f.eks. null?
             
-            //em.getTransaction().commit();
+            em.getTransaction().commit();
 
         } finally {
             em.close();

@@ -2,7 +2,7 @@
 package errorhandling;
 
 
-public class ArgumentNullException extends Exception{ //Runtime?
+public class ArgumentNullException extends Exception{ //RuntimeException?
     int errorCode;
     
     public ArgumentNullException(String string, int errorCode) {
