@@ -7,6 +7,7 @@ import dtos.PhoneDTO;
 import entities.*;
 import errorhandling.ArgumentNullException;
 import errorhandling.ExceptionDTO;
+import errorhandling.InvaldPhoneNumberException;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -388,6 +389,30 @@ public class PersonFacade {
         } finally {
             em.close();
         }
+    }
+
+    
+    public PersonDTO getPersonByPhoneNumber(int phoneNumber) throws ArgumentNullException/*, InvaldPhoneNumberException*/ {
+        EntityManager em = emf.createEntityManager();
+        Phone phoneFromDB = null;
+         /* if (String.valueOf(phoneNumber).length() != 8) {
+            throw new InvaldPhoneNumberException(400, "The phonenumber must contain 8 digits");
+        }*/ 
+                // ^Kunne være nice at have - men så skal vi ændre i db eller validere numrene derfra ------------- TODO - se på dette
+        try {
+            em.getTransaction().begin();
+            TypedQuery<Phone> query = em.createQuery("SELECT ph FROM Phone ph WHERE ph.phoneNumber=:phoneNumber", Phone.class);
+            query.setParameter("phoneNumber", phoneNumber);
+            phoneFromDB = query.getSingleResult();
+
+            //TODO fejlhåndtering ^^ hvad hvis phoneNumber ikke findes i db?
+            em.getTransaction().commit();
+
+     //   } catch(){
+    }finally {
+            em.close();
+        }
+        return new PersonDTO(phoneFromDB.getPerson());
     }
 
 //    public long getNumberOfPersonsByHobby(String hobbyGiven) {

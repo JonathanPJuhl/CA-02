@@ -8,6 +8,7 @@ import entities.Phone;
 
 import java.util.ArrayList;
 import java.util.List;
+import jdk.nashorn.internal.objects.NativeArray;
 
 
 public class PersonDTO {
@@ -16,9 +17,9 @@ public class PersonDTO {
     private String email;
     private String firstName;
     private String lastName;
-    private List<PhoneDTO> phonesDTO;
+    private List<PhoneDTO> phonesDTO = new ArrayList<>();
     private AddressDTO addressesDTO;
-    private List<HobbyDTO> hobbiesDTO;
+    private List<HobbyDTO> hobbiesDTO = new ArrayList<>();
 
 
     public PersonDTO(Person person, AddressDTO addressesDTO, List<PhoneDTO> phonesDTO, List<HobbyDTO> hobbiesDTO) {
@@ -40,10 +41,19 @@ public class PersonDTO {
         this.hobbiesDTO = hobbiesDTO;
     }
 
+//        public PersonDTO(Person pers) {
+//        this.email = pers.getEmail();
+//        this.firstName = pers.getFirstName();
+//        this.lastName = pers.getLastName();
+//    }
+        
     public PersonDTO(Person pers) {
         this.email = pers.getEmail();
         this.firstName = pers.getFirstName();
         this.lastName = pers.getLastName();
+        this.addressesDTO = new AddressDTO(pers.getAddress());
+        pers.getHobbies().forEach(hobby -> this.hobbiesDTO.add(new HobbyDTO(hobby)));
+        pers.getPhones().forEach(phone -> this.phonesDTO.add(new PhoneDTO(phone)));
     }
 
     public static List<PersonDTO> getDtos(List<Person> persons){

@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import dtos.PersonDTO;
 import entities.Person;
 import errorhandling.ArgumentNullException;
+import errorhandling.InvaldPhoneNumberException;
 import utils.EMF_Creator;
 import facades.PersonFacade;
 import java.util.List;
@@ -85,6 +86,15 @@ public class PersonResource {
     @Produces({MediaType.APPLICATION_JSON})
     public String getPersonByID(@PathParam("id") int id) {
         return GSON.toJson(FACADE.getbyID(id));
+    }
+    
+    //TODO - Needs testing !!!!
+     @Path("phone/{phone number}")
+    @GET
+    @Produces({MediaType.APPLICATION_JSON})
+    public String getPersonByPhoneNumber(@PathParam ("phone number") int phoneNumber) throws ArgumentNullException/*, InvaldPhoneNumberException*/ {
+        return GSON.toJson(FACADE.getPersonByPhoneNumber(phoneNumber));
+
     }
 
     @Path("{id}")

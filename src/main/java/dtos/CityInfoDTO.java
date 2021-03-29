@@ -12,7 +12,7 @@ public class CityInfoDTO {
 
     private int zip;
     private String cityName;
-    private List<Address> adresses;
+    private List<AddressDTO> addressesDTOs = new ArrayList<>();
 
     public CityInfoDTO(CityInfo ci) {
         this.zip = ci.getZip();
@@ -20,10 +20,9 @@ public class CityInfoDTO {
     }
     
     
-  public static List<AddressDTO> getDtos(List<Address> adresses){
-        List<AddressDTO> addressDtos = new ArrayList();
-        adresses.forEach(adrs->addressDtos.add(new AddressDTO(adrs)));
-        return addressDtos;
+  public List<AddressDTO> getAddressesDTOs(List<Address> adresses){
+        adresses.forEach(adrs->this.addressesDTOs.add(new AddressDTO(adrs)));
+        return addressesDTOs;
     }
     
     public int getZip() {
@@ -42,14 +41,13 @@ public class CityInfoDTO {
         this.cityName = cityName;
     }
 
-    public List<Address> getAdresses() {
-        return adresses;
+    public List<AddressDTO> getAddressesDTOs() {
+        return addressesDTOs;
     }
 
-    public void setAdresses(List<Address> adresses) {
-        this.adresses = adresses;
+    public void setAddressesDTOs(List<AddressDTO> addressesDTOs) {
+        this.addressesDTOs = addressesDTOs;
     }
-
     
     
 }

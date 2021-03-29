@@ -39,11 +39,11 @@ public class Address implements Serializable {
 
     }
     
-        public void addCityInfo(CityInfo cityInfo){
-        if (cityInfo != null){
-           this.setCityInfo(cityInfo);
-           //address.addPerson(this);
-          }
+    public void addCityInfo(CityInfo cityInfo) {
+        if (cityInfo != null) {
+            this.setCityInfo(cityInfo);
+            //address.addPerson(this);
+        }
     }
     
     public int getId() {

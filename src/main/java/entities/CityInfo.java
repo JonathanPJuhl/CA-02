@@ -2,6 +2,7 @@
 package entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -21,7 +22,7 @@ public class CityInfo implements Serializable {
     private String cityName;
     
     @OneToMany(cascade =CascadeType.PERSIST, mappedBy="cityInfo")
-    private List<Address> address;
+    private List<Address> address/* = new ArrayList<>()*/;
 
     public CityInfo() {
     }
