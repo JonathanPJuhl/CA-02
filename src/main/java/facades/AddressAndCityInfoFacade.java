@@ -4,6 +4,8 @@ import dtos.AddressDTO;
 import dtos.CityInfoDTO;
 import entities.Address;
 import entities.CityInfo;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -101,13 +103,19 @@ public class AddressAndCityInfoFacade {
         }
 
     }
-    /*
-    public List<RenameMeDTO> getAll(){
+    
+    public List<CityInfoDTO> getAll(){
+        List<CityInfoDTO> LISTEADTOER = new ArrayList();
+        
         EntityManager em = emf.createEntityManager();
-        TypedQuery<RenameMe> query = em.createQuery("SELECT r FROM RenameMe r", RenameMe.class);
-        List<RenameMe> rms = query.getResultList();
-        return RenameMeDTO.getDtos(rms);
-    }*/
+        TypedQuery<CityInfo> query = em.createQuery("SELECT r FROM CityInfo r", CityInfo.class);
+        List<CityInfo> rms = query.getResultList();
+        for (CityInfo rm : rms) {
+            LISTEADTOER.add(new CityInfoDTO(rm));
+            
+        }
+        return LISTEADTOER;
+    }
 
  /*
     public static void main(String[] args) {

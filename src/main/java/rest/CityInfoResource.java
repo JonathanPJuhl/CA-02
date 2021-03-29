@@ -2,8 +2,10 @@ package rest;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import dtos.CityInfoDTO;
 import facades.AddressAndCityInfoFacade;
 import facades.PersonFacade;
+import java.util.List;
 import utils.EMF_Creator;
 
 import javax.persistence.EntityManagerFactory;
@@ -23,9 +25,9 @@ public class CityInfoResource {
             
     @GET
     @Produces({MediaType.APPLICATION_JSON})
-    public String getAllZipcodes() {
-        //FACADE.
-        return "{\"msg\":\"Hello World\"}";
+    public String getAllCities() {
+        return GSON.toJson(FACADE.getAll());
+
     }
 
 
