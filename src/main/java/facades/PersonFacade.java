@@ -367,7 +367,7 @@ public class PersonFacade {
     //Ugly but works
     public long getNumberOfPersonsByHobby(String hobbyGiven) {
         EntityManager em = emf.createEntityManager();
-        TypedQuery<Person> count = em.createQuery("SELECT COUNT(p) FROM Person p JOIN p.hobbies ph WHERE ph.name =:hobby", Person.class);
+        TypedQuery<Person> count = em.createQuery("SELECT p FROM Person p JOIN p.hobbies ph WHERE ph.name =:hobby", Person.class);
         count.setParameter("hobby", hobbyGiven);
         List<Person> people = count.getResultList();
         long howMany = people.size();
