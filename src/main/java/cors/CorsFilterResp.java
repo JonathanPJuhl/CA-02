@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package rest;
+package cors;
 
 import java.io.IOException;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -19,7 +19,7 @@ import javax.ws.rs.ext.Provider;
 
 @PreMatching
 @Provider
-public class CorsFilter implements ContainerResponseFilter {
+public class CorsFilterResp implements ContainerResponseFilter {
  @Override
  public void filter( ContainerRequestContext requestCtx, ContainerResponseContext res )
    throws IOException {

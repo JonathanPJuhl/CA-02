@@ -3,16 +3,13 @@ package rest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dtos.PersonDTO;
-import entities.Person;
 import errorhandling.ArgumentNullException;
 import utils.EMF_Creator;
 import facades.PersonFacade;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.TypedQuery;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -32,21 +29,13 @@ public class PersonResource {
     private static final PersonFacade FACADE = PersonFacade.getPersonFacade(EMF);
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    public Response resp(String gson){
-        return Response.ok()
-                .header("Access-Control-Allow-Origin", "*")
-                .header("Access-Control-Allow-Credentials", "true")
-                .header("Access-Control-Allow-Headers","origin, content-type, accept, authorization")
-                .header("Access-Control-Allow-Methods","GET, POST, PUT, DELETE, OPTIONS, HEAD")
-                .entity(gson).build();
-    }
+
 
     @GET
     @Produces({MediaType.APPLICATION_JSON})
-    public Response getAllPersons() {
+    public String getAllPersons() {
         List<PersonDTO> ListOfPeople = FACADE.getAll();
-        CorsFilter cors = new CorsFilter();
-        return resp(GSON.toJson(ListOfPeople));
+        return GSON.toJson(ListOfPeople);
     }
 
     @Path("count")
@@ -87,10 +76,11 @@ public class PersonResource {
         return GSON.toJson(FACADE.getbyID(id));
     }
 
-    @Path("{id}")
+    @Path("delete/{id}")
     @DELETE
-    public void deletePersonById(@PathParam("id") int id) {
+    public int deletePersonById(@PathParam("id") int id) {
         FACADE.deletePersonById(id);
+        return id;
     }
 //    @Produces({MediaType.APPLICATION_JSON})
 //    @Consumes({MediaType.APPLICATION_JSON})
