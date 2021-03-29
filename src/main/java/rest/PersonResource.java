@@ -3,16 +3,13 @@ package rest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dtos.PersonDTO;
-import entities.Person;
 import errorhandling.ArgumentNullException;
 import utils.EMF_Creator;
 import facades.PersonFacade;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.TypedQuery;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -45,7 +42,6 @@ public class PersonResource {
     @Produces({MediaType.APPLICATION_JSON})
     public Response getAllPersons() {
         List<PersonDTO> ListOfPeople = FACADE.getAll();
-        CorsFilter cors = new CorsFilter();
         return resp(GSON.toJson(ListOfPeople));
     }
 
