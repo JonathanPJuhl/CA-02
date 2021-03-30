@@ -108,12 +108,14 @@ public class PersonResource {
         FACADE.addHobbyToPerson(idOfPerson, hobbyToBeAdded);
     }
 
-    @Path("createPerson/{person}")
     @POST
-    public void createPerson(String person) throws Exception {
-        PersonDTO pDTO = GSON.fromJson(person, PersonDTO.class);
-        //PersonDTO pDTO = new PersonDTO()
-        FACADE.create(pDTO);
+    @Path("create")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public String addPerson(String json) {
+        Person persDTO = GSON.fromJson(json, Person.class);
+        PersonDTO persistedPers = FACADE.create(new PersonDTO(persDTO));
+        return GSON.toJson(persistedPers);
     }
 
     @Path("removeHobbyFromPerson/{id}")
