@@ -1,9 +1,6 @@
 package facades;
 
-import dtos.HobbyDTO;
-import dtos.PersonDTO;
-import dtos.Person_UltraDTO;
-import dtos.PhoneDTO;
+import dtos.*;
 import entities.*;
 import errorhandling.ArgumentNullException;
 import errorhandling.ExceptionDTO;
@@ -385,6 +382,34 @@ public class PersonFacade {
             Person pToBeDeleted = aPerson.getSingleResult();
             em.remove(pToBeDeleted);
             em.getTransaction().commit();
+        } finally {
+            em.close();
+        }
+    }
+
+    public PersonDTO getByPhone(int phoneNr) {
+        EntityManager em = emf.createEntityManager();
+
+        try {
+            em.getTransaction().begin();
+
+            //TypedQuery<Person> aPerson = em.createQuery("SELECT p FROM Person p JOIN p.phones pp WHERE pp.phoneNumber = :phone", Person.class);
+            TypedQuery<Phone> aPerson = em.createQuery("SELECT p FROM Phone p WHERE p.phoneNumber = :phone", Phone.class);
+
+            aPerson.setParameter("phone", phoneNr);
+            Phone phone = aPerson.getSingleResult();
+            Person p = phone.getPerson();
+
+            em.getTransaction().commit();
+            List<HobbyDTO> hDTO = new ArrayList<>();
+            for(Hobby h: p.getHobbies()){
+                hDTO.add(new HobbyDTO(h));
+            }
+            List<PhoneDTO> pDTO = new ArrayList<>();
+            for(Phone po: p.getPhones()){
+                pDTO.add(new PhoneDTO(po));
+            }
+            return new PersonDTO(p, new AddressDTO(p.getAddress()),pDTO, hDTO);
         } finally {
             em.close();
         }

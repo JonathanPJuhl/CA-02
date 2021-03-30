@@ -48,13 +48,15 @@ public class Populator {
         PhoneDTO phone = new PhoneDTO(new Phone(2134566, "home"));
         PhoneDTO phone2 = new PhoneDTO(new Phone(483927398, "home"));
         PhoneDTO phone3 = new PhoneDTO(new Phone(12928382, "home"));
+        PhoneDTO phone4 = new PhoneDTO(new Phone(4839273, "home"));
+        PhoneDTO phone5 = new PhoneDTO(new Phone(1292838211, "home"));
         //pF.createPhone(phone);
         //PhoneDTO phoneFromDB = pF.getPhoneFromDB(phone);
         phones.add(phone);
         phones.add(phone2);
         phones.add(phone3);
-        phones2.add(phone2);
-        phones3.add(phone3);
+        phones2.add(phone4);
+        phones3.add(phone5);
         HobbyDTO hobby = new HobbyDTO(new Hobby("Fodbold", "spark til bolden og fake skader","boldspill", "teamsport"));
         HobbyDTO hobby2 = new HobbyDTO(new Hobby("Håndbold", "kast bolden og rigtige skader","boldspill", "teamsport"));
         HobbyDTO hobby3 = new HobbyDTO(new Hobby("Tennis", "sving til bolden og ingen skader","boldspill", "teamsport"));
