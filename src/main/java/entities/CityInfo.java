@@ -17,7 +17,7 @@ public class CityInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    private int zip;
+    private String zip;
     private String cityName;
     
     @OneToMany(cascade =CascadeType.PERSIST, mappedBy="cityInfo")
@@ -26,7 +26,7 @@ public class CityInfo implements Serializable {
     public CityInfo() {
     }
 
-    public CityInfo(int zip, String cityName) {
+    public CityInfo(String zip, String cityName) {
         this.zip = zip;
         this.cityName = cityName;
 
@@ -38,18 +38,20 @@ public class CityInfo implements Serializable {
             address.setCityInfo(this);
         }
     }
-    
-    public int getZip() {
+
+    public String getZip() {
         return zip;
+    }
+
+    public void setZip(String zip) {
+        this.zip = zip;
     }
 
     public String getCityName() {
         return cityName;
     }
 
-    public void setZip(int zip) {
-        this.zip = zip;
-    }
+
 
     public void setCityName(String cityName) {
         this.cityName = cityName;

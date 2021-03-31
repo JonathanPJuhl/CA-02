@@ -41,13 +41,13 @@ public class AddressAndCityInfoFacade {
         return emf.createEntityManager();
     }
 
-    public AddressDTO createAddress(AddressDTO address) {
+    /*public AddressDTO createAddress(AddressDTO address) {
        // CityInfo ci2 = new CityInfo(ci.getZip(), ci.getCityName());
-        Address address1 = new Address(address.getStreet(), address.getAdditionalInfo());
+       // Address address1 = new Address(address.getStreet(), address.getAdditionalInfo());
 
-       /* for (HobbyDTO h : pDTO.getHobbies()) {
+       *//* for (HobbyDTO h : pDTO.getHobbies()) {
             pers.addHobby(new Hobby(h.getHobbyName(), h.getDescription()));
-        }*/
+        }*//*
 
 
 
@@ -62,7 +62,7 @@ public class AddressAndCityInfoFacade {
             em.close();
         }
         return new AddressDTO(address1);
-    }
+    }*/
     public CityInfoDTO createCityInfo(CityInfoDTO cityInfo) {
 
         CityInfo ci = new CityInfo(cityInfo.getZip(), cityInfo.getCityName());

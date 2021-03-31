@@ -113,8 +113,8 @@ public class PersonResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public String addPerson(String json) {
-        Person persDTO = GSON.fromJson(json, Person.class);
-        PersonDTO persistedPers = FACADE.create(new PersonDTO(persDTO));
+        PersonDTO persDTO = GSON.fromJson(json, PersonDTO.class);
+        PersonDTO persistedPers = FACADE.create(persDTO);
         return GSON.toJson(persistedPers);
     }
 

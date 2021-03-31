@@ -29,12 +29,12 @@ public class Populator {
         PhoneFacade pF = PhoneFacade.getPersonFacade(emf);
         HobbyFacade hF = HobbyFacade.getHobbyFacade(emf);
 
-        CityInfoDTO ci = new CityInfoDTO(new CityInfo(7777777, "Narnia"));
-        CityInfoDTO ci2 = new CityInfoDTO(new CityInfo(8888888, "Hogwarts"));
-        CityInfoDTO ci3 = new CityInfoDTO(new CityInfo(9999999, "Helvede"));
-        AddressDTO ad = new AddressDTO( new Address("Street", "Additional"));
-        AddressDTO ad2 = new AddressDTO( new Address("Street2", "In addition"));
-        AddressDTO ad3 = new AddressDTO( new Address("Street3", "Also this"));
+        CityInfoDTO ci = new CityInfoDTO(new CityInfo("777777" , "Narnia"));
+        CityInfoDTO ci2 = new CityInfoDTO(new CityInfo("888888", "Hogwarts"));
+        CityInfoDTO ci3 = new CityInfoDTO(new CityInfo("99999", "Helvede"));
+        AddressDTO ad = new AddressDTO( new Address("Street", "Additional", "2830"));
+        AddressDTO ad2 = new AddressDTO( new Address("Street2", "In addition", "4000"));
+        AddressDTO ad3 = new AddressDTO( new Address("Street3", "Also this", "3000"));
         ad.setCityInfoDto(ci);
         ad2.setCityInfoDto(ci2);
         ad3.setCityInfoDto(ci3);
@@ -82,10 +82,10 @@ public class Populator {
         pDTO.setHobbies(hobbies);
         pDTO2.setHobbies(hobbies2);
         pDTO3.setHobbies(hobbies3);
-        fe.create(pDTO);
+        /*fe.create(pDTO);
         fe.create(pDTO2);
         fe.create(pDTO3);
-
+*/
         /*CityInfo ci2 = new CityInfo(2800, "Lyngby");
         Address ad2 = new Address("Street", "Additional", ci2);
         List<Phone> phones2 = new ArrayList<Phone>();

@@ -1,5 +1,7 @@
 package facades;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import dtos.*;
 import entities.*;
 import errorhandling.ArgumentNullException;
@@ -44,30 +46,42 @@ public class PersonFacade {
     }
 
     public PersonDTO create(PersonDTO pDTO) {
-
+        EntityManager em = emf.createEntityManager();
         Person pers = new Person(pDTO.getEmail(), pDTO.getFirstName(), pDTO.getLastName());
 
-        for (PhoneDTO p : pDTO.getPhones()) {
-            pers.addPhone(new Phone(p.getPhoneNumber(), p.getTypeOfNumber()));
-        }
 
-        for (HobbyDTO h : pDTO.getHobbies()) {
 
-            Hobby hobby = new Hobby(h.getName(), h.getWikiLink(), h.getCategory(), h.getType());
 
-            pers.addHobby(hobby);
 
-        }
 
-        Address address = new Address(pDTO.getAddress().getStreet(),
-                pDTO.getAddress().getAdditionalInfo());
-        address.addCityInfo(new CityInfo(pDTO.getAddress().getCityInfoDto().getZip(), pDTO.getAddress().getCityInfoDto().getCityName()));
-        pers.addAddress(address);
-
-        EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
             em.persist(pers);
+            em.getTransaction().commit();
+
+            for (PhoneDTO p : pDTO.getPhones()) {
+                pers.addPhone(new Phone(p.getPhoneNumber(), p.getTypeOfNumber()));
+            }
+
+            for (HobbyDTO h : pDTO.getHobbies()) {
+
+                Hobby hobby = new Hobby(h.getName(), h.getWikiLink(), h.getCategory(), h.getType());
+
+                pers.addHobby(hobby);
+
+            }
+            Address address = new Address(pDTO.getAddress().getStreet(),
+                    pDTO.getAddress().getAdditionalInfo(), pDTO.getAddress().getZip());
+            CityInfo cityInfo = getCityInfo(pDTO.getCityInfoDTO());
+            //address.addCityInfo(new CityInfo(pDTO.getAddress().getCityInfoDto().getZip(), pDTO.getAddress().getCityInfoDto().getCityName()));
+            address.addCityInfo(cityInfo);
+            pers.addAddress(address);
+            //pers.getAddress().setCityInfo(getCityInfo(new CityInfoDTO(pDTO.getCityInfoDTO().getZip(), pDTO.getCityInfoDTO().getCityName())));
+
+
+
+            em.getTransaction().begin();
+            em.merge(pers);
             em.getTransaction().commit();
         } finally {
             em.close();
@@ -80,6 +94,13 @@ public class PersonFacade {
         PersonDTO pDTO = new PersonDTO(em.find(Person.class, id));
         return pDTO;
 
+    }
+    public CityInfo getCityInfo(CityInfoDTO cdto){
+        EntityManager em = emf.createEntityManager();
+        TypedQuery<CityInfo> query = em.createQuery("SELECT c FROM CityInfo c WHERE c.zip =:zip", CityInfo.class);
+        query.setParameter("zip", cdto.getZip());
+
+        return query.getSingleResult();
     }
 
     public PersonDTO validatePersonDTO(PersonDTO pdto) throws ArgumentNullException { //???
