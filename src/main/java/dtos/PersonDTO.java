@@ -40,10 +40,19 @@ public class PersonDTO {
         this.hobbiesDTO = hobbiesDTO;
     }
 
+//    public PersonDTO(Person pers) {
+//        this.email = pers.getEmail();
+//        this.firstName = pers.getFirstName();
+//        this.lastName = pers.getLastName();
+//    }
+    
     public PersonDTO(Person pers) {
         this.email = pers.getEmail();
         this.firstName = pers.getFirstName();
         this.lastName = pers.getLastName();
+        pers.getPhones().forEach(phone->this.getPhones().add(new PhoneDTO(phone)));
+        this.addressesDTO = new AddressDTO(pers.getAddress());
+        pers.getHobbies().forEach(hobby->this.getHobbies().add(new HobbyDTO(hobby)));
     }
 
     public static List<PersonDTO> getDtos(List<Person> persons){

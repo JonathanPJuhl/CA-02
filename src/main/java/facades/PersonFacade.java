@@ -7,6 +7,7 @@ import dtos.PhoneDTO;
 import entities.*;
 import errorhandling.ArgumentNullException;
 import errorhandling.ExceptionDTO;
+import errorhandling.IllegalPhoneException;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -88,8 +89,13 @@ public class PersonFacade {
     public PersonDTO validatePersonDTO(PersonDTO pdto) throws ArgumentNullException { //???
         if (pdto.getEmail() == null
                 || pdto.getFirstName() == null
-                || pdto.getEmail() == null) {
-            throw new ArgumentNullException("En personegenskab er null", 400); //?????? - TODO Tilpas til bedre exception
+                || pdto.getEmail() == null
+                || pdto.getAddress() == null
+                || pdto.getHobbies().contains(null)
+                || pdto.getPhones().contains(null)
+                || pdto.getAddress().getCityInfoDto() == null
+                ) {
+            throw new ArgumentNullException("En personegenskab er null", 400);
         }
         return pdto;
     }
@@ -101,85 +107,37 @@ public class PersonFacade {
         return (Person) query.getSingleResult();
     }
 
-    public PersonDTO updatePerson(PersonDTO newPersonDTO, int oldPersonID) throws ArgumentNullException, NullPointerException { //TODO overveje måske et objekt istedet for int ?
+    private boolean validatePhone(int phoneNumber) throws IllegalPhoneException {
+       boolean allGood = true;
+        if(String.valueOf(phoneNumber).length() != 8){
+           allGood = false;
+       }
+       return allGood;
+    }
+    
+    public PersonDTO updatePerson(PersonDTO newPersonDTO, int oldPersonID) throws ArgumentNullException{ 
 
         EntityManager em = emf.createEntityManager();
-        PersonDTO updatedPersonDTO;
         Person personFromDB;
         Person personUpdated = null;
+        //List<Boolean> phonesAreGood = ArrayList<>(); 
+        
         try {
             em.getTransaction().begin();
-
-
-            /*if (newData.getFirstName() != null) { */
             validatePersonDTO(newPersonDTO);
+          
+            /*  newPersonDTO.getPhones().forEach(phone ->{ 
+                validatePhone(phone.getPhoneNumber());
+            throw new IllegalPhoneException(406, "Phone number contains 8 digits");
+            });*/
+            
             personFromDB = findPersonByID(oldPersonID, em);
-            if (personFromDB == null) {
-                throw new NullPointerException("Person to update doesn't exist");
-            }
-            personFromDB.setEmail(newPersonDTO.getEmail());
-            personFromDB.setFirstName(newPersonDTO.getFirstName());
-            personFromDB.setLastName(newPersonDTO.getLastName());
             em.merge(personFromDB);
             personUpdated = findPersonByID(personFromDB.getId(), em);
-
-            /*if (newData.getFirstName() != null) {
-
-            Query query = em.createQuery("UPDATE Person p SET p.firstName =:newFirstName WHERE p.id =:id");
-            query.setParameter("newFirstName", newData.getFirstName());
-            query.setParameter("id", newData.getId());
-            query.executeUpdate();
-        }
-        if (newData.getLastName() != null) {
-            Query query2 = em.createQuery("UPDATE Person p SET p.lastName =:newLastName WHERE p.id =:id");
-            query2.setParameter("newLastName", newData.getLastName());
-            query2.setParameter("id", newData.getId());
-            query2.executeUpdate();
-        }
-        if (newData.getAddress() != null) {
-            Query query3 = em.createQuery("UPDATE Person p SET p.address =:newAddress WHERE p.id =:id");
-            query3.setParameter("newAddress", newData.getAddress());
-            query3.setParameter("id", newData.getId());
-            query3.executeUpdate();
-        }
-        if (newData.getEmail() != null) {
-            Query query4 = em.createQuery("UPDATE Person p SET p.email =:newEmail WHERE p.id =:id");
-            query4.setParameter("newEmail", newData.getEmail());
-            query4.setParameter("id", newData.getId());
-            query4.executeUpdate();
-        }
-
-        if (newData.getHobbies() != null) {
-           // TypedQuery<Person_UltraDTO> query7777 = em.createQuery("UPDATE new dtos.Person_UltraDTO (p.hobbyName, p.description) FROM Person p JOIN p.hobbies", Person_UltraDTO.class);
-           // TypedQuery<Person_UltraDTO> query5 = em.createQuery("UPDATE Hobby h SET (h.description =:description, h.hobbyName =:hobbyName) WHERE t.id in (select t1.id from Team t1  LEFT JOIN t1.members m WHERE t1.current = :current_true AND m.account = :account)", Person_UltraDTO.class);
-            TypedQuery<Person_UltraDTO> query6 = em.createQuery("UPDATE Hobby h SET h.description =:description, h.hobbyName =:hobbyName WHERE h.id in (select h1.id from Hobby h1  LEFT JOIN h1.persons p WHERE h1.id = :hobbyID AND p.id = :personID)", Person_UltraDTO.class);
-            TypedQuery<Person_UltraDTO> query7 = em.createQuery("UPDATE Person p SET p.hobbies =: hobby WHERE p.id in (select p1.id from Person p1  LEFT JOIN p1.hobbies h WHERE h.hobbyName = :hobbyName AND p.id = :personID)", Person_UltraDTO.class);
-            query7.setParameter("hobby", newData.getHobbies());
-            query7.setParameter("hobbyName", newData.getHobbies().get(0).getHobbyName());
-            query7.setParameter("personID", newData.getId());
-
-
-
-            
-            
-            //TypedQuery<PersonStyleDTO> q4 = em.createQuery("SELECT new dto.PersonStyleDTO(p.name, p.year, s.styleName) FROM Person p JOIN p.styles s", dto.PersonStyleDTO.class);
-
-            
-            
-//            Query query5 = em.createQuery("UPDATE Person SET Person =:newEmail WHERE person.id =:id");
-
-
-//            
-//            query5.setParameter("newEmail", newData.getEmail());
-//            query5.setParameter("id", newData.getId());
-//            query5.executeUpdate();
-        }*/
             em.getTransaction().commit();
-        } catch (ArgumentNullException ex) {
-            Logger.getLogger(PersonResource.class.getName()).log(Level.SEVERE, null, ex);
-            ex.getErrorCode();
-            throw ex;
-        } finally {
+            
+        }
+        finally {
             em.close();
         }
         return new PersonDTO(personUpdated);
@@ -389,6 +347,8 @@ public class PersonFacade {
             em.close();
         }
     }
+    
+    
 
 //    public long getNumberOfPersonsByHobby(String hobbyGiven) {
 //        EntityManager em = emf.createEntityManager();
@@ -405,4 +365,6 @@ public class PersonFacade {
         fe.getAll().forEach(dto->System.out.println(dto));
     }
      */
+
+    
 }

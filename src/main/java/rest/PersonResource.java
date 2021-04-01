@@ -89,11 +89,12 @@ public class PersonResource {
 //    @PUT
 //    @Consumes({MediaType.APPLICATION_JSON})
 //    @Produces({MediaType.APPLICATION_JSON})
-    @Path("{id}")
+    
+    @Path("{id}")//PhoneNr???
     @PUT
     @Consumes({MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_JSON})
-    public String editPersonByIDAndPersonInfo(@PathParam("id") int iDToEdit, String persInfoForUpdating) {
+    public String editPersonByIDAndPersonInfo(@PathParam("id") int iDToEdit, String persInfoForUpdating) { 
         String jsonPersonDTO;
         try {
             PersonDTO persDTOEditTo = GSON.fromJson(persInfoForUpdating, PersonDTO.class);
@@ -101,9 +102,6 @@ public class PersonResource {
         } catch (ArgumentNullException ex) {
             Logger.getLogger(PersonResource.class.getName()).log(Level.SEVERE, null, ex);
             jsonPersonDTO = ex.getMessage();
-        } catch (NullPointerException e) {
-            Logger.getLogger(PersonResource.class.getName()).log(Level.SEVERE, null, e);
-            jsonPersonDTO = e.getMessage();
         }
         return jsonPersonDTO;
     }

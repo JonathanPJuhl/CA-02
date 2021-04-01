@@ -37,6 +37,10 @@ public class PhoneDTO {
         this.typeOfNumber = typeOfNumber;
     }
 
-    
+    public List<PhoneDTO> getDtos(List<Phone> phones){
+        List<PhoneDTO> phtos = new ArrayList();
+       
+        return phtos;
+    }
     
 }
