@@ -416,11 +416,14 @@ public class PersonFacade {
 
             //TypedQuery<Person> aPerson = em.createQuery("SELECT p FROM Person p JOIN p.phones pp WHERE pp.phoneNumber = :phone", Person.class);
             TypedQuery<Phone> aPerson = em.createQuery("SELECT p FROM Phone p WHERE p.phoneNumber = :phone", Phone.class);
-
+            TypedQuery<Address> cityInfo = em.createQuery("SELECT a FROM Address a WHERE a.id = :aID", Address.class);
             aPerson.setParameter("phone", phoneNr);
-            Phone phone = aPerson.getSingleResult();
-            Person p = phone.getPerson();
 
+            Phone phone = aPerson.getSingleResult();
+
+            Person p = phone.getPerson();
+            cityInfo.setParameter("aID", p.getAddress().getId());
+            CityInfoDTO ciDTO = new CityInfoDTO(cityInfo.getSingleResult().getCityInfo());
             em.getTransaction().commit();
             List<HobbyDTO> hDTO = new ArrayList<>();
             for(Hobby h: p.getHobbies()){
@@ -430,7 +433,7 @@ public class PersonFacade {
             for(Phone po: p.getPhones()){
                 pDTO.add(new PhoneDTO(po));
             }
-            return new PersonDTO(p, new AddressDTO(p.getAddress()),pDTO, hDTO);
+            return new PersonDTO(p, new AddressDTO(p.getAddress(), ciDTO),pDTO, hDTO);
         } finally {
             em.close();
         }
