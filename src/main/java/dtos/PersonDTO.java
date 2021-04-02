@@ -16,9 +16,9 @@ public class PersonDTO {
     private String email;
     private String firstName;
     private String lastName;
-    private List<PhoneDTO> phonesDTO;
+    private List<PhoneDTO> phonesDTO = new ArrayList<>();
     private AddressDTO addressesDTO;
-    private List<HobbyDTO> hobbiesDTO;
+    private List<HobbyDTO> hobbiesDTO = new ArrayList<>();
 
 
     public PersonDTO(Person person, AddressDTO addressesDTO, List<PhoneDTO> phonesDTO, List<HobbyDTO> hobbiesDTO) {

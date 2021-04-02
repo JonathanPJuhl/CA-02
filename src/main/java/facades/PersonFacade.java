@@ -1,5 +1,6 @@
 package facades;
 
+import dtos.AddressDTO;
 import dtos.HobbyDTO;
 import dtos.PersonDTO;
 import dtos.Person_UltraDTO;
@@ -93,8 +94,7 @@ public class PersonFacade {
                 || pdto.getAddress() == null
                 || pdto.getHobbies().contains(null)
                 || pdto.getPhones().contains(null)
-                || pdto.getAddress().getCityInfoDto() == null
-                ) {
+                || pdto.getAddress().getCityInfoDto() == null) {
             throw new ArgumentNullException("En personegenskab er null", 400);
         }
         return pdto;
@@ -107,37 +107,90 @@ public class PersonFacade {
         return (Person) query.getSingleResult();
     }
 
-    private boolean validatePhone(int phoneNumber) throws IllegalPhoneException {
-       boolean allGood = true;
-        if(String.valueOf(phoneNumber).length() != 8){
-           allGood = false;
-       }
-       return allGood;
-    }
-    
-    public PersonDTO updatePerson(PersonDTO newPersonDTO, int oldPersonID) throws ArgumentNullException{ 
+    public Address findAdressByAddressDTO(AddressDTO addressdto, EntityManager em) {
+        TypedQuery<Address> addressQuery = em.createQuery("SELECT a FROM Adress a WHERE a.street =:street AND a.additionalInfo = :additionalInfo", Address.class);
+        addressQuery.setParameter("street", addressdto.getStreet());
+        addressQuery.setParameter("additionalInfo", addressdto.getAdditionalInfo());
 
+        return addressQuery.getSingleResult();
+    }
+
+    private boolean validatePhone(int phoneNumber) throws IllegalPhoneException {
+        boolean allGood = true;
+        if (String.valueOf(phoneNumber).length() != 8) {
+            allGood = false;
+        }
+        return allGood;
+    }
+
+    public PersonDTO updatePerson(PersonDTO newPersonDTO, int oldPersonID) throws ArgumentNullException {
+        Address newAddress;
         EntityManager em = emf.createEntityManager();
         Person personFromDB;
-        Person personUpdated = null;
+        Person newPersonToUpdate = new Person();
+        Person personUpdated = new Person();
+        List<Phone> newListOfPhones = new ArrayList<>();
+        List<Hobby> newListOfHobbies = new ArrayList<>();
+        Phone oldPhone;
+        Phone oldPhoneByDBPerson;
         //List<Boolean> phonesAreGood = ArrayList<>(); 
-        
+
         try {
             em.getTransaction().begin();
             validatePersonDTO(newPersonDTO);
-          
+
             /*  newPersonDTO.getPhones().forEach(phone ->{ 
                 validatePhone(phone.getPhoneNumber());
             throw new IllegalPhoneException(406, "Phone number contains 8 digits");
             });*/
-            
             personFromDB = findPersonByID(oldPersonID, em);
+
+            personFromDB.setFirstName(newPersonDTO.getFirstName());
+            personFromDB.setLastName(newPersonDTO.getLastName());
+            personFromDB.setEmail(newPersonDTO.getEmail());
+
+            //Ny metode? Husk at teste
+            for (int i = 0; i < newPersonDTO.getPhones().size()-1; i++) {
+                for (int j = 0; j < personFromDB.getPhones().size()-1; j++) {
+                    if (newPersonDTO.getPhones().get(j).getPhoneNumber() == personFromDB.getPhones().get(i).getPhoneNumber()
+                            && newPersonDTO.getPhones().get(j).getTypeOfNumber().equals(personFromDB.getPhones().get(i).getTypeOfNumber())) {
+                        break;
+                    } else {
+                        personFromDB.getPhones().get(i).setPhoneNumber(newPersonDTO.getPhones().get(j).getPhoneNumber());
+                        personFromDB.getPhones().get(i).setTypeOfNumber(newPersonDTO.getPhones().get(j).getTypeOfNumber());
+                    }
+                }
+            }
+            //   personFromDB.setPhones(newListOfPhones);
+
+            newAddress = new Address(newPersonDTO.getAddress().getStreet(), newPersonDTO.getAddress().getAdditionalInfo());
+            personFromDB.getAddress().setStreet(newAddress.getStreet());
+            personFromDB.getAddress().setAdditionalInfo(newAddress.getAdditionalInfo());
+            CityInfo newCityInfo = new CityInfo(newPersonDTO.getAddress().getCityInfoDto().getZip(), newPersonDTO.getAddress().getCityInfoDto().getCityName());
+            personFromDB.getAddress().getCityInfo().setZip(newCityInfo.getZip());
+            personFromDB.getAddress().getCityInfo().setCityName(newCityInfo.getCityName());
+
+            //Ny metode? Husk at teste
+            for (int i = 0; i < newPersonDTO.getHobbies().size()-1; i++) {
+                for (int j = 0; j < personFromDB.getHobbies().size()-1; j++) {
+                    if (newPersonDTO.getHobbies().get(j).getName().equals(personFromDB.getHobbies().get(i).getName())) {
+                        break;
+                    } else {
+                        Hobby newhobby = em.find(Hobby.class, newPersonDTO.getHobbies().get(j).getName());
+                        personFromDB.getHobbies().get(i).setName(newhobby.getName());
+                        personFromDB.getHobbies().get(i).setCategory(newhobby.getCategory());
+                        personFromDB.getHobbies().get(i).setWikiLink(newhobby.getWikiLink());
+                        personFromDB.getHobbies().get(i).setType(newhobby.getType());
+                    }
+                }
+            }
+
+            //personFromDB.setHobbies(newListOfHobbies);
             em.merge(personFromDB);
-            personUpdated = findPersonByID(personFromDB.getId(), em);
+            personUpdated = findPersonByID(oldPersonID, em);
             em.getTransaction().commit();
-            
-        }
-        finally {
+
+        } finally {
             em.close();
         }
         return new PersonDTO(personUpdated);
@@ -166,29 +219,20 @@ public class PersonFacade {
 
     }
 
-    public void addHobbyToPerson(int id, String hobbyAdded) throws Exception {
+    public void addHobbyToPerson(int id, HobbyDTO hobbyDTO) throws Exception {
         EntityManager em = emf.createEntityManager();
         Hobby hobbyToBeAdded;
+        Person personToBeEdited;
 
         try {
 
             em.getTransaction().begin();
-            Query aPerson = em.createQuery("SELECT p FROM Person p WHERE p.id=:id");
-            aPerson.setParameter("id", id);
-            Person personToBeEdited = (Person) aPerson.getSingleResult();
-
-            if (personToBeEdited == null) {
-                throw new Exception("Person does not exist in DataBase");
-            }
-
-            Query aHobby = em.createQuery("SELECT h FROM Hobby h WHERE h.name=:name");
-            aHobby.setParameter("name", hobbyAdded);
-            hobbyToBeAdded = (Hobby) aHobby.getSingleResult();
-
+            hobbyToBeAdded = em.find(Hobby.class, hobbyDTO.getName());
             if (hobbyToBeAdded == null) {
                 throw new Exception("The hobby refered by the given hobby name does not currently exist within our databases");
             }
 
+            personToBeEdited = em.find(Person.class, id);
             personToBeEdited.addHobby(hobbyToBeAdded);
 
             em.merge(personToBeEdited);
@@ -347,8 +391,6 @@ public class PersonFacade {
             em.close();
         }
     }
-    
-    
 
 //    public long getNumberOfPersonsByHobby(String hobbyGiven) {
 //        EntityManager em = emf.createEntityManager();
@@ -365,6 +407,4 @@ public class PersonFacade {
         fe.getAll().forEach(dto->System.out.println(dto));
     }
      */
-
-    
 }

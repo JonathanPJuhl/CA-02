@@ -96,10 +96,10 @@ public class PersonFacadeTest {
 
     @Test
     public void testCreatePerson() {
-
-        CityInfoDTO ci = new CityInfoDTO(new CityInfo(2800, "Lyngby"));
-        AddressDTO ad = new AddressDTO(new Address("Street2", "Additional more"));
-        ad.setCityInfoDto(ci);
+        CityInfo cityInfo = new CityInfo(2800, "Lyngby");
+        Address address = new Address("Street2", "Additional more");
+        address.addCityInfo(cityInfo);
+        AddressDTO ad = new AddressDTO(address);
         List<PhoneDTO> phones = new ArrayList<PhoneDTO>();
         PhoneDTO phone = new PhoneDTO(new Phone(73829374, "also home"));
         phones.add(phone);
@@ -118,10 +118,10 @@ public class PersonFacadeTest {
 
     @Test
     public void testGetAllPersons() {
-
-        CityInfoDTO ci = new CityInfoDTO(new CityInfo(2030, "Holte"));
-        AddressDTO ad = new AddressDTO(new Address("Street3", "Additional and more"));
-        ad.setCityInfoDto(ci);
+        CityInfo cityInfo = new CityInfo(2030, "Holte");
+        Address address = new Address("Street3", "Additional and more");
+        address.setCityInfo(cityInfo);
+        AddressDTO ad = new AddressDTO(address);
         List<PhoneDTO> phones = new ArrayList<PhoneDTO>();
         PhoneDTO phone = new PhoneDTO(new Phone(73829374, "also so home"));
         phones.add(phone);
@@ -148,14 +148,37 @@ public class PersonFacadeTest {
     }
 
     @Test
-    public void testEditPerson() throws ArgumentNullException, Exception {
+    public void testEditPersonSetEmail() throws ArgumentNullException, Exception {
         int personToChangeID = person.getId();
-        Person p1 = person;
         PersonDTO pDToExpected = new PersonDTO(person);
        pDToExpected.setEmail("wannabemail@hacker.dk");
         
         PersonDTO pdtoResult = facade.updatePerson(pDToExpected, personToChangeID);
         assertEquals(pDToExpected.getEmail(), pdtoResult.getEmail());
+    }
+    
+    @Test
+    public void testEditPersonSetNewListPhones() throws ArgumentNullException, Exception {
+        List<Phone> oldPhones = new ArrayList<>();
+        Phone phone1 = new Phone(12345678, "Home");
+        Phone phone2 = new Phone(87654321, "Home");
+        Phone phone3 = new Phone(29292929, "Work");
+        oldPhones.add(phone1);
+        oldPhones.add(phone2);
+        oldPhones.add(phone3);
+        
+        person.setPhones(oldPhones);
+        
+        PersonDTO pDTOToEditedPerson = new PersonDTO(person);
+        
+        Phone phoneNew = new Phone(33333333, "Work");
+        pDTOToEditedPerson.getPhones().get(1).setPhoneNumber(phoneNew.getPhoneNumber());
+        pDTOToEditedPerson.getPhones().get(1).setTypeOfNumber(phoneNew.getTypeOfNumber());
+        
+        PersonDTO acctualPersonDTO = facade.updatePerson(pDTOToEditedPerson,person.getId());
+      
+        assertTrue(phoneNew.getPhoneNumber() == acctualPersonDTO.getPhones().get(1).getPhoneNumber() 
+                && phoneNew.getTypeOfNumber().equals(acctualPersonDTO.getPhones().get(1).getPhoneNumber()));
     }
 
     //Negativ test
@@ -205,22 +228,20 @@ public class PersonFacadeTest {
     @Test
     void testAddHobby() throws Exception {
         EntityManager em = emf.createEntityManager();
-
         Hobby hobby2 = new Hobby("Ping Pong", "smash med battet", "boldspill", "freeforall altid bro");
-        hobbies.add(hobby2);
-        em.getTransaction().begin();
+        try{em.getTransaction().begin();
         em.persist(hobby2);
         em.getTransaction().commit();
-        em.close();
-//        person.getHobbies().forEach(h -> {
-//            System.out.println(h.getName());
-//        });
-        facade.addHobbyToPerson(person.getId(), "Ping Pong");
-        assertEquals(person.getHobbies().size(), 2);
+        facade.addHobbyToPerson(person.getId(), new HobbyDTO(hobby2));
+        person = em.find(Person.class, person.getId());
+        }finally{
+            em.close();
+        }
+        assertEquals(2, person.getHobbies().size());
     }
 
     @Test
-    void testAddhone() throws Exception {
+    void testAddphone() throws Exception {
         EntityManager em = emf.createEntityManager();
 
         Phone phone2 = new Phone(23112314, "Club");
@@ -233,7 +254,7 @@ public class PersonFacadeTest {
 //            System.out.println(h.getName());
 //        });
         facade.addPhoneToPerson(person.getId(), 23112314);
-        assertEquals(person.getPhones().size(), 2);
+        assertEquals( 2,person.getPhones().size());
     }
 
     @Test
@@ -248,7 +269,7 @@ public class PersonFacadeTest {
 //        person.getHobbies().forEach(h -> {
 //            System.out.println(h.getName());
 //        });
-        facade.addHobbyToPerson(person.getId(), "Ping Pong");
+        facade.addHobbyToPerson(person.getId(), new HobbyDTO(hobby2));
         facade.removeHobby(person.getId(), "Ping Pong");
                 assertEquals(1, person.getHobbies().size());
     }
