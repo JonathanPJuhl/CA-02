@@ -71,7 +71,7 @@ public class PersonFacade {
 
             }
             Address address = new Address(pDTO.getAddress().getStreet(),
-                    pDTO.getAddress().getAdditionalInfo(), pDTO.getAddress().getZip());
+                    pDTO.getAddress().getAdditionalInfo());
             CityInfo cityInfo = getCityInfo(pDTO.getCityInfoDTO());
             //address.addCityInfo(new CityInfo(pDTO.getAddress().getCityInfoDto().getZip(), pDTO.getAddress().getCityInfoDto().getCityName()));
             address.addCityInfo(cityInfo);

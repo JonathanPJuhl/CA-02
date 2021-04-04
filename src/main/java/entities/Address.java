@@ -25,7 +25,7 @@ public class Address implements Serializable {
     private int id;
     private String street;
     private String additionalInfo;
-    private String zip;
+    //private String zip;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     private CityInfo cityInfo;
@@ -36,10 +36,15 @@ public class Address implements Serializable {
     public Address() {
     }
 
-    public Address(String street, String additionalInfo, String zip) {
+  /*  public Address(String street, String additionalInfo, String zip) {
         this.street = street;
         this.additionalInfo = additionalInfo;
         this.zip = zip;
+
+    }*/public Address(String street, String additionalInfo) {
+        this.street = street;
+        this.additionalInfo = additionalInfo;
+
 
     }
     /*public Address(String street, String additionalInfo, CityInfoDTO cDTO) {
@@ -55,9 +60,7 @@ public class Address implements Serializable {
           }
     }
 
-    public String getZip() {
-        return zip;
-    }
+
 
     public int getId() {
         return id;

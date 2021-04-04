@@ -32,9 +32,9 @@ public class Populator {
         CityInfoDTO ci = new CityInfoDTO(new CityInfo("777777" , "Narnia"));
         CityInfoDTO ci2 = new CityInfoDTO(new CityInfo("888888", "Hogwarts"));
         CityInfoDTO ci3 = new CityInfoDTO(new CityInfo("99999", "Helvede"));
-        AddressDTO ad = new AddressDTO( new Address("Street", "Additional", "2830"));
-        AddressDTO ad2 = new AddressDTO( new Address("Street2", "In addition", "4000"));
-        AddressDTO ad3 = new AddressDTO( new Address("Street3", "Also this", "3000"));
+        AddressDTO ad = new AddressDTO( new Address("Street", "Additional"));
+        AddressDTO ad2 = new AddressDTO( new Address("Street2", "In addition"));
+        AddressDTO ad3 = new AddressDTO( new Address("Street3", "Also this"));
         ad.setCityInfoDto(ci);
         ad2.setCityInfoDto(ci2);
         ad3.setCityInfoDto(ci3);
