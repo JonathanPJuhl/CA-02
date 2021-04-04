@@ -119,7 +119,7 @@ public class PersonFacadeTest {
     @Test
     public void testGetAllPersons() {
 
-        CityInfoDTO ci = new CityInfoDTO(new CityInfo("2030", "Holte"));
+        CityInfoDTO ci = new CityInfoDTO(new CityInfo("2800", "Lyngby"));
         AddressDTO ad = new AddressDTO(new Address("Street3", "Additional and more"));
         ad.setCityInfoDto(ci);
         List<PhoneDTO> phones = new ArrayList<PhoneDTO>();
@@ -128,7 +128,7 @@ public class PersonFacadeTest {
         HobbyDTO hobby = new HobbyDTO(new Hobby("Hockey", "smash more bold", "vintersport", "teamsport"));
         List<HobbyDTO> hobbies = new ArrayList<>();
         hobbies.add(hobby);
-        PersonDTO pDTO = new PersonDTO(new Person("icecool@mail.dk", "Hugo", "Jarvier"), ad, phones, hobbies);
+        PersonDTO pDTO = new PersonDTO(new Person("icecool@mail.dk", "Hugo", "Jarvier"), ad, phones, hobbies, ci);
 
         pDTO.setAddress(ad);
         pDTO.setPhones(phones);

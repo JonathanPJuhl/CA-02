@@ -38,6 +38,7 @@ public class PersonDTO {
         this.phonesDTO = phonesDTO;
         this.addressesDTO = addressesDTO;
         this.hobbiesDTO = hobbiesDTO;
+        this.cityInfoDTO = ciDTO;
     }
     
         public PersonDTO(int id, Person person, AddressDTO addressesDTO, List<PhoneDTO> phonesDTO, List<HobbyDTO> hobbiesDTO) {
