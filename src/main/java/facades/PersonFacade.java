@@ -126,66 +126,82 @@ public class PersonFacade {
     public PersonDTO updatePerson(PersonDTO newPersonDTO, int oldPersonID) throws ArgumentNullException {
         Address newAddress;
         EntityManager em = emf.createEntityManager();
+        EntityManager emPhone = emf.createEntityManager();
         Person personFromDB;
         Person newPersonToUpdate = new Person();
         Person personUpdated = new Person();
         List<Phone> newListOfPhones = new ArrayList<>();
-        List<Hobby> newListOfHobbies = new ArrayList<>();
-        Phone oldPhone;
-        Phone oldPhoneByDBPerson;
-        //List<Boolean> phonesAreGood = ArrayList<>(); 
+        List<PhoneDTO> extraPhonesDTOs = new ArrayList<>();
+        List<Hobby> emptyOfHobbies = new ArrayList<>();
+        Phone phone;
+        PhoneDTO phoneNew;
+        Phone phoneToDelete; 
 
-        try {
-            em.getTransaction().begin();
-            validatePersonDTO(newPersonDTO);
+        validatePersonDTO(newPersonDTO);
 
-            /*  newPersonDTO.getPhones().forEach(phone ->{ 
+        /*  newPersonDTO.getPhones().forEach(phone ->{ 
                 validatePhone(phone.getPhoneNumber());
             throw new IllegalPhoneException(406, "Phone number contains 8 digits");
             });*/
-            personFromDB = findPersonByID(oldPersonID, em);
+        personFromDB = findPersonByID(oldPersonID, em);
 
-            personFromDB.setFirstName(newPersonDTO.getFirstName());
-            personFromDB.setLastName(newPersonDTO.getLastName());
-            personFromDB.setEmail(newPersonDTO.getEmail());
-
-            //Ny metode? Husk at teste
-            for (int i = 0; i < newPersonDTO.getPhones().size()-1; i++) {
-                for (int j = 0; j < personFromDB.getPhones().size()-1; j++) {
-                    if (newPersonDTO.getPhones().get(j).getPhoneNumber() == personFromDB.getPhones().get(i).getPhoneNumber()
-                            && newPersonDTO.getPhones().get(j).getTypeOfNumber().equals(personFromDB.getPhones().get(i).getTypeOfNumber())) {
-                        break;
-                    } else {
-                        personFromDB.getPhones().get(i).setPhoneNumber(newPersonDTO.getPhones().get(j).getPhoneNumber());
-                        personFromDB.getPhones().get(i).setTypeOfNumber(newPersonDTO.getPhones().get(j).getTypeOfNumber());
-                    }
-                }
+        personFromDB.setFirstName(newPersonDTO.getFirstName());
+        personFromDB.setLastName(newPersonDTO.getLastName());
+        personFromDB.setEmail(newPersonDTO.getEmail());
+        newPersonDTO.getPhones().forEach(phoneDTO -> {
+            extraPhonesDTOs.add(phoneDTO);
+        });
+        
+        while(newPersonDTO.getPhones().size()<personFromDB.getPhones().size()){
+            personFromDB.getPhones().remove(newPersonDTO.getPhones().size()-1);
+        }
+            
+        for (int i = 0; i < newPersonDTO.getPhones().size(); i++) {
+            try {
+                phone = personFromDB.getPhones().get(i);
+                phoneNew = newPersonDTO.getPhones().get(i);
+                phone.setPhoneNumber(phoneNew.getPhoneNumber());
+                phone.setTypeOfNumber(phoneNew.getTypeOfNumber());
+                extraPhonesDTOs.remove(phoneNew);
+            } catch (Exception e) {
+                break;
+                
             }
-            //   personFromDB.setPhones(newListOfPhones);
+        }
 
-            newAddress = new Address(newPersonDTO.getAddress().getStreet(), newPersonDTO.getAddress().getAdditionalInfo());
-            personFromDB.getAddress().setStreet(newAddress.getStreet());
-            personFromDB.getAddress().setAdditionalInfo(newAddress.getAdditionalInfo());
-            CityInfo newCityInfo = new CityInfo(newPersonDTO.getAddress().getCityInfoDto().getZip(), newPersonDTO.getAddress().getCityInfoDto().getCityName());
-            personFromDB.getAddress().getCityInfo().setZip(newCityInfo.getZip());
-            personFromDB.getAddress().getCityInfo().setCityName(newCityInfo.getCityName());
+        if (!(extraPhonesDTOs.isEmpty())) {
 
-            //Ny metode? Husk at teste
-            for (int i = 0; i < newPersonDTO.getHobbies().size()-1; i++) {
-                for (int j = 0; j < personFromDB.getHobbies().size()-1; j++) {
-                    if (newPersonDTO.getHobbies().get(j).getName().equals(personFromDB.getHobbies().get(i).getName())) {
-                        break;
-                    } else {
-                        Hobby newhobby = em.find(Hobby.class, newPersonDTO.getHobbies().get(j).getName());
-                        personFromDB.getHobbies().get(i).setName(newhobby.getName());
-                        personFromDB.getHobbies().get(i).setCategory(newhobby.getCategory());
-                        personFromDB.getHobbies().get(i).setWikiLink(newhobby.getWikiLink());
-                        personFromDB.getHobbies().get(i).setType(newhobby.getType());
-                    }
+            try {
+                emPhone.getTransaction().begin();
+                for (PhoneDTO pdto : extraPhonesDTOs) {
+                    Phone phoneToAdd = new Phone(pdto.getPhoneNumber(), pdto.getTypeOfNumber());
+                    emPhone.persist(phoneToAdd);
+                    TypedQuery<Phone> pQuery = emPhone.createQuery("SELECT p FROM Phone p WHERE p.phoneNumber =:number", Phone.class);
+                    pQuery.setParameter("number", pdto.getPhoneNumber());
+                    personFromDB.addPhone(pQuery.getSingleResult());
+
                 }
+                emPhone.getTransaction().commit();
+            } finally {
+                emPhone.close();
             }
+        }
 
-            //personFromDB.setHobbies(newListOfHobbies);
+        newAddress = new Address(newPersonDTO.getAddress().getStreet(), newPersonDTO.getAddress().getAdditionalInfo());
+        personFromDB.getAddress().setStreet(newAddress.getStreet());
+        personFromDB.getAddress().setAdditionalInfo(newAddress.getAdditionalInfo());
+        CityInfo newCityInfo = new CityInfo(newPersonDTO.getAddress().getCityInfoDto().getZip(), newPersonDTO.getAddress().getCityInfoDto().getCityName());
+        personFromDB.getAddress().getCityInfo().setZip(newCityInfo.getZip());
+        personFromDB.getAddress().getCityInfo().setCityName(newCityInfo.getCityName());
+
+        newPersonDTO.getHobbies().forEach((hDTO) -> {
+            personFromDB.setHobbies(emptyOfHobbies);
+            personFromDB.addHobby(new Hobby(hDTO.getName(), hDTO.getWikiLink(), hDTO.getCategory(), hDTO.getType()));
+        });
+        
+        
+        try {
+            em.getTransaction().begin();
             em.merge(personFromDB);
             personUpdated = findPersonByID(oldPersonID, em);
             em.getTransaction().commit();

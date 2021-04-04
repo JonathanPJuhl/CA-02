@@ -39,6 +39,7 @@ public class PersonFacadeTest {
     private static Address ad;
     private static CityInfo ci;
 
+
     public PersonFacadeTest() {
     }
 
@@ -57,7 +58,7 @@ public class PersonFacadeTest {
     //TODO -- Make sure to change the code below to use YOUR OWN entity class
     @BeforeEach
     public void setUp() {
-        EntityManager em = emf.createEntityManager();
+         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
 
@@ -158,27 +159,109 @@ public class PersonFacadeTest {
     }
     
     @Test
-    public void testEditPersonSetNewListPhones() throws ArgumentNullException, Exception {
-        List<Phone> oldPhones = new ArrayList<>();
+    public void testEditPersonSetNewListManyPhones() throws ArgumentNullException, Exception {
+        EntityManager em = emf.createEntityManager();
+        List<Phone> emptyListOfPhones = new ArrayList<>();
         Phone phone1 = new Phone(12345678, "Home");
         Phone phone2 = new Phone(87654321, "Home");
         Phone phone3 = new Phone(29292929, "Work");
-        oldPhones.add(phone1);
-        oldPhones.add(phone2);
-        oldPhones.add(phone3);
+        Person pers = person;
+        pers.setPhones(emptyListOfPhones);
+        pers.addPhone(phone1);
+        pers.addPhone(phone2);
+        pers.addPhone(phone3);
+        try{
+        em.getTransaction().begin();
+        em.merge(pers);
+        em.getTransaction().commit();
+        }finally{
+        em.close();
+        }
+        PersonDTO pDTOToEditedPerson = new PersonDTO(pers);
         
-        person.setPhones(oldPhones);
-        
-        PersonDTO pDTOToEditedPerson = new PersonDTO(person);
-        
-        Phone phoneNew = new Phone(33333333, "Work");
-        pDTOToEditedPerson.getPhones().get(1).setPhoneNumber(phoneNew.getPhoneNumber());
-        pDTOToEditedPerson.getPhones().get(1).setTypeOfNumber(phoneNew.getTypeOfNumber());
-        
-        PersonDTO acctualPersonDTO = facade.updatePerson(pDTOToEditedPerson,person.getId());
+        Phone phoneNew1 = new Phone(33333333, "Work");
+        pDTOToEditedPerson.getPhones().get(1).setPhoneNumber(phoneNew1.getPhoneNumber());
+        pDTOToEditedPerson.getPhones().get(1).setTypeOfNumber(phoneNew1.getTypeOfNumber());
+        Phone phoneNew2 = new Phone(99999999, "Private");
+        pDTOToEditedPerson.getPhones().add(new PhoneDTO(phoneNew2));
+        PersonDTO acctualPersonDTO = facade.updatePerson(pDTOToEditedPerson,pers.getId());
       
-        assertTrue(phoneNew.getPhoneNumber() == acctualPersonDTO.getPhones().get(1).getPhoneNumber() 
-                && phoneNew.getTypeOfNumber().equals(acctualPersonDTO.getPhones().get(1).getPhoneNumber()));
+        assertTrue(phoneNew1.getPhoneNumber() == acctualPersonDTO.getPhones().get(1).getPhoneNumber() 
+                && phoneNew1.getTypeOfNumber().equals(acctualPersonDTO.getPhones().get(1).getTypeOfNumber())
+                && phoneNew2.getPhoneNumber() == acctualPersonDTO.getPhones().get(pDTOToEditedPerson.getPhones().size()-1).getPhoneNumber()
+                && phoneNew2.getTypeOfNumber().equals(acctualPersonDTO.getPhones().get(pDTOToEditedPerson.getPhones().size()-1).getTypeOfNumber()));
+    }
+    
+    @Test
+    public void testEditPersonSetNewListLessPhones() throws ArgumentNullException, Exception {
+        EntityManager em = emf.createEntityManager();
+        List<Phone> emptyListOfPhones = new ArrayList<>();
+        Phone phone1 = new Phone(12345678, "Home");
+        Phone phone2 = new Phone(87654321, "Home");
+        Phone phone3 = new Phone(29292929, "Work");
+        Person pers = person;
+        pers.setPhones(emptyListOfPhones);
+        pers.addPhone(phone1);
+        pers.addPhone(phone2);
+        pers.addPhone(phone3);
+        try{
+        em.getTransaction().begin();
+        em.merge(pers);
+        em.getTransaction().commit();
+        }finally{
+        em.close();
+        }
+        PersonDTO pDTOToEditedPerson = new PersonDTO(pers);
+        
+        Phone phoneNew1 = new Phone(33333333, "Work");
+        pDTOToEditedPerson.getPhones().get(1).setPhoneNumber(phoneNew1.getPhoneNumber());
+        pDTOToEditedPerson.getPhones().get(1).setTypeOfNumber(phoneNew1.getTypeOfNumber());
+        
+        pDTOToEditedPerson.getPhones().remove(0);
+        
+        PersonDTO acctualPersonDTO = facade.updatePerson(pDTOToEditedPerson,pers.getId());
+      
+        assertTrue(phoneNew1.getPhoneNumber() == acctualPersonDTO.getPhones().get(0).getPhoneNumber() 
+                && phoneNew1.getTypeOfNumber().equals(acctualPersonDTO.getPhones().get(0).getTypeOfNumber())
+        && acctualPersonDTO.getPhones().size() == 2);
+    }
+    
+    
+    @Test
+    public void testEditPersonSetNewListHobbies() throws ArgumentNullException, Exception {
+        EntityManager em = emf.createEntityManager();
+        List<Hobby> emptyListOfHobbies = new ArrayList<>();
+        Hobby hobby1 = new Hobby("Håndhold", "Kast med bolden", "boldspil", "teamsport");
+        Hobby hobby2 = new Hobby("Badminton", "Ram en fjerbold", "ketcherspil", "en-mod-en");
+        Hobby hobby3 = new Hobby("PokémonGO", "Fang og træn pokémons", "app spil", "enemandsspil");
+        Hobby hobby4 = new Hobby("Tennis", "Ram en bold", "ketcherspil", "en-mod-en");
+        Person pers = person;
+        pers.setHobbies(emptyListOfHobbies);
+        pers.addHobby(hobby1);
+        pers.addHobby(hobby2);
+        pers.addHobby(hobby3);
+        pers.addHobby(hobby4);
+        try{
+        em.getTransaction().begin();
+        em.merge(pers);
+        em.getTransaction().commit();
+        }finally{
+        em.close();
+        }
+        PersonDTO pDTOToEditedPerson = new PersonDTO(pers);
+        
+        Hobby newHobby = new Hobby("Volleyball", "Kast med bolden over hegn", "boldspil", "teamsport");
+        pDTOToEditedPerson.getHobbies().get(0).setName(newHobby.getName());
+        pDTOToEditedPerson.getHobbies().get(0).setWikiLink(newHobby.getWikiLink());
+        pDTOToEditedPerson.getHobbies().get(0).setCategory(newHobby.getCategory());
+        pDTOToEditedPerson.getHobbies().get(0).setType(newHobby.getType());
+     
+        PersonDTO acctualPersonDTO = facade.updatePerson(pDTOToEditedPerson,pers.getId());
+      
+        assertTrue(newHobby.getName().equals(acctualPersonDTO.getHobbies().get(0).getName())&&
+        newHobby.getWikiLink().equals(acctualPersonDTO.getHobbies().get(0).getWikiLink())&&
+        newHobby.getCategory().equals(acctualPersonDTO.getHobbies().get(0).getCategory())&&
+        newHobby.getType().equals(acctualPersonDTO.getHobbies().get(0).getType()));
     }
 
     //Negativ test

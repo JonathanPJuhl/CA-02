@@ -2,6 +2,7 @@ package rest;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import dtos.HobbyDTO;
 import dtos.PersonDTO;
 import errorhandling.ArgumentNullException;
 import utils.EMF_Creator;
@@ -109,7 +110,8 @@ public class PersonResource {
     @Path("addHobbyToPerson/{id}")
     @PUT
     public void addHobby(@PathParam("id") int idOfPerson, String hobbyToBeAdded) throws Exception {
-        FACADE.addHobbyToPerson(idOfPerson, hobbyToBeAdded);
+        HobbyDTO hobbyDTOToAdd = GSON.fromJson(hobbyToBeAdded, HobbyDTO.class);
+        FACADE.addHobbyToPerson(idOfPerson, hobbyDTOToAdd);
     }
 
     @Path("removeHobbyFromPerson/{id}")
