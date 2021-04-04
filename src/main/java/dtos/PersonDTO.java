@@ -19,9 +19,19 @@ public class PersonDTO {
     private List<PhoneDTO> phonesDTO;
     private AddressDTO addressesDTO;
     private List<HobbyDTO> hobbiesDTO;
+    private CityInfoDTO cityInfoDTO;
+
 
 
     public PersonDTO(Person person, AddressDTO addressesDTO, List<PhoneDTO> phonesDTO, List<HobbyDTO> hobbiesDTO) {
+        this.email = person.getEmail();
+        this.firstName = person.getFirstName();
+        this.lastName = person.getLastName();
+        this.phonesDTO = phonesDTO;
+        this.addressesDTO = addressesDTO;
+        this.hobbiesDTO = hobbiesDTO;
+    }
+    public PersonDTO(Person person, AddressDTO addressesDTO, List<PhoneDTO> phonesDTO, List<HobbyDTO> hobbiesDTO, CityInfoDTO ciDTO) {
         this.email = person.getEmail();
         this.firstName = person.getFirstName();
         this.lastName = person.getLastName();
@@ -103,10 +113,16 @@ public class PersonDTO {
     public int getId() {
         return id;
     }
-    
-  
 
-    public void setId(int id) {// Må vi dette ??? 
+    public CityInfoDTO getCityInfoDTO() {
+        return cityInfoDTO;
+    }
+
+    public void setCityInfoDTO(CityInfoDTO cityInfoDTO) {
+        this.cityInfoDTO = cityInfoDTO;
+    }
+
+    public void setId(int id) {// Må vi dette ???
         this.id = id;
     }
     
