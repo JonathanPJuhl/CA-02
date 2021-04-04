@@ -57,8 +57,8 @@ public class PersonFacadeTest {
     // Setup the DataBase in a known state BEFORE EACH TEST
     //TODO -- Make sure to change the code below to use YOUR OWN entity class
     @BeforeEach
-    public void setUp() {
-         EntityManager em = emf.createEntityManager();
+     public void setUp() {
+        EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
 
@@ -67,11 +67,12 @@ public class PersonFacadeTest {
             em.createNamedQuery("Person.deleteAllRows").executeUpdate();
             em.createNamedQuery("Address.deleteAllRows").executeUpdate();
             em.createNamedQuery("CityInfo.deleteAllRows").executeUpdate();
-
-            ci = new CityInfo(2830, "Virum");
-            ad = new Address("Street", "Additional");
+            em.persist(new CityInfo("2800", "Lyngby"));
+            em.getTransaction().commit();
+            CityInfo ci = facade.getCityInfo(new CityInfoDTO("2800", "Lyngby"));
+            Address ad = new Address("Street", "Additional");
             ad.addCityInfo(ci);
-
+            em.getTransaction().begin();
             phones = new ArrayList<>();
             Phone phone = new Phone(2134566, "home");
 
@@ -80,15 +81,17 @@ public class PersonFacadeTest {
 
             person = new Person("mail@mail.dk", "Jens", "Brønd");
             person.addHobby(hobby);
-            person.addAddress(ad);
+
             person.addPhone(phone);
-            em.persist(person);
+            person.addAddress(ad);
+            em.merge(person);
 
             em.getTransaction().commit();
         } finally {
             em.close();
         }
     }
+
 
     @AfterEach
     public void tearDown() {
@@ -97,7 +100,7 @@ public class PersonFacadeTest {
 
     @Test
     public void testCreatePerson() {
-        CityInfo cityInfo = new CityInfo(2800, "Lyngby");
+        CityInfo cityInfo = new CityInfo("2800", "Lyngby");
         Address address = new Address("Street2", "Additional more");
         address.addCityInfo(cityInfo);
         AddressDTO ad = new AddressDTO(address);
@@ -107,7 +110,7 @@ public class PersonFacadeTest {
         HobbyDTO hobby = new HobbyDTO(new Hobby("Tennis", "smash bold", "boldspill", "teamsport and single player"));
         List<HobbyDTO> hobbies = new ArrayList<>();
         hobbies.add(hobby);
-        PersonDTO pDTO = new PersonDTO(new Person("cool@mail.dk", "Peter", "Jensen"), ad, phones, hobbies);
+        PersonDTO pDTO = new PersonDTO(new Person("cool@mail.dk", "Peter", "Jensen"), ad, phones, hobbies, new CityInfoDTO(cityInfo));
 
         pDTO.setAddress(ad);
         pDTO.setPhones(phones);
@@ -119,7 +122,7 @@ public class PersonFacadeTest {
 
     @Test
     public void testGetAllPersons() {
-        CityInfo cityInfo = new CityInfo(2030, "Holte");
+        CityInfo cityInfo = new CityInfo("2030", "Holte");
         Address address = new Address("Street3", "Additional and more");
         address.setCityInfo(cityInfo);
         AddressDTO ad = new AddressDTO(address);
@@ -129,7 +132,7 @@ public class PersonFacadeTest {
         HobbyDTO hobby = new HobbyDTO(new Hobby("Hockey", "smash more bold", "vintersport", "teamsport"));
         List<HobbyDTO> hobbies = new ArrayList<>();
         hobbies.add(hobby);
-        PersonDTO pDTO = new PersonDTO(new Person("icecool@mail.dk", "Hugo", "Jarvier"), ad, phones, hobbies);
+        PersonDTO pDTO = new PersonDTO(new Person("icecool@mail.dk", "Hugo", "Jarvier"), ad, phones, hobbies, new CityInfoDTO(cityInfo));
 
         pDTO.setAddress(ad);
         pDTO.setPhones(phones);

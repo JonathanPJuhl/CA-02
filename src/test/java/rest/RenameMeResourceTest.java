@@ -67,7 +67,7 @@ public class RenameMeResourceTest {
     public void setUp() {
         EntityManager em = emf.createEntityManager();
 
-        CityInfo ci = new CityInfo(2830, "Virum");
+        CityInfo ci = new CityInfo("2830", "Virum");
         Address ad = new Address("Street", "Additional");
         ad.addCityInfo(ci);
 

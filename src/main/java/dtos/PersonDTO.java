@@ -1,4 +1,3 @@
-
 package dtos;
 
 import entities.Address;
@@ -16,9 +15,11 @@ public class PersonDTO {
     private String email;
     private String firstName;
     private String lastName;
-    private List<PhoneDTO> phonesDTO = new ArrayList<>();
+    private List<PhoneDTO> phonesDTO;
     private AddressDTO addressesDTO;
-    private List<HobbyDTO> hobbiesDTO = new ArrayList<>();
+    private List<HobbyDTO> hobbiesDTO;
+    private CityInfoDTO cityInfoDTO;
+
 
 
     public PersonDTO(Person person, AddressDTO addressesDTO, List<PhoneDTO> phonesDTO, List<HobbyDTO> hobbiesDTO) {
@@ -28,6 +29,15 @@ public class PersonDTO {
         this.phonesDTO = phonesDTO;
         this.addressesDTO = addressesDTO;
         this.hobbiesDTO = hobbiesDTO;
+    }
+    public PersonDTO(Person person, AddressDTO addressesDTO, List<PhoneDTO> phonesDTO, List<HobbyDTO> hobbiesDTO, CityInfoDTO ciDTO) {
+        this.email = person.getEmail();
+        this.firstName = person.getFirstName();
+        this.lastName = person.getLastName();
+        this.phonesDTO = phonesDTO;
+        this.addressesDTO = addressesDTO;
+        this.hobbiesDTO = hobbiesDTO;
+        this.cityInfoDTO = ciDTO;
     }
     
         public PersonDTO(int id, Person person, AddressDTO addressesDTO, List<PhoneDTO> phonesDTO, List<HobbyDTO> hobbiesDTO) {
@@ -40,19 +50,10 @@ public class PersonDTO {
         this.hobbiesDTO = hobbiesDTO;
     }
 
-//    public PersonDTO(Person pers) {
-//        this.email = pers.getEmail();
-//        this.firstName = pers.getFirstName();
-//        this.lastName = pers.getLastName();
-//    }
-    
     public PersonDTO(Person pers) {
         this.email = pers.getEmail();
         this.firstName = pers.getFirstName();
         this.lastName = pers.getLastName();
-        pers.getPhones().forEach(phone->this.getPhones().add(new PhoneDTO(phone)));
-        this.addressesDTO = new AddressDTO(pers.getAddress());
-        pers.getHobbies().forEach(hobby->this.getHobbies().add(new HobbyDTO(hobby)));
     }
 
     public static List<PersonDTO> getDtos(List<Person> persons){
@@ -112,10 +113,16 @@ public class PersonDTO {
     public int getId() {
         return id;
     }
-    
-  
 
-    public void setId(int id) {// Må vi dette ??? 
+    public CityInfoDTO getCityInfoDTO() {
+        return cityInfoDTO;
+    }
+
+    public void setCityInfoDTO(CityInfoDTO cityInfoDTO) {
+        this.cityInfoDTO = cityInfoDTO;
+    }
+
+    public void setId(int id) {// Må vi dette ???
         this.id = id;
     }
     

@@ -1,16 +1,14 @@
 package dtos;
 
-
 import entities.Address;
 import entities.CityInfo;
-
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CityInfoDTO {
 
-    private int zip;
+    private String zip;
     private String cityName;
     private List<Address> adresses;
 
@@ -18,19 +16,23 @@ public class CityInfoDTO {
         this.zip = ci.getZip();
         this.cityName = ci.getCityName();
     }
-    
-    
-  public static List<AddressDTO> getDtos(List<Address> adresses){
+
+    public CityInfoDTO(String zip, String cityName) {
+        this.zip = zip;
+        this.cityName = cityName;
+    }
+
+    public static List<AddressDTO> getDtos(List<Address> adresses) {
         List<AddressDTO> addressDtos = new ArrayList();
-        adresses.forEach(adrs->addressDtos.add(new AddressDTO(adrs)));
+        adresses.forEach(adrs -> addressDtos.add(new AddressDTO(adrs)));
         return addressDtos;
     }
-    
-    public int getZip() {
+
+    public String getZip() {
         return zip;
     }
 
-    public void setZip(int zip) {
+    public void setZip(String zip) {
         this.zip = zip;
     }
 
@@ -50,6 +52,4 @@ public class CityInfoDTO {
         this.adresses = adresses;
     }
 
-    
-    
 }

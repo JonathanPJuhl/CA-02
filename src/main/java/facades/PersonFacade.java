@@ -1,6 +1,7 @@
 package facades;
 
 import dtos.AddressDTO;
+import dtos.CityInfoDTO;
 import dtos.HobbyDTO;
 import dtos.PersonDTO;
 import dtos.Person_UltraDTO;
@@ -49,30 +50,35 @@ public class PersonFacade {
     }
 
     public PersonDTO create(PersonDTO pDTO) {
-
+        EntityManager em = emf.createEntityManager();
         Person pers = new Person(pDTO.getEmail(), pDTO.getFirstName(), pDTO.getLastName());
 
-        for (PhoneDTO p : pDTO.getPhones()) {
-            pers.addPhone(new Phone(p.getPhoneNumber(), p.getTypeOfNumber()));
-        }
-
-        for (HobbyDTO h : pDTO.getHobbies()) {
-
-            Hobby hobby = new Hobby(h.getName(), h.getWikiLink(), h.getCategory(), h.getType());
-
-            pers.addHobby(hobby);
-
-        }
-
-        Address address = new Address(pDTO.getAddress().getStreet(),
-                pDTO.getAddress().getAdditionalInfo());
-        address.addCityInfo(new CityInfo(pDTO.getAddress().getCityInfoDto().getZip(), pDTO.getAddress().getCityInfoDto().getCityName()));
-        pers.addAddress(address);
-
-        EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
             em.persist(pers);
+            em.getTransaction().commit();
+
+            for (PhoneDTO p : pDTO.getPhones()) {
+                pers.addPhone(new Phone(p.getPhoneNumber(), p.getTypeOfNumber()));
+            }
+
+            for (HobbyDTO h : pDTO.getHobbies()) {
+
+                Hobby hobby = new Hobby(h.getName(), h.getWikiLink(), h.getCategory(), h.getType());
+
+                pers.addHobby(hobby);
+
+            }
+            Address address = new Address(pDTO.getAddress().getStreet(),
+                    pDTO.getAddress().getAdditionalInfo());
+            CityInfo cityInfo = getCityInfo(pDTO.getCityInfoDTO());
+            //address.addCityInfo(new CityInfo(pDTO.getAddress().getCityInfoDto().getZip(), pDTO.getAddress().getCityInfoDto().getCityName()));
+            address.addCityInfo(cityInfo);
+            pers.addAddress(address);
+            //pers.getAddress().setCityInfo(getCityInfo(new CityInfoDTO(pDTO.getCityInfoDTO().getZip(), pDTO.getCityInfoDTO().getCityName())));
+
+            em.getTransaction().begin();
+            em.merge(pers);
             em.getTransaction().commit();
         } finally {
             em.close();
@@ -85,6 +91,14 @@ public class PersonFacade {
         PersonDTO pDTO = new PersonDTO(em.find(Person.class, id));
         return pDTO;
 
+    }
+
+    public CityInfo getCityInfo(CityInfoDTO cdto) {
+        EntityManager em = emf.createEntityManager();
+        TypedQuery<CityInfo> query = em.createQuery("SELECT c FROM CityInfo c WHERE c.zip =:zip", CityInfo.class);
+        query.setParameter("zip", cdto.getZip());
+
+        return query.getSingleResult();
     }
 
     public PersonDTO validatePersonDTO(PersonDTO pdto) throws ArgumentNullException { //???
@@ -135,7 +149,7 @@ public class PersonFacade {
         List<Hobby> emptyOfHobbies = new ArrayList<>();
         Phone phone;
         PhoneDTO phoneNew;
-        Phone phoneToDelete; 
+        Phone phoneToDelete;
 
         validatePersonDTO(newPersonDTO);
 
@@ -153,12 +167,12 @@ public class PersonFacade {
         newPersonDTO.getPhones().forEach(phoneDTO -> {
             extraPhonesDTOs.add(phoneDTO);
         });
-        
+
         //Makes sure that personFromDB's list of phones isn't larger than the new list og phonesDTOs
-        while(newPersonDTO.getPhones().size()<personFromDB.getPhones().size()){
-            personFromDB.getPhones().remove(newPersonDTO.getPhones().size()-1);
+        while (newPersonDTO.getPhones().size() < personFromDB.getPhones().size()) {
+            personFromDB.getPhones().remove(newPersonDTO.getPhones().size() - 1);
         }
-            
+
         //Sets new phones instead of old once but keeps id
         for (int i = 0; i < newPersonDTO.getPhones().size(); i++) {
             try {
@@ -169,7 +183,7 @@ public class PersonFacade {
                 extraPhonesDTOs.remove(phoneNew);
             } catch (Exception e) {
                 break;
-                
+
             }
         }
 
@@ -204,8 +218,7 @@ public class PersonFacade {
             personFromDB.setHobbies(emptyOfHobbies);
             personFromDB.addHobby(new Hobby(hDTO.getName(), hDTO.getWikiLink(), hDTO.getCategory(), hDTO.getType()));
         });
-        
-        
+
         try {
             em.getTransaction().begin();
             em.merge(personFromDB);
@@ -248,7 +261,7 @@ public class PersonFacade {
 
         try {
 
-            em.getTransaction().begin(); 
+            em.getTransaction().begin();
             TypedQuery<Hobby> hobbyQ = em.createQuery("SELECT h FROM Hobby h WHERE h.name =:name", Hobby.class);
             hobbyQ.setParameter("name", hobbyDTO.getName());
             hobbyToBeAdded = hobbyQ.getSingleResult();
