@@ -148,14 +148,18 @@ public class PersonFacade {
         personFromDB.setFirstName(newPersonDTO.getFirstName());
         personFromDB.setLastName(newPersonDTO.getLastName());
         personFromDB.setEmail(newPersonDTO.getEmail());
+
+        //Phones
         newPersonDTO.getPhones().forEach(phoneDTO -> {
             extraPhonesDTOs.add(phoneDTO);
         });
         
+        //Makes sure that personFromDB's list of phones isn't larger than the new list og phonesDTOs
         while(newPersonDTO.getPhones().size()<personFromDB.getPhones().size()){
             personFromDB.getPhones().remove(newPersonDTO.getPhones().size()-1);
         }
             
+        //Sets new phones instead of old once but keeps id
         for (int i = 0; i < newPersonDTO.getPhones().size(); i++) {
             try {
                 phone = personFromDB.getPhones().get(i);
@@ -169,8 +173,8 @@ public class PersonFacade {
             }
         }
 
+        //Persist new phones if there is more phones i the new list og phones
         if (!(extraPhonesDTOs.isEmpty())) {
-
             try {
                 emPhone.getTransaction().begin();
                 for (PhoneDTO pdto : extraPhonesDTOs) {
@@ -187,6 +191,7 @@ public class PersonFacade {
             }
         }
 
+        //Adresses and City information
         newAddress = new Address(newPersonDTO.getAddress().getStreet(), newPersonDTO.getAddress().getAdditionalInfo());
         personFromDB.getAddress().setStreet(newAddress.getStreet());
         personFromDB.getAddress().setAdditionalInfo(newAddress.getAdditionalInfo());
@@ -194,6 +199,7 @@ public class PersonFacade {
         personFromDB.getAddress().getCityInfo().setZip(newCityInfo.getZip());
         personFromDB.getAddress().getCityInfo().setCityName(newCityInfo.getCityName());
 
+        //Hobbies - resets old list and adds the new hobbies
         newPersonDTO.getHobbies().forEach((hDTO) -> {
             personFromDB.setHobbies(emptyOfHobbies);
             personFromDB.addHobby(new Hobby(hDTO.getName(), hDTO.getWikiLink(), hDTO.getCategory(), hDTO.getType()));
