@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dtos.HobbyDTO;
 import dtos.PersonDTO;
+import entities.Person;
 import errorhandling.ArgumentNullException;
 import utils.EMF_Creator;
 import facades.PersonFacade;
@@ -11,15 +12,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManagerFactory;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 //Todo Remove or change relevant parts before ACTUAL use
 @Path("persons")
@@ -114,6 +108,16 @@ public class PersonResource {
         FACADE.addHobbyToPerson(idOfPerson, hobbyDTOToAdd);
     }
 
+    @POST
+    @Path("create")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public String addPerson(String json) {
+        PersonDTO persDTO = GSON.fromJson(json, PersonDTO.class);
+        PersonDTO persistedPers = FACADE.create(persDTO);
+        return GSON.toJson(persistedPers);
+    }
+
     @Path("removeHobbyFromPerson/{id}")
     @DELETE
     public void removeHobby(@PathParam("id") int idOfPerson, String hobbyToBeRemoved) throws Exception {
@@ -130,6 +134,14 @@ public class PersonResource {
     @DELETE
     public void removePhone(@PathParam("id") int idOfPerson, String numbr) throws Exception {
         FACADE.removePhone(idOfPerson, Integer.parseInt(numbr));
+    }
+
+    @Path("phone/{phoneNr}")
+    @GET
+    @Produces({MediaType.APPLICATION_JSON})
+    public String getPersonByPhone(@PathParam("phoneNr") int phoneNr) {
+
+        return GSON.toJson(FACADE.getByPhone(phoneNr));
     }
 
 }

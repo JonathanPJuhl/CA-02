@@ -10,7 +10,7 @@ import java.util.List;
 
 public class CityInfoDTO {
 
-    private int zip;
+    private String zip;
     private String cityName;
     private List<Address> adresses;
 
@@ -18,6 +18,15 @@ public class CityInfoDTO {
         this.zip = ci.getZip();
         this.cityName = ci.getCityName();
     }
+    public CityInfoDTO(String zip, String cityName) {
+        this.zip = zip;
+        this.cityName = cityName;
+    }
+/*    public CityInfoDTO(int zip, String cityName) {
+        this.zip = zip;
+        this.cityName = cityName;
+    }*/
+
     
     
   public static List<AddressDTO> getDtos(List<Address> adresses){
@@ -26,11 +35,11 @@ public class CityInfoDTO {
         return addressDtos;
     }
     
-    public int getZip() {
+    public String getZip() {
         return zip;
     }
 
-    public void setZip(int zip) {
+    public void setZip(String zip) {
         this.zip = zip;
     }
 
