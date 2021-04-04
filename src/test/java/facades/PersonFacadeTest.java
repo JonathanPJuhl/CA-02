@@ -333,11 +333,9 @@ public class PersonFacadeTest {
         em.persist(phone2);
         em.getTransaction().commit();
         em.close();
-//        person.getHobbies().forEach(h -> {
-//            System.out.println(h.getName());
-//        });
-        facade.addPhoneToPerson(person.getId(), 23112314);
-        assertEquals( 2,person.getPhones().size());
+
+        PersonDTO personDTOExpected = facade.addPhoneToPerson(person.getId(), 23112314);
+        assertEquals( 2,personDTOExpected.getPhones().size());
     }
 
     @Test

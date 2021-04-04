@@ -242,8 +242,11 @@ public class PersonFacade {
 
         try {
 
-            em.getTransaction().begin();
-            hobbyToBeAdded = em.find(Hobby.class, hobbyDTO.getName());
+            em.getTransaction().begin(); 
+            TypedQuery<Hobby> hobbyQ = em.createQuery("SELECT h FROM Hobby h WHERE h.name =:name", Hobby.class);
+            hobbyQ.setParameter("name", hobbyDTO.getName());
+            hobbyToBeAdded = hobbyQ.getSingleResult();
+
             if (hobbyToBeAdded == null) {
                 throw new Exception("The hobby refered by the given hobby name does not currently exist within our databases");
             }
@@ -259,9 +262,10 @@ public class PersonFacade {
         }
     }
 
-    public void addPhoneToPerson(int id, int number) throws Exception {
+    public PersonDTO addPhoneToPerson(int id, int number) throws Exception {
         EntityManager em = emf.createEntityManager();
         Phone phoneToBeAdded;
+        Person personResult = null;
 
         try {
             em.getTransaction().begin();
@@ -284,10 +288,12 @@ public class PersonFacade {
 
             em.merge(personToBeEdited);
             em.getTransaction().commit();
+            personResult = em.find(Person.class, personToBeEdited.getId());
 
         } finally {
             em.close();
         }
+        return new PersonDTO(personResult);
     }
 
     public void removeHobby(int id, String hobbyRemove) throws Exception {
