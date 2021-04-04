@@ -15,9 +15,9 @@ public class PersonDTO {
     private String email;
     private String firstName;
     private String lastName;
-    private List<PhoneDTO> phonesDTO;
+    private List<PhoneDTO> phonesDTO = new ArrayList<>();
     private AddressDTO addressesDTO;
-    private List<HobbyDTO> hobbiesDTO;
+    private List<HobbyDTO> hobbiesDTO = new ArrayList<>();
     private CityInfoDTO cityInfoDTO;
 
 
@@ -54,6 +54,16 @@ public class PersonDTO {
         this.email = pers.getEmail();
         this.firstName = pers.getFirstName();
         this.lastName = pers.getLastName();
+    }
+    
+    public PersonDTO(Person pers, boolean toHaveAnotherConstructor) {
+        this.email = pers.getEmail();
+        this.firstName = pers.getFirstName();
+        this.lastName = pers.getLastName();
+        pers.getPhones().forEach(phone->this.getPhones().add(new PhoneDTO(phone)));
+        this.addressesDTO = new AddressDTO(pers.getAddress());
+        this.cityInfoDTO = new CityInfoDTO(pers.getAddress().getCityInfo());
+        pers.getHobbies().forEach(hobby->this.getHobbies().add(new HobbyDTO(hobby)));
     }
 
     public static List<PersonDTO> getDtos(List<Person> persons){

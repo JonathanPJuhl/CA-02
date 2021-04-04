@@ -17,6 +17,7 @@ import utils.EMF_Creator;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.TypedQuery;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -37,8 +38,6 @@ public class PersonFacadeTest {
     private static List<Hobby> hobbies;
     private static List<Phone> phones;
     private static Address ad;
-    private static CityInfo ci;
-
 
     public PersonFacadeTest() {
     }
@@ -57,8 +56,9 @@ public class PersonFacadeTest {
     // Setup the DataBase in a known state BEFORE EACH TEST
     //TODO -- Make sure to change the code below to use YOUR OWN entity class
     @BeforeEach
-     public void setUp() {
+    public void setUp() {
         EntityManager em = emf.createEntityManager();
+        EntityManager emPerson = emf.createEntityManager();
         try {
             em.getTransaction().begin();
 
@@ -85,13 +85,25 @@ public class PersonFacadeTest {
             person.addPhone(phone);
             person.addAddress(ad);
             em.merge(person);
-
             em.getTransaction().commit();
+
         } finally {
             em.close();
+            try {
+
+                emPerson.getTransaction().begin();
+                TypedQuery<Person> pQuery = emPerson.createQuery("SELECT p FROM Person p WHERE p.firstName =:firstName AND p.lastName =:lastName AND p.email=:email", Person.class);
+                pQuery.setParameter("firstName", person.getFirstName());
+                pQuery.setParameter("lastName", person.getLastName());
+                pQuery.setParameter("email", person.getEmail());
+                person = pQuery.getSingleResult();
+                emPerson.getTransaction().commit();
+                
+            }finally{
+                emPerson.close();
+            }
         }
     }
-
 
     @AfterEach
     public void tearDown() {
@@ -122,17 +134,17 @@ public class PersonFacadeTest {
 
     @Test
     public void testGetAllPersons() {
-        CityInfo cityInfo = new CityInfo("2030", "Holte");
-        Address address = new Address("Street3", "Additional and more");
-        address.setCityInfo(cityInfo);
-        AddressDTO ad = new AddressDTO(address);
+
+        CityInfoDTO ci = new CityInfoDTO(new CityInfo("2800", "Lyngby"));
+        AddressDTO ad = new AddressDTO(new Address("Street3", "Additional and more"));
+        ad.setCityInfoDto(ci);
         List<PhoneDTO> phones = new ArrayList<PhoneDTO>();
         PhoneDTO phone = new PhoneDTO(new Phone(73829374, "also so home"));
         phones.add(phone);
         HobbyDTO hobby = new HobbyDTO(new Hobby("Hockey", "smash more bold", "vintersport", "teamsport"));
         List<HobbyDTO> hobbies = new ArrayList<>();
         hobbies.add(hobby);
-        PersonDTO pDTO = new PersonDTO(new Person("icecool@mail.dk", "Hugo", "Jarvier"), ad, phones, hobbies, new CityInfoDTO(cityInfo));
+        PersonDTO pDTO = new PersonDTO(new Person("icecool@mail.dk", "Hugo", "Jarvier"), ad, phones, hobbies, ci);
 
         pDTO.setAddress(ad);
         pDTO.setPhones(phones);
@@ -154,13 +166,13 @@ public class PersonFacadeTest {
     @Test
     public void testEditPersonSetEmail() throws ArgumentNullException, Exception {
         int personToChangeID = person.getId();
-        PersonDTO pDToExpected = new PersonDTO(person);
-       pDToExpected.setEmail("wannabemail@hacker.dk");
-        
+        PersonDTO pDToExpected = new PersonDTO(person, true);
+        pDToExpected.setEmail("wannabemail@hacker.dk");
+
         PersonDTO pdtoResult = facade.updatePerson(pDToExpected, personToChangeID);
         assertEquals(pDToExpected.getEmail(), pdtoResult.getEmail());
     }
-    
+
     @Test
     public void testEditPersonSetNewListManyPhones() throws ArgumentNullException, Exception {
         EntityManager em = emf.createEntityManager();
@@ -173,28 +185,28 @@ public class PersonFacadeTest {
         pers.addPhone(phone1);
         pers.addPhone(phone2);
         pers.addPhone(phone3);
-        try{
-        em.getTransaction().begin();
-        em.merge(pers);
-        em.getTransaction().commit();
-        }finally{
-        em.close();
+        try {
+            em.getTransaction().begin();
+            em.merge(pers);
+            em.getTransaction().commit();
+        } finally {
+            em.close();
         }
-        PersonDTO pDTOToEditedPerson = new PersonDTO(pers);
-        
+        PersonDTO pDTOToEditedPerson = new PersonDTO(pers, true);
+
         Phone phoneNew1 = new Phone(33333333, "Work");
         pDTOToEditedPerson.getPhones().get(1).setPhoneNumber(phoneNew1.getPhoneNumber());
         pDTOToEditedPerson.getPhones().get(1).setTypeOfNumber(phoneNew1.getTypeOfNumber());
         Phone phoneNew2 = new Phone(99999999, "Private");
         pDTOToEditedPerson.getPhones().add(new PhoneDTO(phoneNew2));
-        PersonDTO acctualPersonDTO = facade.updatePerson(pDTOToEditedPerson,pers.getId());
-      
-        assertTrue(phoneNew1.getPhoneNumber() == acctualPersonDTO.getPhones().get(1).getPhoneNumber() 
+        PersonDTO acctualPersonDTO = facade.updatePerson(pDTOToEditedPerson, pers.getId());
+
+        assertTrue(phoneNew1.getPhoneNumber() == acctualPersonDTO.getPhones().get(1).getPhoneNumber()
                 && phoneNew1.getTypeOfNumber().equals(acctualPersonDTO.getPhones().get(1).getTypeOfNumber())
-                && phoneNew2.getPhoneNumber() == acctualPersonDTO.getPhones().get(pDTOToEditedPerson.getPhones().size()-1).getPhoneNumber()
-                && phoneNew2.getTypeOfNumber().equals(acctualPersonDTO.getPhones().get(pDTOToEditedPerson.getPhones().size()-1).getTypeOfNumber()));
+                && phoneNew2.getPhoneNumber() == acctualPersonDTO.getPhones().get(pDTOToEditedPerson.getPhones().size() - 1).getPhoneNumber()
+                && phoneNew2.getTypeOfNumber().equals(acctualPersonDTO.getPhones().get(pDTOToEditedPerson.getPhones().size() - 1).getTypeOfNumber()));
     }
-    
+
     @Test
     public void testEditPersonSetNewListLessPhones() throws ArgumentNullException, Exception {
         EntityManager em = emf.createEntityManager();
@@ -207,29 +219,28 @@ public class PersonFacadeTest {
         pers.addPhone(phone1);
         pers.addPhone(phone2);
         pers.addPhone(phone3);
-        try{
-        em.getTransaction().begin();
-        em.merge(pers);
-        em.getTransaction().commit();
-        }finally{
-        em.close();
+        try {
+            em.getTransaction().begin();
+            em.merge(pers);
+            em.getTransaction().commit();
+        } finally {
+            em.close();
         }
-        PersonDTO pDTOToEditedPerson = new PersonDTO(pers);
-        
+        PersonDTO pDTOToEditedPerson = new PersonDTO(pers, true);
+
         Phone phoneNew1 = new Phone(33333333, "Work");
         pDTOToEditedPerson.getPhones().get(1).setPhoneNumber(phoneNew1.getPhoneNumber());
         pDTOToEditedPerson.getPhones().get(1).setTypeOfNumber(phoneNew1.getTypeOfNumber());
-        
+
         pDTOToEditedPerson.getPhones().remove(0);
-        
-        PersonDTO acctualPersonDTO = facade.updatePerson(pDTOToEditedPerson,pers.getId());
-      
-        assertTrue(phoneNew1.getPhoneNumber() == acctualPersonDTO.getPhones().get(0).getPhoneNumber() 
+
+        PersonDTO acctualPersonDTO = facade.updatePerson(pDTOToEditedPerson, pers.getId());
+
+        assertTrue(phoneNew1.getPhoneNumber() == acctualPersonDTO.getPhones().get(0).getPhoneNumber()
                 && phoneNew1.getTypeOfNumber().equals(acctualPersonDTO.getPhones().get(0).getTypeOfNumber())
-        && acctualPersonDTO.getPhones().size() == 2);
+                && acctualPersonDTO.getPhones().size() == 2);
     }
-    
-    
+
     @Test
     public void testEditPersonSetNewListHobbies() throws ArgumentNullException, Exception {
         EntityManager em = emf.createEntityManager();
@@ -244,27 +255,27 @@ public class PersonFacadeTest {
         pers.addHobby(hobby2);
         pers.addHobby(hobby3);
         pers.addHobby(hobby4);
-        try{
-        em.getTransaction().begin();
-        em.merge(pers);
-        em.getTransaction().commit();
-        }finally{
-        em.close();
+        try {
+            em.getTransaction().begin();
+            em.merge(pers);
+            em.getTransaction().commit();
+        } finally {
+            em.close();
         }
-        PersonDTO pDTOToEditedPerson = new PersonDTO(pers);
-        
+        PersonDTO pDTOToEditedPerson = new PersonDTO(pers, true);
+
         Hobby newHobby = new Hobby("Volleyball", "Kast med bolden over hegn", "boldspil", "teamsport");
         pDTOToEditedPerson.getHobbies().get(0).setName(newHobby.getName());
         pDTOToEditedPerson.getHobbies().get(0).setWikiLink(newHobby.getWikiLink());
         pDTOToEditedPerson.getHobbies().get(0).setCategory(newHobby.getCategory());
         pDTOToEditedPerson.getHobbies().get(0).setType(newHobby.getType());
-     
-        PersonDTO acctualPersonDTO = facade.updatePerson(pDTOToEditedPerson,pers.getId());
-      
-        assertTrue(newHobby.getName().equals(acctualPersonDTO.getHobbies().get(0).getName())&&
-        newHobby.getWikiLink().equals(acctualPersonDTO.getHobbies().get(0).getWikiLink())&&
-        newHobby.getCategory().equals(acctualPersonDTO.getHobbies().get(0).getCategory())&&
-        newHobby.getType().equals(acctualPersonDTO.getHobbies().get(0).getType()));
+
+        PersonDTO acctualPersonDTO = facade.updatePerson(pDTOToEditedPerson, pers.getId());
+
+        assertTrue(newHobby.getName().equals(acctualPersonDTO.getHobbies().get(0).getName())
+                && newHobby.getWikiLink().equals(acctualPersonDTO.getHobbies().get(0).getWikiLink())
+                && newHobby.getCategory().equals(acctualPersonDTO.getHobbies().get(0).getCategory())
+                && newHobby.getType().equals(acctualPersonDTO.getHobbies().get(0).getType()));
     }
 
     //Negativ test
@@ -315,12 +326,13 @@ public class PersonFacadeTest {
     void testAddHobby() throws Exception {
         EntityManager em = emf.createEntityManager();
         Hobby hobby2 = new Hobby("Ping Pong", "smash med battet", "boldspill", "freeforall altid bro");
-        try{em.getTransaction().begin();
-        em.persist(hobby2);
-        em.getTransaction().commit();
-        facade.addHobbyToPerson(person.getId(), new HobbyDTO(hobby2));
-        person = em.find(Person.class, person.getId());
-        }finally{
+        try {
+            em.getTransaction().begin();
+            em.persist(hobby2);
+            em.getTransaction().commit();
+            facade.addHobbyToPerson(person.getId(), new HobbyDTO(hobby2));
+            person = em.find(Person.class, person.getId());
+        } finally {
             em.close();
         }
         assertEquals(2, person.getHobbies().size());
@@ -336,9 +348,8 @@ public class PersonFacadeTest {
         em.persist(phone2);
         em.getTransaction().commit();
         em.close();
-
         PersonDTO personDTOExpected = facade.addPhoneToPerson(person.getId(), 23112314);
-        assertEquals( 2,personDTOExpected.getPhones().size());
+        assertEquals(2, personDTOExpected.getPhones().size());
     }
 
     @Test
@@ -355,15 +366,14 @@ public class PersonFacadeTest {
 //        });
         facade.addHobbyToPerson(person.getId(), new HobbyDTO(hobby2));
         facade.removeHobby(person.getId(), "Ping Pong");
-                assertEquals(1, person.getHobbies().size());
+        assertEquals(1, person.getHobbies().size());
     }
-    
-    
+
     @Test
     void testPhoneRemoval() throws Exception {
         EntityManager em = emf.createEntityManager();
 
-        Phone phone2 = new Phone( 33224512, "Work");
+        Phone phone2 = new Phone(33224512, "Work");
         em.getTransaction().begin();
         em.persist(phone2);
         em.getTransaction().commit();
@@ -373,7 +383,7 @@ public class PersonFacadeTest {
 //        });
         facade.addPhoneToPerson(person.getId(), 33224512);
         facade.removePhone(person.getId(), 33224512);
-                assertEquals(1, person.getPhones().size());
+        assertEquals(1, person.getPhones().size());
     }
 
 }

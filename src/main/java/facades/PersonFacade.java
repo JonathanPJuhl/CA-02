@@ -52,7 +52,6 @@ public class PersonFacade {
     public PersonDTO create(PersonDTO pDTO) {
         EntityManager em = emf.createEntityManager();
         Person pers = new Person(pDTO.getEmail(), pDTO.getFirstName(), pDTO.getLastName());
-
         try {
             em.getTransaction().begin();
             em.persist(pers);
@@ -108,7 +107,7 @@ public class PersonFacade {
                 || pdto.getAddress() == null
                 || pdto.getHobbies().contains(null)
                 || pdto.getPhones().contains(null)
-                || pdto.getAddress().getCityInfoDto() == null) {
+                || pdto.getCityInfoDTO() == null) {
             throw new ArgumentNullException("En personegenskab er null", 400);
         }
         return pdto;
@@ -209,7 +208,7 @@ public class PersonFacade {
         newAddress = new Address(newPersonDTO.getAddress().getStreet(), newPersonDTO.getAddress().getAdditionalInfo());
         personFromDB.getAddress().setStreet(newAddress.getStreet());
         personFromDB.getAddress().setAdditionalInfo(newAddress.getAdditionalInfo());
-        CityInfo newCityInfo = new CityInfo(newPersonDTO.getAddress().getCityInfoDto().getZip(), newPersonDTO.getAddress().getCityInfoDto().getCityName());
+        CityInfo newCityInfo = new CityInfo(newPersonDTO.getCityInfoDTO().getZip(), newPersonDTO.getCityInfoDTO().getCityName());
         personFromDB.getAddress().getCityInfo().setZip(newCityInfo.getZip());
         personFromDB.getAddress().getCityInfo().setCityName(newCityInfo.getCityName());
 
@@ -228,7 +227,7 @@ public class PersonFacade {
         } finally {
             em.close();
         }
-        return new PersonDTO(personUpdated);
+        return new PersonDTO(personUpdated, true);
     }
 
     public int getPersonIDByNameAndNumber(PersonDTO personDTO) {
@@ -312,7 +311,7 @@ public class PersonFacade {
         } finally {
             em.close();
         }
-        return new PersonDTO(personResult);
+        return new PersonDTO(personResult, true);
     }
 
     public void removeHobby(int id, String hobbyRemove) throws Exception {
