@@ -11,11 +11,11 @@ public class AddressDTO {
     private String additionalInfo;
     private CityInfoDTO cityInfoDto;
 
-    public AddressDTO(Address address, CityInfoDTO cityInfoDto) {
-        this.street = address.getStreet();
-        this.additionalInfo = address.getAdditionalInfo();
-        this.cityInfoDto = cityInfoDto;
-    }
+//    public AddressDTO(Address address, CityInfoDTO cityInfoDto) {
+//        this.street = address.getStreet();
+//        this.additionalInfo = address.getAdditionalInfo();
+//        this.cityInfoDto = cityInfoDto;
+//    }
 
     public AddressDTO(Address address) {
         this.street = address.getStreet();
