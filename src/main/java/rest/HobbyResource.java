@@ -13,6 +13,7 @@ import utils.EMF_Creator;
 import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
@@ -21,15 +22,23 @@ import javax.ws.rs.core.MediaType;
 public class HobbyResource {
 
     private static final EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();
-       
-    private static final HobbyFacade FACADE =  HobbyFacade.getHobbyFacade(EMF);
+
+    private static final HobbyFacade FACADE = HobbyFacade.getHobbyFacade(EMF);
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-            
+
     @GET
     @Produces({MediaType.APPLICATION_JSON})
     public String getAllHobbies() {
         List<HobbyDTO> ListOfHobbies = FACADE.getAll();
         return GSON.toJson(ListOfHobbies);
 
+    }
+
+    @GET
+    @Path("{hobby}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public String getHobbyByHobbyName(@PathParam("hobby") String hobby) {
+
+        return GSON.toJson(FACADE.findHobbyByName(hobby));
     }
 }
