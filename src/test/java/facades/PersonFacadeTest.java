@@ -120,7 +120,7 @@ public class PersonFacadeTest {
         List<PhoneDTO> phones = new ArrayList<PhoneDTO>();
         PhoneDTO phone = new PhoneDTO(new Phone(73829374, "also home"));
         phones.add(phone);
-        HobbyDTO hobby = new HobbyDTO(new Hobby("Tennis", "smash bold", "boldspill", "teamsport and single player"));
+        HobbyDTO hobby = new HobbyDTO(new Hobby("Fodbold", "smash bold", "boldspill", "teamsport and single player"));
         List<HobbyDTO> hobbies = new ArrayList<>();
         hobbies.add(hobby);
         PersonDTO pDTO = new PersonDTO(new Person("cool@mail.dk", "Peter", "Jensen"), ad, phones, hobbies, cityInfo);
@@ -142,7 +142,7 @@ public class PersonFacadeTest {
         List<PhoneDTO> phones = new ArrayList<PhoneDTO>();
         PhoneDTO phone = new PhoneDTO(new Phone(73829374, "also so home"));
         phones.add(phone);
-        HobbyDTO hobby = new HobbyDTO(new Hobby("Hockey", "smash more bold", "vintersport", "teamsport"));
+        HobbyDTO hobby = new HobbyDTO(new Hobby("Fodbold", "smash more bold", "vintersport", "teamsport"));
         List<HobbyDTO> hobbies = new ArrayList<>();
         hobbies.add(hobby);
         PersonDTO pDTO = new PersonDTO(new Person("icecool@mail.dk", "Hugo", "Jarvier"), ad, phones, hobbies, ci);
@@ -242,7 +242,7 @@ public class PersonFacadeTest {
                 && phoneNew1.getTypeOfNumber().equals(acctualPersonDTO.getPhones().get(0).getTypeOfNumber())
                 && acctualPersonDTO.getPhones().size() == 2);
     }
-
+    @Disabled
     @Test
     public void testEditPersonSetNewListHobbies() throws ArgumentNullException, Exception {
         EntityManager em = emf.createEntityManager();
