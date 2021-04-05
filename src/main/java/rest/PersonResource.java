@@ -2,6 +2,7 @@ package rest;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import dtos.HobbyDTO;
 import dtos.PersonDTO;
 import entities.Person;
 import errorhandling.ArgumentNullException;
@@ -11,7 +12,18 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManagerFactory;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
 import javax.ws.rs.*;
+
 import javax.ws.rs.core.MediaType;
 
 //Todo Remove or change relevant parts before ACTUAL use
@@ -83,29 +95,28 @@ public class PersonResource {
 //    @PUT
 //    @Consumes({MediaType.APPLICATION_JSON})
 //    @Produces({MediaType.APPLICATION_JSON})
-    @Path("{id}")
+    
+    @Path("update/{phoneNumber}")
     @PUT
     @Consumes({MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_JSON})
-    public String editPersonByIDAndPersonInfo(@PathParam("id") int iDToEdit, String persInfoForUpdating) {
-        String jsonPersonDTO;
+    public String editPersonByIDAndPersonInfo(@PathParam("phoneNumber") int phoneNumber, String persInfoForUpdating) { 
+        PersonDTO persDTOEditTo;
+        String personUpdated = null;
         try {
-            PersonDTO persDTOEditTo = GSON.fromJson(persInfoForUpdating, PersonDTO.class);
-            jsonPersonDTO = GSON.toJson(FACADE.updatePerson(persDTOEditTo, iDToEdit));
+            persDTOEditTo = GSON.fromJson(persInfoForUpdating, PersonDTO.class); 
+            personUpdated = GSON.toJson(FACADE.updatePerson(persDTOEditTo, phoneNumber));
         } catch (ArgumentNullException ex) {
             Logger.getLogger(PersonResource.class.getName()).log(Level.SEVERE, null, ex);
-            jsonPersonDTO = ex.getMessage();
-        } catch (NullPointerException e) {
-            Logger.getLogger(PersonResource.class.getName()).log(Level.SEVERE, null, e);
-            jsonPersonDTO = e.getMessage();
         }
-        return jsonPersonDTO;
+        return personUpdated;
     }
 
     @Path("addHobbyToPerson/{id}")
     @PUT
     public void addHobby(@PathParam("id") int idOfPerson, String hobbyToBeAdded) throws Exception {
-        FACADE.addHobbyToPerson(idOfPerson, hobbyToBeAdded);
+        HobbyDTO hobbyDTOToAdd = GSON.fromJson(hobbyToBeAdded, HobbyDTO.class);
+        FACADE.addHobbyToPerson(idOfPerson, hobbyDTOToAdd);
     }
 
     @POST
@@ -118,6 +129,7 @@ public class PersonResource {
         return GSON.toJson(persistedPers);
     }
 
+    
     @Path("removeHobbyFromPerson/{id}")
     @DELETE
     public void removeHobby(@PathParam("id") int idOfPerson, String hobbyToBeRemoved) throws Exception {
@@ -135,6 +147,8 @@ public class PersonResource {
     public void removePhone(@PathParam("id") int idOfPerson, String numbr) throws Exception {
         FACADE.removePhone(idOfPerson, Integer.parseInt(numbr));
     }
+    
+    
 
     @Path("phone/{phoneNr}")
     @GET

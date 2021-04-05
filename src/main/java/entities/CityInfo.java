@@ -51,8 +51,6 @@ public class CityInfo implements Serializable {
         return cityName;
     }
 
-
-
     public void setCityName(String cityName) {
         this.cityName = cityName;
     }

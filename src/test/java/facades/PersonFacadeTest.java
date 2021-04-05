@@ -17,6 +17,7 @@ import utils.EMF_Creator;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.TypedQuery;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -28,7 +29,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 //Uncomment the line below, to temporarily disable this test
-@Disabled
+//@Disabled
 public class PersonFacadeTest {
 
     private static EntityManagerFactory emf;
@@ -36,6 +37,7 @@ public class PersonFacadeTest {
     private static Person person;
     private static List<Hobby> hobbies;
     private static List<Phone> phones;
+    private static Address ad;
 
     public PersonFacadeTest() {
     }
@@ -56,6 +58,7 @@ public class PersonFacadeTest {
     @BeforeEach
     public void setUp() {
         EntityManager em = emf.createEntityManager();
+        EntityManager emPerson = emf.createEntityManager();
         try {
             em.getTransaction().begin();
 
@@ -82,10 +85,23 @@ public class PersonFacadeTest {
             person.addPhone(phone);
             person.addAddress(ad);
             em.merge(person);
-
             em.getTransaction().commit();
+
         } finally {
             em.close();
+            try {
+
+                emPerson.getTransaction().begin();
+                TypedQuery<Person> pQuery = emPerson.createQuery("SELECT p FROM Person p WHERE p.firstName =:firstName AND p.lastName =:lastName AND p.email=:email", Person.class);
+                pQuery.setParameter("firstName", person.getFirstName());
+                pQuery.setParameter("lastName", person.getLastName());
+                pQuery.setParameter("email", person.getEmail());
+                person = pQuery.getSingleResult();
+                emPerson.getTransaction().commit();
+                
+            }finally{
+                emPerson.close();
+            }
         }
     }
 
@@ -96,17 +112,18 @@ public class PersonFacadeTest {
 
     @Test
     public void testCreatePerson() {
-
-        CityInfoDTO ci = new CityInfoDTO(new CityInfo("2800", "Lyngby"));
-        AddressDTO ad = new AddressDTO(new Address("Street2", "Additional more"));
-        ad.setCityInfoDto(ci);
+        CityInfoDTO cityInfo = new CityInfoDTO("2800", "Lyngby");
+        Address address = new Address("Street2", "Additional more");
+        CityInfo ci = facade.getCityInfo(cityInfo);
+        address.addCityInfo(ci);
+        AddressDTO ad = new AddressDTO(address);
         List<PhoneDTO> phones = new ArrayList<PhoneDTO>();
         PhoneDTO phone = new PhoneDTO(new Phone(73829374, "also home"));
         phones.add(phone);
         HobbyDTO hobby = new HobbyDTO(new Hobby("Tennis", "smash bold", "boldspill", "teamsport and single player"));
         List<HobbyDTO> hobbies = new ArrayList<>();
         hobbies.add(hobby);
-        PersonDTO pDTO = new PersonDTO(new Person("cool@mail.dk", "Peter", "Jensen"), ad, phones, hobbies);
+        PersonDTO pDTO = new PersonDTO(new Person("cool@mail.dk", "Peter", "Jensen"), ad, phones, hobbies, cityInfo);
 
         pDTO.setAddress(ad);
         pDTO.setPhones(phones);
@@ -148,12 +165,119 @@ public class PersonFacadeTest {
     }
 
     @Test
-    public void testEditPerson() throws ArgumentNullException, Exception {
-        int personToChangeID = person.getId();
-        PersonDTO pDToExpected = new PersonDTO(person);
+    public void testEditPersonSetEmail() throws ArgumentNullException, Exception {
+        PersonDTO pDToExpected = new PersonDTO(person, true);
         pDToExpected.setEmail("wannabemail@hacker.dk");
-        PersonDTO pdtoResult = facade.updatePerson(pDToExpected, personToChangeID);
+
+        PersonDTO pdtoResult = facade.updatePerson(pDToExpected, person.getPhones().get(0).getPhoneNumber());
         assertEquals(pDToExpected.getEmail(), pdtoResult.getEmail());
+    }
+
+    @Disabled //Hvorfor virker denne ik? :(
+    @Test
+    public void testEditPersonSetNewListManyPhones() throws ArgumentNullException, Exception {
+        EntityManager em = emf.createEntityManager();
+        List<Phone> emptyListOfPhones = new ArrayList<>();
+        Phone phone1 = new Phone(12345678, "Home");
+        Phone phone2 = new Phone(87654321, "Home");
+        Phone phone3 = new Phone(29244444, "Work");
+        Person pers = person;
+        pers.setPhones(emptyListOfPhones);
+        pers.addPhone(phone1);
+        pers.addPhone(phone2);
+        pers.addPhone(phone3);
+        try {
+            em.getTransaction().begin();
+            em.merge(pers);
+            em.getTransaction().commit();
+        } finally {
+            em.close();
+        }
+        PersonDTO pDTOToEditedPerson = new PersonDTO(pers, true);
+
+        Phone phoneNew1 = new Phone(33333333, "Work");
+        pDTOToEditedPerson.getPhones().get(1).setPhoneNumber(phoneNew1.getPhoneNumber());
+        pDTOToEditedPerson.getPhones().get(1).setTypeOfNumber(phoneNew1.getTypeOfNumber());
+        Phone phoneNew2 = new Phone(99999999, "Private");
+        pDTOToEditedPerson.getPhones().add(new PhoneDTO(phoneNew2));
+        PersonDTO acctualPersonDTO = facade.updatePerson(pDTOToEditedPerson, person.getPhones().get(0).getPhoneNumber());
+
+        assertTrue(phoneNew1.getPhoneNumber() == acctualPersonDTO.getPhones().get(1).getPhoneNumber()
+                && phoneNew1.getTypeOfNumber().equals(acctualPersonDTO.getPhones().get(1).getTypeOfNumber())
+                && phoneNew2.getPhoneNumber() == acctualPersonDTO.getPhones().get(pDTOToEditedPerson.getPhones().size() - 1).getPhoneNumber()
+                && phoneNew2.getTypeOfNumber().equals(acctualPersonDTO.getPhones().get(pDTOToEditedPerson.getPhones().size() - 1).getTypeOfNumber()));
+    }
+
+    @Disabled //Hvorfor virker denne ik? :(
+    @Test
+    public void testEditPersonSetNewListLessPhones() throws ArgumentNullException, Exception {
+        EntityManager em = emf.createEntityManager();
+        List<Phone> emptyListOfPhones = new ArrayList<>();
+        Phone phone1 = new Phone(12345678, "Home");
+        Phone phone2 = new Phone(87654321, "Home");
+        Phone phone3 = new Phone(28292929, "Work");
+        Person pers = person;
+        pers.setPhones(emptyListOfPhones);
+        pers.addPhone(phone1);
+        pers.addPhone(phone2);
+        pers.addPhone(phone3);
+        try {
+            em.getTransaction().begin();
+            em.merge(pers);
+            em.getTransaction().commit();
+        } finally {
+            em.close();
+        }
+        PersonDTO pDTOToEditedPerson = new PersonDTO(pers, true);
+
+        Phone phoneNew1 = new Phone(33333333, "Work");
+        pDTOToEditedPerson.getPhones().get(1).setPhoneNumber(phoneNew1.getPhoneNumber());
+        pDTOToEditedPerson.getPhones().get(1).setTypeOfNumber(phoneNew1.getTypeOfNumber());
+
+        pDTOToEditedPerson.getPhones().remove(0);
+
+        PersonDTO acctualPersonDTO = facade.updatePerson(pDTOToEditedPerson,phone1.getPhoneNumber());
+
+        assertTrue(phoneNew1.getPhoneNumber() == acctualPersonDTO.getPhones().get(0).getPhoneNumber()
+                && phoneNew1.getTypeOfNumber().equals(acctualPersonDTO.getPhones().get(0).getTypeOfNumber())
+                && acctualPersonDTO.getPhones().size() == 2);
+    }
+
+    @Test
+    public void testEditPersonSetNewListHobbies() throws ArgumentNullException, Exception {
+        EntityManager em = emf.createEntityManager();
+        List<Hobby> emptyListOfHobbies = new ArrayList<>();
+        Hobby hobby1 = new Hobby("Håndhold", "Kast med bolden", "boldspil", "teamsport");
+        Hobby hobby2 = new Hobby("Badminton", "Ram en fjerbold", "ketcherspil", "en-mod-en");
+        Hobby hobby3 = new Hobby("PokémonGO", "Fang og træn pokémons", "app spil", "enemandsspil");
+        Hobby hobby4 = new Hobby("Tennis", "Ram en bold", "ketcherspil", "en-mod-en");
+        Person pers = person;
+        pers.setHobbies(emptyListOfHobbies);
+        pers.addHobby(hobby1);
+        pers.addHobby(hobby2);
+        pers.addHobby(hobby3);
+        pers.addHobby(hobby4);
+        try {
+            em.getTransaction().begin();
+            em.merge(pers);
+            em.getTransaction().commit();
+        } finally {
+            em.close();
+        }
+        PersonDTO pDTOToEditedPerson = new PersonDTO(pers, true);
+
+        Hobby newHobby = new Hobby("Volleyball", "Kast med bolden over hegn", "boldspil", "teamsport");
+        pDTOToEditedPerson.getHobbies().get(0).setName(newHobby.getName());
+        pDTOToEditedPerson.getHobbies().get(0).setWikiLink(newHobby.getWikiLink());
+        pDTOToEditedPerson.getHobbies().get(0).setCategory(newHobby.getCategory());
+        pDTOToEditedPerson.getHobbies().get(0).setType(newHobby.getType());
+
+        PersonDTO acctualPersonDTO = facade.updatePerson(pDTOToEditedPerson, person.getPhones().get(0).getPhoneNumber());
+
+        assertTrue(newHobby.getName().equals(acctualPersonDTO.getHobbies().get(0).getName())
+                && newHobby.getWikiLink().equals(acctualPersonDTO.getHobbies().get(0).getWikiLink())
+                && newHobby.getCategory().equals(acctualPersonDTO.getHobbies().get(0).getCategory())
+                && newHobby.getType().equals(acctualPersonDTO.getHobbies().get(0).getType()));
     }
 
     //Negativ test
@@ -203,22 +327,21 @@ public class PersonFacadeTest {
     @Test
     void testAddHobby() throws Exception {
         EntityManager em = emf.createEntityManager();
-
         Hobby hobby2 = new Hobby("Ping Pong", "smash med battet", "boldspill", "freeforall altid bro");
-        hobbies.add(hobby2);
-        em.getTransaction().begin();
-        em.persist(hobby2);
-        em.getTransaction().commit();
-        em.close();
-//        person.getHobbies().forEach(h -> {
-//            System.out.println(h.getName());
-//        });
-        facade.addHobbyToPerson(person.getId(), "Ping Pong");
-        assertEquals(person.getHobbies().size(), 2);
+        try {
+            em.getTransaction().begin();
+            em.persist(hobby2);
+            em.getTransaction().commit();
+            facade.addHobbyToPerson(person.getId(), new HobbyDTO(hobby2));
+            person = em.find(Person.class, person.getId());
+        } finally {
+            em.close();
+        }
+        assertEquals(2, person.getHobbies().size());
     }
 
     @Test
-    void testAddhone() throws Exception {
+    void testAddphone() throws Exception {
         EntityManager em = emf.createEntityManager();
 
         Phone phone2 = new Phone(23112314, "Club");
@@ -227,11 +350,8 @@ public class PersonFacadeTest {
         em.persist(phone2);
         em.getTransaction().commit();
         em.close();
-//        person.getHobbies().forEach(h -> {
-//            System.out.println(h.getName());
-//        });
-        facade.addPhoneToPerson(person.getId(), 23112314);
-        assertEquals(person.getPhones().size(), 2);
+        PersonDTO personDTOExpected = facade.addPhoneToPerson(person.getId(), 23112314);
+        assertEquals(2, personDTOExpected.getPhones().size());
     }
 
     @Test
@@ -246,17 +366,16 @@ public class PersonFacadeTest {
 //        person.getHobbies().forEach(h -> {
 //            System.out.println(h.getName());
 //        });
-        facade.addHobbyToPerson(person.getId(), "Ping Pong");
+        facade.addHobbyToPerson(person.getId(), new HobbyDTO(hobby2));
         facade.removeHobby(person.getId(), "Ping Pong");
-                assertEquals(1, person.getHobbies().size());
+        assertEquals(1, person.getHobbies().size());
     }
-
 
     @Test
     void testPhoneRemoval() throws Exception {
         EntityManager em = emf.createEntityManager();
 
-        Phone phone2 = new Phone( 33224512, "Work");
+        Phone phone2 = new Phone(33224512, "Work");
         em.getTransaction().begin();
         em.persist(phone2);
         em.getTransaction().commit();
@@ -266,7 +385,7 @@ public class PersonFacadeTest {
 //        });
         facade.addPhoneToPerson(person.getId(), 33224512);
         facade.removePhone(person.getId(), 33224512);
-                assertEquals(1, person.getPhones().size());
+        assertEquals(1, person.getPhones().size());
     }
 
 }

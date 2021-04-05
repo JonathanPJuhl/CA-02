@@ -12,6 +12,7 @@ public class AddressDTO {
     private CityInfoDTO cityInfoDto;
     String zip;
 
+    
     public AddressDTO(Address address, String zip) {
         this.street = address.getStreet();
         this.additionalInfo = address.getAdditionalInfo();

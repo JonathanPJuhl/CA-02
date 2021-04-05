@@ -1,9 +1,7 @@
 package dtos;
 
-
 import entities.Address;
 import entities.CityInfo;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,23 +16,18 @@ public class CityInfoDTO {
         this.zip = ci.getZip();
         this.cityName = ci.getCityName();
     }
+
     public CityInfoDTO(String zip, String cityName) {
         this.zip = zip;
         this.cityName = cityName;
     }
-/*    public CityInfoDTO(int zip, String cityName) {
-        this.zip = zip;
-        this.cityName = cityName;
-    }*/
-
     
-    
-  public static List<AddressDTO> getDtos(List<Address> adresses){
+    public static List<AddressDTO> getDtos(List<Address> adresses) {
         List<AddressDTO> addressDtos = new ArrayList();
-        adresses.forEach(adrs->addressDtos.add(new AddressDTO(adrs)));
+        adresses.forEach(adrs -> addressDtos.add(new AddressDTO(adrs)));
         return addressDtos;
     }
-    
+
     public String getZip() {
         return zip;
     }
@@ -59,6 +52,4 @@ public class CityInfoDTO {
         this.adresses = adresses;
     }
 
-    
-    
 }

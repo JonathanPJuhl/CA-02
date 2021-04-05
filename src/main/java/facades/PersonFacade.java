@@ -1,11 +1,21 @@
 package facades;
 
+
+import dtos.AddressDTO;
+import dtos.CityInfoDTO;
+import dtos.HobbyDTO;
+import dtos.PersonDTO;
+import dtos.Person_UltraDTO;
+import dtos.PhoneDTO;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dtos.*;
+
 import entities.*;
 import errorhandling.ArgumentNullException;
 import errorhandling.ExceptionDTO;
+import errorhandling.IllegalPhoneException;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -55,9 +65,9 @@ public class PersonFacade {
 
 
         try {
-            em.getTransaction().begin();
-            em.persist(pers);
-            em.getTransaction().commit();
+            //em.getTransaction().begin();
+            //em.persist(pers);
+            //em.getTransaction().commit();
 
             for (PhoneDTO p : pDTO.getPhones()) {
                 pers.addPhone(new Phone(p.getPhoneNumber(), p.getTypeOfNumber()));
@@ -103,104 +113,135 @@ public class PersonFacade {
         return query.getSingleResult();
     }
 
+
     public PersonDTO validatePersonDTO(PersonDTO pdto) throws ArgumentNullException { //???
         if (pdto.getEmail() == null
                 || pdto.getFirstName() == null
-                || pdto.getEmail() == null) {
-            throw new ArgumentNullException("En personegenskab er null", 400); //?????? - TODO Tilpas til bedre exception
+                || pdto.getEmail() == null
+                || pdto.getAddress() == null
+                || pdto.getHobbies().contains(null)
+                || pdto.getPhones().contains(null)
+                || pdto.getCityInfoDTO() == null) {
+            throw new ArgumentNullException("En personegenskab er null", 400);
         }
         return pdto;
     }
 
-    public Person findPersonByID(int personDTOID, EntityManager em) {
-        Query query = em.createQuery("SELECT p FROM Person p WHERE p.id =:id", Person.class);
-        query.setParameter("id", personDTOID);
-
-        return (Person) query.getSingleResult();
+    public Person findPersonByID(int phoneNumber, EntityManager em) {
+        TypedQuery<Phone> query = em.createQuery("SELECT ph FROM Phone ph WHERE ph.phoneNumber =:number", Phone.class);
+        query.setParameter("number", phoneNumber);
+        Phone phone = query.getSingleResult();
+        return phone.getPerson();
     }
 
-    public PersonDTO updatePerson(PersonDTO newPersonDTO, int oldPersonID) throws ArgumentNullException, NullPointerException { //TODO overveje måske et objekt istedet for int ?
+    public Address findAdressByAddressDTO(AddressDTO addressdto, EntityManager em) {
+        TypedQuery<Address> addressQuery = em.createQuery("SELECT a FROM Adress a WHERE a.street =:street AND a.additionalInfo = :additionalInfo", Address.class);
+        addressQuery.setParameter("street", addressdto.getStreet());
+        addressQuery.setParameter("additionalInfo", addressdto.getAdditionalInfo());
 
+        return addressQuery.getSingleResult();
+    }
+
+    private boolean validatePhone(int phoneNumber) throws IllegalPhoneException {
+        boolean allGood = true;
+        if (String.valueOf(phoneNumber).length() != 8) {
+            allGood = false;
+        }
+        return allGood;
+    }
+
+    public PersonDTO updatePerson(PersonDTO newPersonDTO, int oldPersonPhoneNumber) throws ArgumentNullException {
+        Address newAddress;
         EntityManager em = emf.createEntityManager();
-        PersonDTO updatedPersonDTO;
+        EntityManager emPhone = emf.createEntityManager();
         Person personFromDB;
-        Person personUpdated = null;
+        Person newPersonToUpdate = new Person();
+        Person personUpdated = new Person();
+        List<Phone> newListOfPhones = new ArrayList<>();
+        List<PhoneDTO> extraPhonesDTOs = new ArrayList<>();
+        List<Hobby> emptyOfHobbies = new ArrayList<>();
+        Phone phone;
+        PhoneDTO phoneNew;
+        Phone phoneToDelete;
+
+        validatePersonDTO(newPersonDTO);
+
+        /*  newPersonDTO.getPhones().forEach(phone ->{ 
+                validatePhone(phone.getPhoneNumber());
+            throw new IllegalPhoneException(406, "Phone number contains 8 digits");
+            });*/
+        personFromDB = findPersonByID(oldPersonPhoneNumber, em);
+
+        personFromDB.setFirstName(newPersonDTO.getFirstName());
+        personFromDB.setLastName(newPersonDTO.getLastName());
+        personFromDB.setEmail(newPersonDTO.getEmail());
+
+        //Phones
+        newPersonDTO.getPhones().forEach(phoneDTO -> {
+            extraPhonesDTOs.add(phoneDTO);
+        });
+
+        //Makes sure that personFromDB's list of phones isn't larger than the new list og phonesDTOs
+        while (newPersonDTO.getPhones().size() < personFromDB.getPhones().size()) {
+            personFromDB.getPhones().remove(newPersonDTO.getPhones().size() - 1);
+        }
+
+        //Sets new phones instead of old once but keeps id
+        for (int i = 0; i < newPersonDTO.getPhones().size(); i++) {
+            try {
+                phone = personFromDB.getPhones().get(i);
+                phoneNew = newPersonDTO.getPhones().get(i);
+                phone.setPhoneNumber(phoneNew.getPhoneNumber());
+                phone.setTypeOfNumber(phoneNew.getTypeOfNumber());
+                extraPhonesDTOs.remove(phoneNew);
+            } catch (Exception e) {
+                break;
+
+            }
+        }
+
+        //Persist new phones if there is more phones i the new list og phones
+        if (!(extraPhonesDTOs.isEmpty())) {
+            try {
+                emPhone.getTransaction().begin();
+                for (PhoneDTO pdto : extraPhonesDTOs) {
+                    Phone phoneToAdd = new Phone(pdto.getPhoneNumber(), pdto.getTypeOfNumber());
+                    emPhone.persist(phoneToAdd);
+                    TypedQuery<Phone> pQuery = emPhone.createQuery("SELECT p FROM Phone p WHERE p.phoneNumber =:number", Phone.class);
+                    pQuery.setParameter("number", pdto.getPhoneNumber());
+                    personFromDB.addPhone(pQuery.getSingleResult());
+
+                }
+                emPhone.getTransaction().commit();
+            } finally {
+                emPhone.close();
+            }
+        }
+
+        //Adresses and City information
+        newAddress = new Address(newPersonDTO.getAddress().getStreet(), newPersonDTO.getAddress().getAdditionalInfo());
+        personFromDB.getAddress().setStreet(newAddress.getStreet());
+        personFromDB.getAddress().setAdditionalInfo(newAddress.getAdditionalInfo());
+        CityInfo newCityInfo = new CityInfo(newPersonDTO.getCityInfoDTO().getZip(), newPersonDTO.getCityInfoDTO().getCityName());
+        personFromDB.getAddress().getCityInfo().setZip(newCityInfo.getZip());
+        personFromDB.getAddress().getCityInfo().setCityName(newCityInfo.getCityName());
+
+        //Hobbies - resets old list and adds the new hobbies
+        newPersonDTO.getHobbies().forEach((hDTO) -> {
+            personFromDB.setHobbies(emptyOfHobbies);
+            personFromDB.addHobby(new Hobby(hDTO.getName(), hDTO.getWikiLink(), hDTO.getCategory(), hDTO.getType()));
+        });
+
         try {
             em.getTransaction().begin();
-
-
-            /*if (newData.getFirstName() != null) { */
-            validatePersonDTO(newPersonDTO);
-            personFromDB = findPersonByID(oldPersonID, em);
-            if (personFromDB == null) {
-                throw new NullPointerException("Person to update doesn't exist");
-            }
-            personFromDB.setEmail(newPersonDTO.getEmail());
-            personFromDB.setFirstName(newPersonDTO.getFirstName());
-            personFromDB.setLastName(newPersonDTO.getLastName());
             em.merge(personFromDB);
-            personUpdated = findPersonByID(personFromDB.getId(), em);
-
-            /*if (newData.getFirstName() != null) {
-
-            Query query = em.createQuery("UPDATE Person p SET p.firstName =:newFirstName WHERE p.id =:id");
-            query.setParameter("newFirstName", newData.getFirstName());
-            query.setParameter("id", newData.getId());
-            query.executeUpdate();
-        }
-        if (newData.getLastName() != null) {
-            Query query2 = em.createQuery("UPDATE Person p SET p.lastName =:newLastName WHERE p.id =:id");
-            query2.setParameter("newLastName", newData.getLastName());
-            query2.setParameter("id", newData.getId());
-            query2.executeUpdate();
-        }
-        if (newData.getAddress() != null) {
-            Query query3 = em.createQuery("UPDATE Person p SET p.address =:newAddress WHERE p.id =:id");
-            query3.setParameter("newAddress", newData.getAddress());
-            query3.setParameter("id", newData.getId());
-            query3.executeUpdate();
-        }
-        if (newData.getEmail() != null) {
-            Query query4 = em.createQuery("UPDATE Person p SET p.email =:newEmail WHERE p.id =:id");
-            query4.setParameter("newEmail", newData.getEmail());
-            query4.setParameter("id", newData.getId());
-            query4.executeUpdate();
-        }
-
-        if (newData.getHobbies() != null) {
-           // TypedQuery<Person_UltraDTO> query7777 = em.createQuery("UPDATE new dtos.Person_UltraDTO (p.hobbyName, p.description) FROM Person p JOIN p.hobbies", Person_UltraDTO.class);
-           // TypedQuery<Person_UltraDTO> query5 = em.createQuery("UPDATE Hobby h SET (h.description =:description, h.hobbyName =:hobbyName) WHERE t.id in (select t1.id from Team t1  LEFT JOIN t1.members m WHERE t1.current = :current_true AND m.account = :account)", Person_UltraDTO.class);
-            TypedQuery<Person_UltraDTO> query6 = em.createQuery("UPDATE Hobby h SET h.description =:description, h.hobbyName =:hobbyName WHERE h.id in (select h1.id from Hobby h1  LEFT JOIN h1.persons p WHERE h1.id = :hobbyID AND p.id = :personID)", Person_UltraDTO.class);
-            TypedQuery<Person_UltraDTO> query7 = em.createQuery("UPDATE Person p SET p.hobbies =: hobby WHERE p.id in (select p1.id from Person p1  LEFT JOIN p1.hobbies h WHERE h.hobbyName = :hobbyName AND p.id = :personID)", Person_UltraDTO.class);
-            query7.setParameter("hobby", newData.getHobbies());
-            query7.setParameter("hobbyName", newData.getHobbies().get(0).getHobbyName());
-            query7.setParameter("personID", newData.getId());
-
-
-
-            
-            
-            //TypedQuery<PersonStyleDTO> q4 = em.createQuery("SELECT new dto.PersonStyleDTO(p.name, p.year, s.styleName) FROM Person p JOIN p.styles s", dto.PersonStyleDTO.class);
-
-            
-            
-//            Query query5 = em.createQuery("UPDATE Person SET Person =:newEmail WHERE person.id =:id");
-
-
-//            
-//            query5.setParameter("newEmail", newData.getEmail());
-//            query5.setParameter("id", newData.getId());
-//            query5.executeUpdate();
-        }*/
+            personUpdated = em.find(Person.class, personFromDB.getId());
             em.getTransaction().commit();
-        } catch (ArgumentNullException ex) {
-            Logger.getLogger(PersonResource.class.getName()).log(Level.SEVERE, null, ex);
-            ex.getErrorCode();
-            throw ex;
+
         } finally {
             em.close();
         }
-        return new PersonDTO(personUpdated);
+        return new PersonDTO(personUpdated, true);
     }
 
     public int getPersonIDByNameAndNumber(PersonDTO personDTO) {
@@ -226,29 +267,23 @@ public class PersonFacade {
 
     }
 
-    public void addHobbyToPerson(int id, String hobbyAdded) throws Exception {
+    public void addHobbyToPerson(int id, HobbyDTO hobbyDTO) throws Exception {
         EntityManager em = emf.createEntityManager();
         Hobby hobbyToBeAdded;
+        Person personToBeEdited;
 
         try {
 
             em.getTransaction().begin();
-            Query aPerson = em.createQuery("SELECT p FROM Person p WHERE p.id=:id");
-            aPerson.setParameter("id", id);
-            Person personToBeEdited = (Person) aPerson.getSingleResult();
-
-            if (personToBeEdited == null) {
-                throw new Exception("Person does not exist in DataBase");
-            }
-
-            Query aHobby = em.createQuery("SELECT h FROM Hobby h WHERE h.name=:name");
-            aHobby.setParameter("name", hobbyAdded);
-            hobbyToBeAdded = (Hobby) aHobby.getSingleResult();
+            TypedQuery<Hobby> hobbyQ = em.createQuery("SELECT h FROM Hobby h WHERE h.name =:name", Hobby.class);
+            hobbyQ.setParameter("name", hobbyDTO.getName());
+            hobbyToBeAdded = hobbyQ.getSingleResult();
 
             if (hobbyToBeAdded == null) {
                 throw new Exception("The hobby refered by the given hobby name does not currently exist within our databases");
             }
 
+            personToBeEdited = em.find(Person.class, id);
             personToBeEdited.addHobby(hobbyToBeAdded);
 
             em.merge(personToBeEdited);
@@ -259,9 +294,10 @@ public class PersonFacade {
         }
     }
 
-    public void addPhoneToPerson(int id, int number) throws Exception {
+    public PersonDTO addPhoneToPerson(int id, int number) throws Exception {
         EntityManager em = emf.createEntityManager();
         Phone phoneToBeAdded;
+        Person personResult = null;
 
         try {
             em.getTransaction().begin();
@@ -284,10 +320,12 @@ public class PersonFacade {
 
             em.merge(personToBeEdited);
             em.getTransaction().commit();
+            personResult = em.find(Person.class, personToBeEdited.getId());
 
         } finally {
             em.close();
         }
+        return new PersonDTO(personResult, true);
     }
 
     public void removeHobby(int id, String hobbyRemove) throws Exception {
