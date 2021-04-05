@@ -1,6 +1,8 @@
 
 package entities;
 
+import dtos.CityInfoDTO;
+
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -23,6 +25,7 @@ public class Address implements Serializable {
     private int id;
     private String street;
     private String additionalInfo;
+    //private String zip;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     private CityInfo cityInfo;
@@ -33,19 +36,32 @@ public class Address implements Serializable {
     public Address() {
     }
 
-    public Address(String street, String additionalInfo) {
+  /*  public Address(String street, String additionalInfo, String zip) {
+        this.street = street;
+        this.additionalInfo = additionalInfo;
+        this.zip = zip;
+
+    }*/public Address(String street, String additionalInfo) {
         this.street = street;
         this.additionalInfo = additionalInfo;
 
+
     }
+    /*public Address(String street, String additionalInfo, CityInfoDTO cDTO) {
+        this.street = street;
+        this.additionalInfo = additionalInfo;
+        this.cityInfo = cDTO.
+    }*/
     
         public void addCityInfo(CityInfo cityInfo){
         if (cityInfo != null){
            this.setCityInfo(cityInfo);
-           //address.addPerson(this);
+            cityInfo.addAddress(this);
           }
     }
-    
+
+
+
     public int getId() {
         return id;
     }

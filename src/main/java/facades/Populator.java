@@ -32,6 +32,7 @@ public class Populator {
         CityInfoDTO ci = new CityInfoDTO(new CityInfo("7777777", "Virum"));
         CityInfoDTO ci2 = new CityInfoDTO(new CityInfo("8888888", "Lyngby"));
         CityInfoDTO ci3 = new CityInfoDTO(new CityInfo("9999999", "Helvete"));
+
         AddressDTO ad = new AddressDTO( new Address("Street", "Additional"));
         AddressDTO ad2 = new AddressDTO( new Address("Street2", "In addition"));
         AddressDTO ad3 = new AddressDTO( new Address("Street3", "Also this"));
@@ -48,13 +49,15 @@ public class Populator {
         PhoneDTO phone = new PhoneDTO(new Phone(2134566, "home"));
         PhoneDTO phone2 = new PhoneDTO(new Phone(483927398, "home"));
         PhoneDTO phone3 = new PhoneDTO(new Phone(12928382, "home"));
+        PhoneDTO phone4 = new PhoneDTO(new Phone(4839273, "home"));
+        PhoneDTO phone5 = new PhoneDTO(new Phone(1292838211, "home"));
         //pF.createPhone(phone);
         //PhoneDTO phoneFromDB = pF.getPhoneFromDB(phone);
         phones.add(phone);
         phones.add(phone2);
         phones.add(phone3);
-        phones2.add(phone2);
-        phones3.add(phone3);
+        phones2.add(phone4);
+        phones3.add(phone5);
         HobbyDTO hobby = new HobbyDTO(new Hobby("Fodbold", "spark til bolden og fake skader","boldspill", "teamsport"));
         HobbyDTO hobby2 = new HobbyDTO(new Hobby("Håndbold", "kast bolden og rigtige skader","boldspill", "teamsport"));
         HobbyDTO hobby3 = new HobbyDTO(new Hobby("Tennis", "sving til bolden og ingen skader","boldspill", "teamsport"));
@@ -80,10 +83,10 @@ public class Populator {
         pDTO.setHobbies(hobbies);
         pDTO2.setHobbies(hobbies2);
         pDTO3.setHobbies(hobbies3);
-        fe.create(pDTO);
+        /*fe.create(pDTO);
         fe.create(pDTO2);
         fe.create(pDTO3);
-
+*/
         /*CityInfo ci2 = new CityInfo(2800, "Lyngby");
         Address ad2 = new Address("Street", "Additional", ci2);
         List<Phone> phones2 = new ArrayList<Phone>();

@@ -21,7 +21,7 @@ public class CityInfoDTO {
         this.zip = zip;
         this.cityName = cityName;
     }
-
+    
     public static List<AddressDTO> getDtos(List<Address> adresses) {
         List<AddressDTO> addressDtos = new ArrayList();
         adresses.forEach(adrs -> addressDtos.add(new AddressDTO(adrs)));

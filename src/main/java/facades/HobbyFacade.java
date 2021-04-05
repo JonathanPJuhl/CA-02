@@ -4,6 +4,7 @@ import dtos.HobbyDTO;
 
 import entities.Hobby;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -18,6 +19,22 @@ public class HobbyFacade {
 
     private static HobbyFacade instance;
     private static EntityManagerFactory emf;
+
+
+    public List<HobbyDTO> findHobbyByName(String hobbyName){
+        String[] arr = hobbyName.split(",");
+        EntityManager em = emf.createEntityManager();
+        List<HobbyDTO> hDTO = new ArrayList<>();
+        for (String hobby: arr
+             ) {
+            TypedQuery<Hobby> query = em.createQuery("SELECT h FROM Hobby h WHERE h.name = :hobby", Hobby.class);
+            query.setParameter("hobby", hobby);
+            hDTO.add(new HobbyDTO(query.getSingleResult()));
+        }
+
+
+        return hDTO;
+    }
 
     //Private Constructor to ensure Singleton
     private HobbyFacade() {
@@ -67,7 +84,7 @@ public class HobbyFacade {
 
     public HobbyDTO getHobbyFromDB(HobbyDTO hobby){
         EntityManager em = emf.createEntityManager();
-        TypedQuery<Hobby> hobbyFromDB = em.createQuery("SELECT h FROM Hobby h WHERE h.hobbyName = :a1", Hobby.class);
+        TypedQuery<Hobby> hobbyFromDB = em.createQuery("SELECT h FROM Hobby h WHERE h.name = :a1", Hobby.class);
         hobbyFromDB.setParameter("a1", hobby.getName());
         return new HobbyDTO(hobbyFromDB.getSingleResult());
     }

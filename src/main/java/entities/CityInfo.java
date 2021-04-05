@@ -43,12 +43,12 @@ public class CityInfo implements Serializable {
         return zip;
     }
 
-    public String getCityName() {
-        return cityName;
-    }
-
     public void setZip(String zip) {
         this.zip = zip;
+    }
+
+    public String getCityName() {
+        return cityName;
     }
 
     public void setCityName(String cityName) {

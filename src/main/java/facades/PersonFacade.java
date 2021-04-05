@@ -1,11 +1,17 @@
 package facades;
 
+
 import dtos.AddressDTO;
 import dtos.CityInfoDTO;
 import dtos.HobbyDTO;
 import dtos.PersonDTO;
 import dtos.Person_UltraDTO;
 import dtos.PhoneDTO;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import dtos.*;
+
 import entities.*;
 import errorhandling.ArgumentNullException;
 import errorhandling.ExceptionDTO;
@@ -52,6 +58,12 @@ public class PersonFacade {
     public PersonDTO create(PersonDTO pDTO) {
         EntityManager em = emf.createEntityManager();
         Person pers = new Person(pDTO.getEmail(), pDTO.getFirstName(), pDTO.getLastName());
+
+
+
+
+
+
         try {
             em.getTransaction().begin();
             em.persist(pers);
@@ -76,6 +88,8 @@ public class PersonFacade {
             pers.addAddress(address);
             //pers.getAddress().setCityInfo(getCityInfo(new CityInfoDTO(pDTO.getCityInfoDTO().getZip(), pDTO.getCityInfoDTO().getCityName())));
 
+
+
             em.getTransaction().begin();
             em.merge(pers);
             em.getTransaction().commit();
@@ -91,14 +105,14 @@ public class PersonFacade {
         return pDTO;
 
     }
-
-    public CityInfo getCityInfo(CityInfoDTO cdto) {
+    public CityInfo getCityInfo(CityInfoDTO cdto){
         EntityManager em = emf.createEntityManager();
         TypedQuery<CityInfo> query = em.createQuery("SELECT c FROM CityInfo c WHERE c.zip =:zip", CityInfo.class);
         query.setParameter("zip", cdto.getZip());
 
         return query.getSingleResult();
     }
+
 
     public PersonDTO validatePersonDTO(PersonDTO pdto) throws ArgumentNullException { //???
         if (pdto.getEmail() == null
@@ -427,6 +441,37 @@ public class PersonFacade {
             Person pToBeDeleted = aPerson.getSingleResult();
             em.remove(pToBeDeleted);
             em.getTransaction().commit();
+        } finally {
+            em.close();
+        }
+    }
+
+    public PersonDTO getByPhone(int phoneNr) {
+        EntityManager em = emf.createEntityManager();
+
+        try {
+            em.getTransaction().begin();
+
+            //TypedQuery<Person> aPerson = em.createQuery("SELECT p FROM Person p JOIN p.phones pp WHERE pp.phoneNumber = :phone", Person.class);
+            TypedQuery<Phone> aPerson = em.createQuery("SELECT p FROM Phone p WHERE p.phoneNumber = :phone", Phone.class);
+            TypedQuery<Address> cityInfo = em.createQuery("SELECT a FROM Address a WHERE a.id = :aID", Address.class);
+            aPerson.setParameter("phone", phoneNr);
+
+            Phone phone = aPerson.getSingleResult();
+
+            Person p = phone.getPerson();
+            cityInfo.setParameter("aID", p.getAddress().getId());
+            CityInfoDTO ciDTO = new CityInfoDTO(cityInfo.getSingleResult().getCityInfo());
+            em.getTransaction().commit();
+            List<HobbyDTO> hDTO = new ArrayList<>();
+            for(Hobby h: p.getHobbies()){
+                hDTO.add(new HobbyDTO(h));
+            }
+            List<PhoneDTO> pDTO = new ArrayList<>();
+            for(Phone po: p.getPhones()){
+                pDTO.add(new PhoneDTO(po));
+            }
+            return new PersonDTO(p, new AddressDTO(p.getAddress(), ciDTO),pDTO, hDTO);
         } finally {
             em.close();
         }
