@@ -17,12 +17,17 @@ public class CityInfoDTO {
         this.cityName = ci.getCityName();
     }
 
+
     public CityInfoDTO(String zip, String cityName) {
         this.zip = zip;
         this.cityName = cityName;
     }
 
-    public static List<AddressDTO> getDtos(List<Address> adresses) {
+
+    
+    
+  public static List<AddressDTO> getDtos(List<Address> adresses){
+
         List<AddressDTO> addressDtos = new ArrayList();
         adresses.forEach(adrs -> addressDtos.add(new AddressDTO(adrs)));
         return addressDtos;

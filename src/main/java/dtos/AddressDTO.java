@@ -10,17 +10,29 @@ public class AddressDTO {
     private String street;
     private String additionalInfo;
     private CityInfoDTO cityInfoDto;
+    String zip;
 
-//    public AddressDTO(Address address, CityInfoDTO cityInfoDto) {
-//        this.street = address.getStreet();
-//        this.additionalInfo = address.getAdditionalInfo();
-//        this.cityInfoDto = cityInfoDto;
-//    }
+    public AddressDTO(Address address, String zip) {
+        this.street = address.getStreet();
+        this.additionalInfo = address.getAdditionalInfo();
+        this.zip = zip;
+    }
+
+    public AddressDTO(Address address, CityInfoDTO c) {
+        this.street = address.getStreet();
+        this.additionalInfo = address.getAdditionalInfo();
+        this.cityInfoDto = c;
+    }
+
 
     public AddressDTO(Address address) {
         this.street = address.getStreet();
         this.additionalInfo = address.getAdditionalInfo();
        // this.cityInfoDto = new CityInfoDTO(address.getCityInfo());
+    }
+
+    public String getZip() {
+        return zip;
     }
 
     public String getStreet() {

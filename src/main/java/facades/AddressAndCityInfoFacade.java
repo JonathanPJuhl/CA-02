@@ -4,6 +4,8 @@ import dtos.AddressDTO;
 import dtos.CityInfoDTO;
 import entities.Address;
 import entities.CityInfo;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -39,13 +41,13 @@ public class AddressAndCityInfoFacade {
         return emf.createEntityManager();
     }
 
-    public AddressDTO createAddress(AddressDTO address) {
+    /*public AddressDTO createAddress(AddressDTO address) {
        // CityInfo ci2 = new CityInfo(ci.getZip(), ci.getCityName());
-        Address address1 = new Address(address.getStreet(), address.getAdditionalInfo());
+       // Address address1 = new Address(address.getStreet(), address.getAdditionalInfo());
 
-       /* for (HobbyDTO h : pDTO.getHobbies()) {
+       *//* for (HobbyDTO h : pDTO.getHobbies()) {
             pers.addHobby(new Hobby(h.getHobbyName(), h.getDescription()));
-        }*/
+        }*//*
 
 
 
@@ -60,7 +62,7 @@ public class AddressAndCityInfoFacade {
             em.close();
         }
         return new AddressDTO(address1);
-    }
+    }*/
     public CityInfoDTO createCityInfo(CityInfoDTO cityInfo) {
 
         CityInfo ci = new CityInfo(cityInfo.getZip(), cityInfo.getCityName());
@@ -101,13 +103,19 @@ public class AddressAndCityInfoFacade {
         }
 
     }
-    /*
-    public List<RenameMeDTO> getAll(){
+    
+    public List<CityInfoDTO> getAll(){
+        List<CityInfoDTO> LISTEADTOER = new ArrayList();
+        
         EntityManager em = emf.createEntityManager();
-        TypedQuery<RenameMe> query = em.createQuery("SELECT r FROM RenameMe r", RenameMe.class);
-        List<RenameMe> rms = query.getResultList();
-        return RenameMeDTO.getDtos(rms);
-    }*/
+        TypedQuery<CityInfo> query = em.createQuery("SELECT r FROM CityInfo r", CityInfo.class);
+        List<CityInfo> rms = query.getResultList();
+        for (CityInfo rm : rms) {
+            LISTEADTOER.add(new CityInfoDTO(rm));
+            
+        }
+        return LISTEADTOER;
+    }
 
  /*
     public static void main(String[] args) {
