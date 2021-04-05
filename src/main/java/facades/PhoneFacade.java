@@ -53,10 +53,10 @@ public class PhoneFacade {
         return new PhoneDTO(phone1);
     }
 
-    public PhoneDTO getPhoneFromDB(PhoneDTO phone){
+    public PhoneDTO getPhoneFromDB(int phone){
         EntityManager em = emf.createEntityManager();
         TypedQuery<Phone> phoneFromDB = em.createQuery("SELECT p FROM Phone p WHERE p.phoneNumber = :a1", Phone.class);
-        phoneFromDB.setParameter("a1", phone.getPhoneNumber());
+        phoneFromDB.setParameter("a1", phone);
         return new PhoneDTO(phoneFromDB.getSingleResult());
     }
 

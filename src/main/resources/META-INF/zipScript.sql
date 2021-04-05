@@ -1803,3 +1803,4 @@ INSERT INTO HOBBY (name,wikiLink,category,type)  VALUES ('Gongoozler','https://e
 INSERT INTO HOBBY (name,wikiLink,category,type)  VALUES ('Satellitovervågning','https://en.wikipedia.org/wiki/Satellite_watching','Observation','Udendørs');
 INSERT INTO HOBBY (name,wikiLink,category,type)  VALUES ('Trainspotting (hobby)','https://en.wikipedia.org/wiki/Trainspotting_(hobby)','Observation','Udendørs');
 INSERT INTO HOBBY (name,wikiLink,category,type)  VALUES ('Hvalsafari','https://en.wikipedia.org/wiki/Whale_watching','Observation','Udendørs');
+ALTER TABLE HOBBY  ADD UNIQUE (name);

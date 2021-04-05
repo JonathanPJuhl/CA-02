@@ -35,6 +35,12 @@ public class HobbyFacade {
 
         return hDTO;
     }
+    public Hobby findSingleHobbyByName(String hobbyName){
+        EntityManager em = emf.createEntityManager();
+            TypedQuery<Hobby> query = em.createQuery("SELECT h FROM Hobby h WHERE h.name = :hobby", Hobby.class);
+            query.setParameter("hobby", hobbyName);
+        return query.getSingleResult();
+    }
 
     //Private Constructor to ensure Singleton
     private HobbyFacade() {
