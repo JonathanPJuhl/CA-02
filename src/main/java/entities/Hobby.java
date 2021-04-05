@@ -47,6 +47,12 @@ public class Hobby implements Serializable {
         this.type = type;
         this.persons = new ArrayList<>();
     }
+    public void addPerson(Person pers) {
+        if (pers != null) {
+            this.persons.add(pers);
+            pers.getHobbies().add(this);
+        }
+    }
  
     public int getId() {
         return id;

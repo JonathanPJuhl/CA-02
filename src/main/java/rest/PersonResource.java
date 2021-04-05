@@ -6,6 +6,7 @@ import dtos.HobbyDTO;
 import dtos.PersonDTO;
 import entities.Person;
 import errorhandling.ArgumentNullException;
+import facades.PhoneFacade;
 import utils.EMF_Creator;
 import facades.PersonFacade;
 import java.util.List;
@@ -33,6 +34,7 @@ public class PersonResource {
     private static final EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();
 
     private static final PersonFacade FACADE = PersonFacade.getPersonFacade(EMF);
+    private static final PhoneFacade PHONEFACADE = PhoneFacade.getPersonFacade(EMF);
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
 
@@ -157,5 +159,10 @@ public class PersonResource {
 
         return GSON.toJson(FACADE.getByPhone(phoneNr));
     }
-
+    @Path("getPhoneObjectByNr/{phoneNr}")
+    @GET
+    @Produces({MediaType.APPLICATION_JSON})
+    public String getPhoneObjByNr(@PathParam("phoneNr") int phoneNr){
+        return GSON.toJson(PHONEFACADE.getPhoneFromDB(phoneNr));
+    }
 }

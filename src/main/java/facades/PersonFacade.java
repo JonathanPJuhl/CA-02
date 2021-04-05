@@ -57,28 +57,28 @@ public class PersonFacade {
 
     public PersonDTO create(PersonDTO pDTO) {
         EntityManager em = emf.createEntityManager();
+        EntityManager em2 = emf.createEntityManager();
         Person pers = new Person(pDTO.getEmail(), pDTO.getFirstName(), pDTO.getLastName());
 
-
-
-
-
-
         try {
-            //em.getTransaction().begin();
-            //em.persist(pers);
-            //em.getTransaction().commit();
+            em.getTransaction().begin();
+            em.persist(pers);
+            em.getTransaction().commit();
 
             for (PhoneDTO p : pDTO.getPhones()) {
                 pers.addPhone(new Phone(p.getPhoneNumber(), p.getTypeOfNumber()));
             }
 
-            for (HobbyDTO h : pDTO.getHobbies()) {
 
-                Hobby hobby = new Hobby(h.getName(), h.getWikiLink(), h.getCategory(), h.getType());
+            for (HobbyDTO h : pDTO.getHobbies()) {
+                HobbyFacade hf = HobbyFacade.getHobbyFacade(emf);
+                Hobby hobby = hf.findSingleHobbyByName(h.getName());
 
                 pers.addHobby(hobby);
-
+                hobby.addPerson(pers);
+                /*em.getTransaction().begin();
+                em.merge(hobby);
+                em.getTransaction().commit();*/
             }
             Address address = new Address(pDTO.getAddress().getStreet(),
                     pDTO.getAddress().getAdditionalInfo());
@@ -90,11 +90,13 @@ public class PersonFacade {
 
 
 
-            em.getTransaction().begin();
-            em.merge(pers);
-            em.getTransaction().commit();
+            em2.getTransaction().begin();
+
+            em2.merge(pers);
+            em2.getTransaction().commit();
         } finally {
             em.close();
+            em2.close();
         }
         return new PersonDTO(pers);
     }
@@ -135,7 +137,7 @@ public class PersonFacade {
     }
 
     public Address findAdressByAddressDTO(AddressDTO addressdto, EntityManager em) {
-        TypedQuery<Address> addressQuery = em.createQuery("SELECT a FROM Adress a WHERE a.street =:street AND a.additionalInfo = :additionalInfo", Address.class);
+        TypedQuery<Address> addressQuery = em.createQuery("SELECT a FROM Address a WHERE a.street =:street AND a.additionalInfo = :additionalInfo", Address.class);
         addressQuery.setParameter("street", addressdto.getStreet());
         addressQuery.setParameter("additionalInfo", addressdto.getAdditionalInfo());
 
@@ -228,8 +230,10 @@ public class PersonFacade {
 
         //Hobbies - resets old list and adds the new hobbies
         newPersonDTO.getHobbies().forEach((hDTO) -> {
+            HobbyFacade hf = HobbyFacade.getHobbyFacade(emf);
+            Hobby hobby = hf.findSingleHobbyByName(hDTO.getName());
             personFromDB.setHobbies(emptyOfHobbies);
-            personFromDB.addHobby(new Hobby(hDTO.getName(), hDTO.getWikiLink(), hDTO.getCategory(), hDTO.getType()));
+            personFromDB.addHobby(hobby);
         });
 
         try {
