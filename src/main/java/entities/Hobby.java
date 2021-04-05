@@ -26,7 +26,7 @@ public class Hobby implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @Column(unique = true)
+    //@Column(unique = true)
     private String name;
     private String wikiLink;
     private String category;

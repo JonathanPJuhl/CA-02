@@ -65,9 +65,9 @@ public class PersonFacade {
 
 
         try {
-            em.getTransaction().begin();
-            em.persist(pers);
-            em.getTransaction().commit();
+            //em.getTransaction().begin();
+            //em.persist(pers);
+            //em.getTransaction().commit();
 
             for (PhoneDTO p : pDTO.getPhones()) {
                 pers.addPhone(new Phone(p.getPhoneNumber(), p.getTypeOfNumber()));
