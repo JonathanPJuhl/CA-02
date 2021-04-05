@@ -113,11 +113,11 @@ public class PersonFacade {
         return pdto;
     }
 
-    public Person findPersonByID(int personDTOID, EntityManager em) {
-        Query query = em.createQuery("SELECT p FROM Person p WHERE p.id =:id", Person.class);
-        query.setParameter("id", personDTOID);
-
-        return (Person) query.getSingleResult();
+    public Person findPersonByID(int phoneNumber, EntityManager em) {
+        TypedQuery<Phone> query = em.createQuery("SELECT ph FROM Phone ph WHERE ph.phoneNumber =:number", Phone.class);
+        query.setParameter("number", phoneNumber);
+        Phone phone = query.getSingleResult();
+        return phone.getPerson();
     }
 
     public Address findAdressByAddressDTO(AddressDTO addressdto, EntityManager em) {
@@ -136,7 +136,7 @@ public class PersonFacade {
         return allGood;
     }
 
-    public PersonDTO updatePerson(PersonDTO newPersonDTO, int oldPersonID) throws ArgumentNullException {
+    public PersonDTO updatePerson(PersonDTO newPersonDTO, int oldPersonPhoneNumber) throws ArgumentNullException {
         Address newAddress;
         EntityManager em = emf.createEntityManager();
         EntityManager emPhone = emf.createEntityManager();
@@ -156,7 +156,7 @@ public class PersonFacade {
                 validatePhone(phone.getPhoneNumber());
             throw new IllegalPhoneException(406, "Phone number contains 8 digits");
             });*/
-        personFromDB = findPersonByID(oldPersonID, em);
+        personFromDB = findPersonByID(oldPersonPhoneNumber, em);
 
         personFromDB.setFirstName(newPersonDTO.getFirstName());
         personFromDB.setLastName(newPersonDTO.getLastName());
@@ -221,7 +221,7 @@ public class PersonFacade {
         try {
             em.getTransaction().begin();
             em.merge(personFromDB);
-            personUpdated = findPersonByID(oldPersonID, em);
+            personUpdated = em.find(Person.class, personFromDB.getId());
             em.getTransaction().commit();
 
         } finally {

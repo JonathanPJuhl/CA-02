@@ -14,6 +14,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -91,20 +92,20 @@ public class PersonResource {
 //    @Consumes({MediaType.APPLICATION_JSON})
 //    @Produces({MediaType.APPLICATION_JSON})
     
-    @Path("{id}")//PhoneNr???
+    @Path("update/{phoneNumber}")
     @PUT
     @Consumes({MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_JSON})
-    public String editPersonByIDAndPersonInfo(@PathParam("id") int iDToEdit, String persInfoForUpdating) { 
-        String jsonPersonDTO;
+    public String editPersonByIDAndPersonInfo(@PathParam("phoneNumber") int phoneNumber, String persInfoForUpdating) { 
+        PersonDTO persDTOEditTo;
+        String personUpdated = null;
         try {
-            PersonDTO persDTOEditTo = GSON.fromJson(persInfoForUpdating, PersonDTO.class);
-            jsonPersonDTO = GSON.toJson(FACADE.updatePerson(persDTOEditTo, iDToEdit));
+            persDTOEditTo = GSON.fromJson(persInfoForUpdating, PersonDTO.class); 
+            personUpdated = GSON.toJson(FACADE.updatePerson(persDTOEditTo, phoneNumber));
         } catch (ArgumentNullException ex) {
             Logger.getLogger(PersonResource.class.getName()).log(Level.SEVERE, null, ex);
-            jsonPersonDTO = ex.getMessage();
         }
-        return jsonPersonDTO;
+        return personUpdated;
     }
 
     @Path("addHobbyToPerson/{id}")
@@ -130,6 +131,16 @@ public class PersonResource {
     @DELETE
     public void removePhone(@PathParam("id") int idOfPerson, String numbr) throws Exception {
         FACADE.removePhone(idOfPerson, Integer.parseInt(numbr));
+    }
+    
+    @POST
+    @Path("create")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public String addPerson(String json) {
+        PersonDTO persDTO = GSON.fromJson(json, PersonDTO.class);
+        PersonDTO persistedPers = FACADE.create(persDTO);
+        return GSON.toJson(persistedPers);
     }
 
 }

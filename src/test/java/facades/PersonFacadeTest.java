@@ -165,11 +165,10 @@ public class PersonFacadeTest {
 
     @Test
     public void testEditPersonSetEmail() throws ArgumentNullException, Exception {
-        int personToChangeID = person.getId();
         PersonDTO pDToExpected = new PersonDTO(person, true);
         pDToExpected.setEmail("wannabemail@hacker.dk");
 
-        PersonDTO pdtoResult = facade.updatePerson(pDToExpected, personToChangeID);
+        PersonDTO pdtoResult = facade.updatePerson(pDToExpected, person.getPhones().get(0).getPhoneNumber());
         assertEquals(pDToExpected.getEmail(), pdtoResult.getEmail());
     }
 
@@ -199,7 +198,7 @@ public class PersonFacadeTest {
         pDTOToEditedPerson.getPhones().get(1).setTypeOfNumber(phoneNew1.getTypeOfNumber());
         Phone phoneNew2 = new Phone(99999999, "Private");
         pDTOToEditedPerson.getPhones().add(new PhoneDTO(phoneNew2));
-        PersonDTO acctualPersonDTO = facade.updatePerson(pDTOToEditedPerson, pers.getId());
+        PersonDTO acctualPersonDTO = facade.updatePerson(pDTOToEditedPerson, person.getPhones().get(0).getPhoneNumber());
 
         assertTrue(phoneNew1.getPhoneNumber() == acctualPersonDTO.getPhones().get(1).getPhoneNumber()
                 && phoneNew1.getTypeOfNumber().equals(acctualPersonDTO.getPhones().get(1).getTypeOfNumber())
@@ -234,7 +233,7 @@ public class PersonFacadeTest {
 
         pDTOToEditedPerson.getPhones().remove(0);
 
-        PersonDTO acctualPersonDTO = facade.updatePerson(pDTOToEditedPerson, pers.getId());
+        PersonDTO acctualPersonDTO = facade.updatePerson(pDTOToEditedPerson,phone1.getPhoneNumber());
 
         assertTrue(phoneNew1.getPhoneNumber() == acctualPersonDTO.getPhones().get(0).getPhoneNumber()
                 && phoneNew1.getTypeOfNumber().equals(acctualPersonDTO.getPhones().get(0).getTypeOfNumber())
@@ -270,7 +269,7 @@ public class PersonFacadeTest {
         pDTOToEditedPerson.getHobbies().get(0).setCategory(newHobby.getCategory());
         pDTOToEditedPerson.getHobbies().get(0).setType(newHobby.getType());
 
-        PersonDTO acctualPersonDTO = facade.updatePerson(pDTOToEditedPerson, pers.getId());
+        PersonDTO acctualPersonDTO = facade.updatePerson(pDTOToEditedPerson, person.getPhones().get(0).getPhoneNumber());
 
         assertTrue(newHobby.getName().equals(acctualPersonDTO.getHobbies().get(0).getName())
                 && newHobby.getWikiLink().equals(acctualPersonDTO.getHobbies().get(0).getWikiLink())
